@@ -1,3 +1,11 @@
+#netbeans
+**/nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
 #picture
 *.ssh
 *.bmp
