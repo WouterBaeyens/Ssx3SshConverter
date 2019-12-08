@@ -36,16 +36,27 @@ public class ByteUtil {
     
     /**
      * Converts array of bytes to a long (using Little Endian format)
-     * @param by byte array that will be converted 
+     * @param bytes byte array that will be converted
      * @return long, with the calculated value of the byte array
      */
-    public static long convertToLongLE(byte[] by){
+    public static long convertToLongLE(byte[] bytes) {
         long value = 0;
-        for (int i = 0; i < by.length; i++)
+        for (int i = 0; i < bytes.length; i++)
         {
-            value += ((long) by[i] & 0xffL) << (8 * i);
+            value += ((long) bytes[i] & 0xffL) << (8 * i);
         }
         return value;
+    }
+
+    /**
+     * Returns a string that also includes the hex representation as it can often help deciphering ssh files.
+     *
+     * @param value
+     * @return a string representation that includes the value as hex
+     * ex: 17584 -> "17584/0x44b0"
+     */
+    public static String printLongWithHex(long value) {
+        return value + "/0x" + Long.toHexString(value);
     }
     
     public static byte[] combineByteArrays(byte[]... byteArrays){

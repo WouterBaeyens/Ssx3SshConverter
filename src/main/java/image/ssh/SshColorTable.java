@@ -5,22 +5,19 @@
  */
 package image.ssh;
 
-import com.mycompany.sshtobpmconverter.*;
-import util.ByteUtil;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import converter.ImageFileWrapper;
 import converter.Pixel;
 import image.ImgComponent;
+import org.apache.commons.codec.DecoderException;
+import util.ByteUtil;
+import util.PrintUtil;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.List;
-import java.util.Map;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.ArrayUtils;
-import util.PrintUtil;
 
 /**
  *
@@ -45,7 +42,6 @@ public class SshColorTable implements ImgComponent {
         for (int i = 0; i < nrOfTableEntries; i++) {
             int pixelCode = getPixelCodeFromTableIndexNr(i);
             sshFile.read(bgrValue);
-
 
             try {
                 colorMap.put(pixelCode, Pixel.createPixelFromBGR(bgrValue));

@@ -8,6 +8,7 @@ package converter;
 import com.google.common.io.Files;
 import image.ssh.SshHeader;
 import image.ssh.SshImage;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,16 +24,17 @@ import java.util.Map;
  */
 public class SshImageFileWrapper implements ImageFileWrapper{
 
+    private static final String READ_ONLY_MODE = "r";
     private RandomAccessFile file;
     private SshHeader header;
     private SshImage image;
     
     public SshImageFileWrapper(File sshFile) throws FileNotFoundException, IOException{
-        if(!isSshFile(sshFile))
+        if (!isSshFile(sshFile)) {
             throw new IllegalArgumentException("only ssh files allowed!");
-        String filePermissions = "r";
-        file = new RandomAccessFile(sshFile, filePermissions);
-        header = new SshHeader(file);
+        }
+        file = new RandomAccessFile(sshFile, READ_ONLY_MODE);
+        header = new SshHeader(file, 0);
         long imageOffset = header.getSize();
         image = new SshImage(file, imageOffset);
     }

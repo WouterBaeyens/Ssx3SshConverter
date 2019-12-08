@@ -6,15 +6,16 @@
 package image.ssh;
 
 import image.ImgComponent;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+import util.ByteUtil;
+import util.PrintUtil;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-import util.ByteUtil;
-import util.PrintUtil;
 
 /**
  *
@@ -123,9 +124,11 @@ public class SshImageHeader implements ImgComponent{
     
     @Override
     public void printFormatted() {
+        System.out.println("---IMG HEADER---");
         System.out.println(PrintUtil.toRainbow("? (usually 02)", " imgSize: " + ByteUtil.convertToLongLE(imgSize), 
                 " imgWidth: " + ByteUtil.convertToLongLE(imgWidth), " imgHeight: " + ByteUtil.convertToLongLE(imgHeight), " unused2", " encodingType: " + getEncodingType().toString()));
-        System.out.println(PrintUtil.toHexString(true, unknown, imgSize, imgWidth, imgHeight, unused, encodingType));    }
+        System.out.println(PrintUtil.toHexString(true, unknown, imgSize, imgWidth, imgHeight, unused, encodingType));
+    }
 
     public enum EncodingType {
         NONE("00000000"),

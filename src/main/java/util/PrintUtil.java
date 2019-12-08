@@ -5,9 +5,6 @@
  */
 package util;
 
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
@@ -56,40 +53,41 @@ public class PrintUtil {
         return builder.toString();
     }
 /**
- * Like standard insert, but with special char's (in this case no "\" signes except for ansi
- * @param text
- * @param insert
- * @param period
+ * Like standard splitting with delimiter, but ignoring special chars (for example the invisible colour information{@code [30;1m } )
+ *
+ * @param text          the original text
+ * @param delimiter     the delimiter to be inserted every {@code groupSize} characters
+ * @param groupSize     the size of each text-segment that is cut by the delimiter
  * @return 
  */
-    public static String ansiInsert(
-            String text, String insert, int period) {
+public static String insertForColouredString(
+        String text, String delimiter, int groupSize) {
         int amountOfAnsi = StringUtils.countMatches(text, "\033");
         int ansiLength = 7;
         StringBuilder builder = new StringBuilder(
-                text.length() + insert.length() * ((text.length() - amountOfAnsi*ansiLength) / period) + 1);
+                text.length() + delimiter.length() * ((text.length() - amountOfAnsi * ansiLength) / groupSize) + 1);
 
         int index = 0;
         String prefix = "";
         while (index < text.length()) {
-            // Don't put the insert in the very first iteration.
+            // Don't put the delimiter in the very first iteration.
             // This is easier than appending it *after* each substring
             builder.append(prefix);
-            prefix = insert;
+            prefix = delimiter;
             //determine Length
             int accountedFor = 0;
-            String substr = text.substring(index,Math.min(index + period, text.length()));
+            String substr = text.substring(index, Math.min(index + groupSize, text.length()));
             int found = StringUtils.countMatches(substr, "\033");
             while (accountedFor < found){
                 accountedFor = found;
-                substr = text.substring(index,Math.min(index + period + found * ansiLength, text.length()));
+                substr = text.substring(index, Math.min(index + groupSize + found * ansiLength, text.length()));
                 //if no new ansi is found as a result of extending the string, the loop finishes
                 found =  StringUtils.countMatches(substr, "\033");
             }
             
             builder.append(text.substring(index,
-                    Math.min(index + period + found * ansiLength, text.length())));
-            index += period + found * ansiLength;
+                    Math.min(index + groupSize + found * ansiLength, text.length())));
+            index += groupSize + found * ansiLength;
         }
         return builder.toString();
     }
@@ -111,7 +109,7 @@ public class PrintUtil {
         if (colorSwitch) {
             return toRainbow(hexString);
         } else {
-            return Arrays.toString(hexString);
+            return String.join("", hexString);
         }
     }
 
@@ -123,16 +121,16 @@ public class PrintUtil {
      * @return colored concatenation of the given string list.
      */
     public static String toRainbow(String... list) {
-        String result = "";
-        String[] colors = {"\033[30;1m", "\033[31;1m", "\033[32;1m", "\033[34;1m", "\033[35;1m"};
-        String reset = "\033[0m";
+        final StringBuilder result = new StringBuilder();
+        final String[] colors = {"\033[30;1m", "\033[31;1m", "\033[32;1m", "\033[34;1m", "\033[35;1m"};
+        final String noColor = "\033[0m";
+
         int i = 0;
         for (String listElement : list) {
-            result += colors[i % colors.length];
-            i++;
-            result += listElement;
+            result.append(colors[i++ % colors.length]);
+            result.append(listElement);
         }
-        result += reset;
-        return result;
+        result.append(noColor);
+        return result.toString();
     }
 }

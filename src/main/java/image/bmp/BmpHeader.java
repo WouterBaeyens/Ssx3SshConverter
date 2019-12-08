@@ -5,11 +5,10 @@
  */
 package image.bmp;
 
-import com.mycompany.sshtobpmconverter.*;
+import image.ImgComponent;
 import util.ByteUtil;
 import util.PrintUtil;
-import com.google.common.primitives.Longs;
-import image.ImgComponent;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
@@ -179,8 +178,8 @@ public class BmpHeader implements ImgComponent{
                 " horizontalRez (px/m): " + ByteUtil.convertToLongLE(horizontalRez),
                 " verticalRez (px/m): " + ByteUtil.convertToLongLE(verticalRez), "\ncolorsInPalette: " + ByteUtil.convertToLongLE(colorsInPalette),
                 " colorImportance: " + ByteUtil.convertToLongLE(colorImportance)));
-        
-        System.out.println(PrintUtil.ansiInsert(new String(new char[42]).replace('\0', ' ') + 
+
+        System.out.println(PrintUtil.insertForColouredString(new String(new char[42]).replace('\0', ' ') +
                 PrintUtil.toHexString(true, dibSize, imgWidth, imgHeight, nrOfPlanes, bitsPerPixel, compression,
                         bitmapDataSize, horizontalRez, verticalRez, colorsInPalette, colorImportance), "\n", 16*3));
     }

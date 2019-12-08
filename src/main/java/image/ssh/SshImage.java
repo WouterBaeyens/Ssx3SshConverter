@@ -8,6 +8,7 @@ package image.ssh;
 import converter.ImageFileWrapper;
 import converter.Pixel;
 import image.ImgComponent;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.codec.DecoderException;
 
 /**
  *
@@ -163,8 +163,10 @@ public class SshImage implements ImgComponent {
     
     @Override
     public void printFormatted() {
-        System.out.println("---IMG HEADER---");
+        System.out.println("---SSH IMAGE---");
         header.printFormatted();
+        System.out.println("***<IMG DATA>***");
+        postImage.printFormatted();
         colorTable.printFormatted();
         footer.printFormatted();
     }

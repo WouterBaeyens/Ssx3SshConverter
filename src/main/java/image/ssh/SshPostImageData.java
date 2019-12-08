@@ -5,13 +5,13 @@
  */
 package image.ssh;
 
-import com.mycompany.sshtobpmconverter.*;
 import image.ImgComponent;
+import util.ByteUtil;
+import util.PrintUtil;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import util.ByteUtil;
-import util.PrintUtil;
 
 /**
  *
@@ -22,7 +22,8 @@ public class SshPostImageData implements ImgComponent{
         private long positionOffset;
         
         private static final byte[] defaultData = {0x21, 0x10, 0x04, 0x00, 0x00, 0x01, 0x01, 0x00,
-                                    0x00, 0x01, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00};
+                0x00, 0x01, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00,};
+    //0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, };
         
         //this is the part between the pixel data and the color palette data
     // no idea yet what it is, 
