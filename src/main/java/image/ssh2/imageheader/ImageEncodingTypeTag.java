@@ -1,6 +1,9 @@
 package image.ssh2.imageheader;
 
 import image.ImgSubComponent;
+import image.ssh.InterleafedDecoderStrategy;
+import image.ssh.NoneDecoderStrategy;
+import image.ssh.SshImageDecoderStrategy;
 import util.PrintUtil;
 
 import java.io.IOException;
@@ -58,18 +61,23 @@ public class ImageEncodingTypeTag implements ImgSubComponent {
     }
 
     public enum EncodingType {
-        NONE("00000000"),
-        INTERLEAFED("00200000");
+        NONE("00000000", new NoneDecoderStrategy()),
+        INTERLACED("00200000", new InterleafedDecoderStrategy());
 
         final String value;
+        private final SshImageDecoderStrategy decoderStrategy;
 
-        EncodingType(String value) {
+        EncodingType(String value, SshImageDecoderStrategy decoderStrategy) {
             this.value = value;
+            this.decoderStrategy = decoderStrategy;
+        }
+
+        public SshImageDecoderStrategy getDecoderStrategy() {
+            return decoderStrategy;
         }
 
         public static Optional<EncodingType> getEncodingType(byte[] data) {
             String dataAsString = PrintUtil.toHexString(false, data).trim().replaceAll(" ", "");
-            ;
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
                     .findAny();
@@ -77,7 +85,6 @@ public class ImageEncodingTypeTag implements ImgSubComponent {
 
         public static String getInfo(byte[] data) {
             String dataAsString = PrintUtil.toHexString(false, data).trim().replaceAll(" ", "");
-            ;
             return getEncodingType(data)
                     .map(matchingType -> matchingType.toString() + "(" + matchingType.value + ")")
                     .orElseGet(() -> "Unknown encoding (" + dataAsString + ")");

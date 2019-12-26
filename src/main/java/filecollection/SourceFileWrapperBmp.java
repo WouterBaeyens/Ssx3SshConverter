@@ -2,13 +2,13 @@ package filecollection;
 
 import java.io.File;
 
-public class FileWrapperBmp implements FileWrapper {
+public class SourceFileWrapperBmp implements SourceFileWrapper {
 
     private static final FileExtension FILE_EXTENSION = FileExtension.BMP_EXTENSION;
 
     private final File bmpFile;
 
-    FileWrapperBmp(File bmpFile) {
+    SourceFileWrapperBmp(File bmpFile) {
         this.bmpFile = bmpFile;
     }
 

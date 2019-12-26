@@ -5,14 +5,16 @@
  */
 package converter;
 
-import java.util.Arrays;
+import com.mycompany.sshtobpmconverter.IPixel;
 import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Arrays;
 
 /**
  *
  * @author Wouter
  */
-public class Pixel {
+public class Pixel implements IPixel {
     
     private byte[] rgb = new byte[3];
     
@@ -33,8 +35,8 @@ public class Pixel {
     public byte[] getRGBValue(){
         return rgb;
     }
-    
-    public byte[] getBGRValue(){
+
+    public byte[] getRGBValueLE() {
         byte[] bgr = ArrayUtils.clone(rgb);
         ArrayUtils.reverse(bgr);
         return bgr;

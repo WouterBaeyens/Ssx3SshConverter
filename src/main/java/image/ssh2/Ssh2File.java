@@ -15,12 +15,13 @@ public class Ssh2File {
     private final RandomAccessFile sshFile;
 
     private final Ssh2FileHeader ssh2FileHeader;
+    private final List<Ssh2Image> images;
 
     public Ssh2File(File sshFile) throws IOException {
         System.out.println("Deserialising ssh file");
         this.sshFile = openStream(sshFile);
-        ssh2FileHeader = deserializeFileHeader(0);
-        List<Ssh2Image> images = deserializeImages(ssh2FileHeader.getImageInfoList());
+        this.ssh2FileHeader = deserializeFileHeader(0);
+        this.images = deserializeImages(ssh2FileHeader.getImageInfoList());
     }
 
     private RandomAccessFile openStream(File sshFile) throws FileNotFoundException {
@@ -41,6 +42,10 @@ public class Ssh2File {
 
     private Ssh2Image deserializeImage(final ImageHeaderInfoTag imageInfo) throws IOException {
         return new Ssh2Image(sshFile, imageInfo);
+    }
+
+    public List<Ssh2Image> getImages() {
+        return images;
     }
 
     public void close() throws IOException {

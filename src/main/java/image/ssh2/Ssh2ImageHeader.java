@@ -1,6 +1,7 @@
 package image.ssh2;
 
 import image.ImgSubComponent;
+import image.ssh.SshImageDecoderStrategy;
 import image.ssh2.imageheader.ImageEncodingTypeTag;
 import image.ssh2.imageheader.ImageHeightTag;
 import image.ssh2.imageheader.ImageMaterialTag;
@@ -49,7 +50,7 @@ public class Ssh2ImageHeader {
 
         final ImageEncodingTypeTag encodingTypeTag = new ImageEncodingTypeTag(sshFile, imageMaterialTag.getEndPos());
         encodingType = encodingTypeTag.getEncodingType();
-        imageHeaderEndPosition = encodingTypeTag.getEndPos();
+        this.imageHeaderEndPosition = encodingTypeTag.getEndPos();
         subComponents.add(encodingTypeTag);
 
         printFormatted();
@@ -63,12 +64,16 @@ public class Ssh2ImageHeader {
         return imageWidth;
     }
 
+    public long getImageHeaderEndPosition() {
+        return imageHeaderEndPosition;
+    }
+
     public long getImageEndPosition() {
         return imageHeaderStartPosition + imageWithHeaderSize;
     }
 
-    public ImageEncodingTypeTag.EncodingType getEncodingType() {
-        return encodingType;
+    public SshImageDecoderStrategy getImageDecodingStrategy() {
+        return encodingType.getDecoderStrategy();
     }
 
     public void printFormatted() {

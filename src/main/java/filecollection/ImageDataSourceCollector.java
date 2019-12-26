@@ -16,9 +16,9 @@ import java.util.stream.Stream;
 /**
  * Used to collect groups of files linked to the same image.
  */
-public class ImageDataFilesCollector {
+public class ImageDataSourceCollector {
 
-    Map<String, ImageDataFiles> imageDataList = new HashMap<>();
+    Map<String, ImageDataSource> imageDataList = new HashMap<>();
 
     private static final BiPredicate<Path, BasicFileAttributes> NORMAL_SSH_MATCHER = (path, attr) ->
             path.toString().endsWith(FileExtension.SSH_EXTENSION.value) && !path.toString().endsWith(FileExtension.SSH_BACKUP_EXTENSION.value);
@@ -29,32 +29,32 @@ public class ImageDataFilesCollector {
     private static final BiPredicate<Path, BasicFileAttributes> BMP_MATCHER = (path, attr) ->
             path.toString().endsWith(FileExtension.BMP_EXTENSION.value);
 
-    public static Set<ImageDataFiles> collectImageDataFiles() throws IOException {
-        Map<String, ImageDataFiles.ImageDataFilesBuilder> imageDataFilesMap = new HashMap<>();
+    public static Set<ImageDataSource> collectFilesAndGroupByImage() throws IOException {
+        Map<String, ImageDataSource.ImageDataFilesBuilder> imageDataFilesMap = new HashMap<>();
 
-        findFilesInCurrentDirectory(NORMAL_SSH_MATCHER).map(FileWrapperSsh::new)
+        findFilesInCurrentDirectory(NORMAL_SSH_MATCHER).map(SourceFileWrapperSsh::new)
                 .forEach(fileWrapperSsh -> {
                     final String pathWithoutExtension = fileWrapperSsh.getFileNameWithoutExtension();
-                    imageDataFilesMap.putIfAbsent(pathWithoutExtension, new ImageDataFiles.ImageDataFilesBuilder());
+                    imageDataFilesMap.putIfAbsent(pathWithoutExtension, new ImageDataSource.ImageDataFilesBuilder());
                     imageDataFilesMap.get(pathWithoutExtension).addSshFile(fileWrapperSsh);
                 });
 
-        findFilesInCurrentDirectory(BMP_MATCHER).map(FileWrapperBmp::new)
+        findFilesInCurrentDirectory(BMP_MATCHER).map(SourceFileWrapperBmp::new)
                 .forEach(fileWrapperBmp -> {
                     final String pathWithoutExtension = fileWrapperBmp.getFileNameWithoutExtension();
-                    imageDataFilesMap.putIfAbsent(pathWithoutExtension, new ImageDataFiles.ImageDataFilesBuilder());
+                    imageDataFilesMap.putIfAbsent(pathWithoutExtension, new ImageDataSource.ImageDataFilesBuilder());
                     imageDataFilesMap.get(pathWithoutExtension).addBmpFile(fileWrapperBmp);
                 });
 
-        findFilesInCurrentDirectory(SSH_BACKUP_MATCHER).map(FileWrapperSshBackup::new)
+        findFilesInCurrentDirectory(SSH_BACKUP_MATCHER).map(SourceFileWrapperSshBackup::new)
                 .forEach(fileWrapperSshBackup -> {
                     final String pathWithoutExtension = fileWrapperSshBackup.getFileNameWithoutExtension();
-                    imageDataFilesMap.putIfAbsent(pathWithoutExtension, new ImageDataFiles.ImageDataFilesBuilder());
+                    imageDataFilesMap.putIfAbsent(pathWithoutExtension, new ImageDataSource.ImageDataFilesBuilder());
                     imageDataFilesMap.get(pathWithoutExtension).addSshBackupFile(fileWrapperSshBackup);
                 });
 
         return imageDataFilesMap.values().stream()
-                .map(ImageDataFiles.ImageDataFilesBuilder::build)
+                .map(ImageDataSource.ImageDataFilesBuilder::build)
                 .collect(Collectors.toSet());
     }
 

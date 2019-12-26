@@ -2,7 +2,7 @@ package filecollection;
 
 import java.io.File;
 
-public interface FileWrapper {
+public interface SourceFileWrapper {
 
     File getFile();
 

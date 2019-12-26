@@ -5,8 +5,8 @@
  */
 package image.ssh;
 
-import converter.ImageFileWrapper;
-import converter.Pixel;
+import com.mycompany.sshtobpmconverter.IPixel;
+import converter.Image;
 import image.ImgComponent;
 
 import java.io.IOException;
@@ -27,8 +27,8 @@ public class SshImage implements ImgComponent {
     //used to read image data from (instead of storing it all)
     private RandomAccessFile sshDataFile;
     private long offset;
-    
-    ImageFileWrapper wrapper;
+
+    Image wrapper;
 
     private long imageDataOffset;
     
@@ -50,8 +50,8 @@ public class SshImage implements ImgComponent {
         long footerOffset = colorTable.getPositionOffset() + colorTable.getSize();
         footer = new SshFooter(sshDataFile, footerOffset);
     }
-    
-    public SshImage(ImageFileWrapper wrapper) throws IOException{
+
+    public SshImage(Image wrapper) throws IOException {
         this.wrapper = wrapper;
         header = new SshImageHeader(wrapper.getImgWidth(), wrapper.getImgHeight());
         postImage = new SshPostImageData();
@@ -81,9 +81,9 @@ public class SshImage implements ImgComponent {
         //os.flush();
         //IMAGE writing
         int imgHeight = wrapper.getImgHeight();
-        List<List<Pixel>> image = decoderStrategy.encodeImage(wrapper.getImage());
-        for(List<Pixel> row: image){
-            for(Pixel pixel: row){
+        List<List<IPixel>> image = decoderStrategy.encodeImage(wrapper.getImage());
+        for (List<IPixel> row : image) {
+            for (IPixel pixel : row) {
                 os.write(colorTable.getByteFromPixel(pixel));
             }
         }
@@ -103,9 +103,9 @@ public class SshImage implements ImgComponent {
      * @return 
      * @throws java.io.IOException 
      */
-    public Map<Integer, List<Pixel>> getImageRow(int rowNr) throws IOException {
-        Map<Integer, List<Pixel>> result = new HashMap<>();
-        List<Pixel> pixelList = new ArrayList<>();
+    public Map<Integer, List<IPixel>> getImageRow(int rowNr) throws IOException {
+        Map<Integer, List<IPixel>> result = new HashMap<>();
+        List<IPixel> pixelList = new ArrayList<>();
         if(rowNr >= getImgHeight())
             throw new IllegalArgumentException("given rowNr is bigger than the height of the img");
         int imgWidth = (int) getImgWidth();
@@ -133,12 +133,12 @@ public class SshImage implements ImgComponent {
                 
         }
     }
-    
-    public List<List<Pixel>> getImage() throws IOException {
-        List<List<Pixel>> image = new ArrayList<>();
+
+    public List<List<IPixel>> getImage() throws IOException {
+        List<List<IPixel>> image = new ArrayList<>();
         int imgHeight = (int) getImgHeight();
         int imgWidth = (int) getImgWidth();
-        List<Pixel> imageRow;
+        List<IPixel> imageRow;
         for(int rowNr = 0; rowNr < imgHeight; rowNr++){
             imageRow = new ArrayList<>();
             long rowOffset = imageDataOffset + imgWidth * rowNr;

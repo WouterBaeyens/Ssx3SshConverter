@@ -1,11 +1,15 @@
 package image.ssh2;
 
+import com.mycompany.sshtobpmconverter.IPixel;
+import converter.Image;
 import image.ssh2.fileheader.ImageHeaderInfoTag;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Ssh2Image {
+public class Ssh2Image implements Image {
 
     private final RandomAccessFile sshFile;
     private final String imageName;
@@ -28,11 +32,69 @@ public class Ssh2Image {
         return ssh2ImageHeader.getImageEndPosition();
     }
 
+    private long getImageStartPosition() {
+        return ssh2ImageHeader.getImageHeaderEndPosition();
+    }
+
     private Ssh2ImageHeader deserializeImageHeader() throws IOException {
         return new Ssh2ImageHeader(sshFile, filePosition);
     }
 
     private Ssh2ColorTable deserializeColorTable() throws IOException {
         return new Ssh2ColorTable(sshFile, getImageEndPosition());
+    }
+
+    /**
+     * Returns the complete image as a list of rows
+     * I'm a bit paranoid about big files and the space it would consume,
+     * but the positives (faster, easier to use) probably outweigh the negatives
+     *
+     * @return A list of list, representing a list of rows containing a list of pixels.
+     * @throws IOException
+     */
+    @Override
+    public List<List<IPixel>> getImage() throws IOException {
+        List<List<IPixel>> image = new ArrayList<>();
+        int imgHeight = getImgHeight();
+        int imgWidth = getImgWidth();
+        sshFile.seek(getImageStartPosition());
+        for (int rowNr = 0; rowNr < imgHeight; rowNr++) {
+            List<IPixel> imageRow = new ArrayList<>();
+            for (int i = 0; i < imgWidth; i++) {
+                byte pixelCode = sshFile.readByte();
+                imageRow.add(ssh2ColorTable.getPixelFromByte(pixelCode));
+            }
+            image.add(imageRow);
+        }
+        return ssh2ImageHeader.getImageDecodingStrategy().decodeImage(image);
+    }
+
+    /**
+     * Get the width (in pixels) of the image.
+     *
+     * @return
+     */
+    @Override
+    public int getImgWidth() {
+        return ssh2ImageHeader.getImageWidth();
+    }
+
+    /**
+     * Get the height (in pixels) of the image
+     *
+     * @return
+     */
+    @Override
+    public int getImgHeight() {
+        return ssh2ImageHeader.getImageHeight();
+    }
+
+    @Override
+    public void printFormatted() {
+    }
+
+    @Override
+    public String getImageName() {
+        return imageName;
     }
 }

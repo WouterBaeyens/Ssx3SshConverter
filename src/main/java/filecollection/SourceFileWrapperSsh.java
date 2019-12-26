@@ -2,13 +2,13 @@ package filecollection;
 
 import java.io.File;
 
-public class FileWrapperSsh implements FileWrapper {
+public class SourceFileWrapperSsh implements SourceFileWrapper {
 
     private static final FileExtension FILE_EXTENSION = FileExtension.SSH_EXTENSION;
 
     private final File sshFile;
 
-    FileWrapperSsh(File sshFile) {
+    SourceFileWrapperSsh(File sshFile) {
         this.sshFile = sshFile;
     }
 

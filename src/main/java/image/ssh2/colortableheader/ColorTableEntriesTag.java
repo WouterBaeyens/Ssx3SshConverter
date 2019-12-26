@@ -9,6 +9,7 @@ import java.io.RandomAccessFile;
 
 /**
  * My initial guess would be that this number refers to the nr of defined colors. (the nr is lower when size is lower)
+ * It seems that the same colors with different alpha channel are counted as one
  * To be verified
  */
 public class ColorTableEntriesTag implements ImgSubComponent {
