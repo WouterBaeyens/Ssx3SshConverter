@@ -1,5 +1,8 @@
 package image;
 
+import util.FileUtil;
+import util.PrintUtil;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -7,36 +10,33 @@ public abstract class ImgSubComponent {
 
     private final int componentSize;
     private final long startPosition;
+    private final byte[] data;
 
-    public ImgSubComponent(final RandomAccessFile file, final long startPosition, final long size) {
+    public ImgSubComponent(final RandomAccessFile file, final long startPosition, final long size) throws IOException {
         this.startPosition = startPosition;
         this.componentSize = Math.toIntExact(size);
+        this.data = FileUtil.read(file, startPosition, componentSize);
     }
 
-    public long getSize() {
+    public int getSize() {
         return componentSize;
     }
 
-    long getStartPos() {
-
+    public long getStartPos() {
+        return startPosition;
     }
 
     public long getEndPos() {
         return getStartPos() + getSize();
     }
 
-    public byte[] read(RandomAccessFile file, long startPosition) throws IOException {
-        return read(file, startPosition, (int) getSize());
-    }
-
-    byte[] read(RandomAccessFile file, long startPosition, int length) throws IOException {
-        byte[] data = new byte[length];
-        file.seek(startPosition);
-        file.read(data);
+    public byte[] getBytes() {
         return data;
     }
 
-    String getHexData();
+    public String getHexData() {
+        return PrintUtil.toHexString(false, data);
+    }
 
-    String getInfo();
+    public abstract String getInfo();
 }

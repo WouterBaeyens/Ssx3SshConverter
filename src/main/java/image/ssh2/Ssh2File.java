@@ -1,6 +1,7 @@
 package image.ssh2;
 
 import image.ssh2.fileheader.ImageHeaderInfoTag;
+import util.ByteUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,6 +23,7 @@ public class Ssh2File {
         this.sshFile = openStream(sshFile);
         this.ssh2FileHeader = deserializeFileHeader(0);
         this.images = deserializeImages(ssh2FileHeader.getImageInfoList());
+        printFormatted();
     }
 
     private RandomAccessFile openStream(File sshFile) throws FileNotFoundException {
@@ -34,14 +36,30 @@ public class Ssh2File {
 
     private List<Ssh2Image> deserializeImages(List<ImageHeaderInfoTag> imageInfoList) throws IOException {
         List<Ssh2Image> images = new ArrayList<>();
+        Ssh2Image previousImage = null;
         for (ImageHeaderInfoTag imageInfo : imageInfoList) {
-            images.add(deserializeImage(imageInfo));
+            final Ssh2Image currentImage = deserializeImage(imageInfo);
+            images.add(currentImage);
+            if (previousImage != null) {
+                System.out.println("From " + ByteUtil.printLongWithHex(previousImage.getEndPosition()) + "\tto " + ByteUtil.printLongWithHex(imageInfo.getHeaderLocation()));
+                System.out.println("PADDING: " + ByteUtil.printLongWithHex(imageInfo.getHeaderLocation() - previousImage.getEndPosition()));
+                System.out.println("SIZE: " + ByteUtil.printLongWithHex(currentImage.getEndPosition() - previousImage.getEndPosition()));
+            }
+            previousImage = currentImage;
         }
         return images;
     }
 
     private Ssh2Image deserializeImage(final ImageHeaderInfoTag imageInfo) throws IOException {
-        return new Ssh2Image(sshFile, imageInfo);
+        final Ssh2Image ssh2Image = new Ssh2Image(sshFile, imageInfo);
+        return ssh2Image;
+    }
+
+    public void printFormatted() {
+        ssh2FileHeader.printFormatted();
+        images.forEach(Ssh2Image::printFormatted);
+        long leftOverSize = ssh2FileHeader.getFileSize() - images.get(images.size() - 1).getEndPosition();
+        System.out.println("Leftover size: " + ByteUtil.printLongWithHex(leftOverSize));
     }
 
     public List<Ssh2Image> getImages() {

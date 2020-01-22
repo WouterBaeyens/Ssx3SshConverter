@@ -17,36 +17,17 @@ import java.util.Optional;
  * Note: the length of this tag is just a wild guess (only the 2nd byte has changed so far).
  * It could be that the tag is only 1 byte long and the other bytes can contain other info
  */
-public class ImageEncodingTypeTag implements ImgSubComponent {
+public class ImageEncodingTypeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
-    private final long startPosition;
-    private final byte[] data;
 
     public ImageEncodingTypeTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        this.startPosition = startPosition;
-        data = read(file, startPosition);
+        super(file, startPosition, DEFAULT_SIZE);
     }
-
-    @Override
-    public long getSize() {
-        return DEFAULT_SIZE;
-    }
-
-    @Override
-    public long getStartPos() {
-        return startPosition;
-    }
-
-    @Override
-    public String getHexData() {
-        return PrintUtil.toHexString(false, data);
-    }
-
 
     @Override
     public String getInfo() {
-        return "EncodingType: " + EncodingType.getInfo(data);
+        return "EncodingType: " + EncodingType.getInfo(getBytes());
     }
 
     /**
@@ -56,7 +37,7 @@ public class ImageEncodingTypeTag implements ImgSubComponent {
      * @return the encoding type
      */
     public EncodingType getEncodingType() {
-        return EncodingType.getEncodingType(data)
+        return EncodingType.getEncodingType(getBytes())
                 .orElse(EncodingType.NONE);
     }
 
@@ -77,14 +58,14 @@ public class ImageEncodingTypeTag implements ImgSubComponent {
         }
 
         public static Optional<EncodingType> getEncodingType(byte[] data) {
-            String dataAsString = PrintUtil.toHexString(false, data).trim().replaceAll(" ", "");
+            String dataAsString = PrintUtil.toHexString(false, data).trim().replace(" ", "");
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
                     .findAny();
         }
 
         public static String getInfo(byte[] data) {
-            String dataAsString = PrintUtil.toHexString(false, data).trim().replaceAll(" ", "");
+            String dataAsString = PrintUtil.toHexString(false, data).trim().replace(" ", "");
             return getEncodingType(data)
                     .map(matchingType -> matchingType.toString() + "(" + matchingType.value + ")")
                     .orElseGet(() -> "Unknown encoding (" + dataAsString + ")");

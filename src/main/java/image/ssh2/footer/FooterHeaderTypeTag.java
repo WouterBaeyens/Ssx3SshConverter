@@ -1,4 +1,4 @@
-package image.ssh2.fileheader;
+package image.ssh2.footer;
 
 import image.ImgSubComponent;
 
@@ -6,29 +6,25 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 
-/**
- * This tag describes the file type (similar to how the extension .ssh also describes the file type).
- * It will most likely be "SHPS", describing the file as an ssh, also known as a compressed .fsh (which would have filetype "SHPI")
- */
-public class FileTypeTag extends ImgSubComponent {
+public class FooterHeaderTypeTag extends ImgSubComponent {
 
-    private static final long DEFAULT_SIZE = 4;
+    private static final long DEFAULT_SIZE = 1;
 
-    public FileTypeTag(final RandomAccessFile file, final long startPosition) throws IOException {
+    public FooterHeaderTypeTag(final RandomAccessFile file, final long startPosition) throws IOException {
         super(file, startPosition, DEFAULT_SIZE);
     }
 
     @Override
     public String getInfo() {
-        return "FileType: " + FileType.getInfo(getBytes());
+        return "Footer header type: " + FooterHeaderType.getInfo(getBytes());
     }
 
-    public enum FileType {
-        SHPS("SHPS");
+    public enum FooterHeaderType {
+        DEFAULT("i");
 
         final String value;
 
-        FileType(String value) {
+        FooterHeaderType(String value) {
             this.value = value;
         }
 

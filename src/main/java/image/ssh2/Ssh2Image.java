@@ -17,19 +17,24 @@ public class Ssh2Image implements Image {
 
     private final Ssh2ImageHeader ssh2ImageHeader;
     private final Ssh2ColorTable ssh2ColorTable;
+    private final Ssh2ImageFooter ssh2ImageFooter;
 
 
     public Ssh2Image(final RandomAccessFile sshFile, final ImageHeaderInfoTag imageInfo) throws IOException {
         this.sshFile = sshFile;
         this.filePosition = imageInfo.getHeaderLocation();
         this.imageName = imageInfo.getName();
-        System.out.println("image: " + imageName);
         this.ssh2ImageHeader = deserializeImageHeader();
         this.ssh2ColorTable = deserializeColorTable();
+        this.ssh2ImageFooter = deserializeImageFooter();
     }
 
     public long getImageEndPosition() {
         return ssh2ImageHeader.getImageEndPosition();
+    }
+
+    public long getEndPosition() {
+        return ssh2ColorTable.getEndPosition();
     }
 
     private long getImageStartPosition() {
@@ -42,6 +47,10 @@ public class Ssh2Image implements Image {
 
     private Ssh2ColorTable deserializeColorTable() throws IOException {
         return new Ssh2ColorTable(sshFile, getImageEndPosition());
+    }
+
+    private Ssh2ImageFooter deserializeImageFooter() throws IOException {
+        return new Ssh2ImageFooter(sshFile, ssh2ColorTable.getEndPosition());
     }
 
     /**
@@ -91,6 +100,13 @@ public class Ssh2Image implements Image {
 
     @Override
     public void printFormatted() {
+        String imageTitle = "* image: " + imageName + " *";
+        System.out.println("\n" + imageTitle.replaceAll(".", "*"));
+        System.out.println(imageTitle);
+        System.out.println(imageTitle.replaceAll(".", "*") + "\n");
+        ssh2ImageHeader.printFormatted();
+        ssh2ColorTable.printFormatted();
+        ssh2ImageFooter.printFormatted();
     }
 
     @Override

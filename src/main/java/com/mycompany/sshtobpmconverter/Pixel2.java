@@ -22,7 +22,7 @@ public class Pixel2 implements IPixel {
     public static Pixel2 createPixelFromLE(final byte[] bytes) {
         final byte[] rgba = Arrays.copyOf(bytes, 4);
         ByteUtil.swap(rgba, 0, 2);
-        return new Pixel2(tintGreenForSpecialAlpha(rgba));
+        return new Pixel2(rgba);
     }
 
     private static byte[] tintGreenForSpecialAlpha(final byte[] rgba) {

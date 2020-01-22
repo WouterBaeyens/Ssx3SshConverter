@@ -1,4 +1,4 @@
-package image.ssh2.imageheader;
+package image.ssh2.footer;
 
 import image.ImgSubComponent;
 import util.PrintUtil;
@@ -8,41 +8,38 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 
 /**
- * The purpose and info within this tag is completely unknown.
- * Always all 0's so far
- * <p>
- * Note: even the name ImageMaterialTag is just a wild guess
- **/
-public class ImageMaterialTag extends ImgSubComponent {
+ * Until more is known about the content (and the content is not always the same)
+ * I'll group everything together in 1 tag.
+ */
+public class FooterHeaderUnknown1Tag extends ImgSubComponent {
 
-    private static final long DEFAULT_SIZE = 4;
+    private static final long DEFAULT_SIZE = 12;
 
-    public ImageMaterialTag(final RandomAccessFile file, final long startPosition) throws IOException {
+    public FooterHeaderUnknown1Tag(final RandomAccessFile file, final long startPosition) throws IOException {
         super(file, startPosition, DEFAULT_SIZE);
     }
 
     @Override
     public String getInfo() {
-        return "?Material?: " + MaterialType.getInfo(getBytes());
+        return "?Footer header stuff?: " + ImageType.getInfo(getBytes());
     }
 
-    public enum MaterialType {
-        DEFAULT("00000000");
+    public enum ImageType {
+        DEFAULT("000080000000000000000000");
 
         final String value;
 
-        MaterialType(String value) {
+        ImageType(String value) {
             this.value = value;
         }
 
         public static String getInfo(byte[] data) {
-            //todo check if Hex.encodeHexString(data); is sufficient
             String dataAsString = PrintUtil.toHexString(false, data).trim().replace(" ", "");
 
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
                     .findAny().map(matchingType -> matchingType.toString() + "(" + matchingType.value + ")")
-                    .orElseGet(() -> "Unknown Material (" + dataAsString + ")");
+                    .orElseGet(() -> "Unknown type (" + dataAsString + ")");
         }
     }
 }

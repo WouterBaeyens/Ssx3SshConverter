@@ -1,7 +1,6 @@
 package image.ssh2.fileheader;
 
 import image.ImgSubComponent;
-import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -12,36 +11,17 @@ import java.util.Arrays;
  * ERTS is what Electronic Arts is called on the stock market.
  * This might be to continuously remind their developers to buy EA stock.
  */
-public class EaTag implements ImgSubComponent {
+public class EaTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 8;
-    private final long startPosition;
-    private final byte[] data;
 
     public EaTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        this.startPosition = startPosition;
-        data = read(file, getStartPos());
+        super(file, startPosition, DEFAULT_SIZE);
     }
-
-    @Override
-    public long getSize() {
-        return DEFAULT_SIZE;
-    }
-
-    @Override
-    public long getStartPos() {
-        return startPosition;
-    }
-
-    @Override
-    public String getHexData() {
-        return PrintUtil.toHexString(false, data);
-    }
-
 
     @Override
     public String getInfo() {
-        return "EA slogan: " + EAType.getInfo(data);
+        return "EA slogan: " + EAType.getInfo(getBytes());
     }
 
     public enum EAType {

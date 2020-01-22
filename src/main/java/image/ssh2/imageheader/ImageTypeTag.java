@@ -13,36 +13,17 @@ import java.util.Arrays;
  * <p>
  * Note: even the name ImageTypeTag is just a wild guess
  */
-public class ImageTypeTag implements ImgSubComponent {
+public class ImageTypeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 1;
-    private final long startPosition;
-    private final byte[] data;
 
     public ImageTypeTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        this.startPosition = startPosition;
-        data = read(file, startPosition);
+        super(file, startPosition, DEFAULT_SIZE);
     }
-
-    @Override
-    public long getSize() {
-        return DEFAULT_SIZE;
-    }
-
-    @Override
-    public long getStartPos() {
-        return startPosition;
-    }
-
-    @Override
-    public String getHexData() {
-        return PrintUtil.toHexString(false, data);
-    }
-
 
     @Override
     public String getInfo() {
-        return "?ImageType?: " + ImageType.getInfo(data);
+        return "?ImageType?: " + ImageType.getInfo(getBytes());
     }
 
     public enum ImageType {
@@ -55,8 +36,8 @@ public class ImageTypeTag implements ImgSubComponent {
         }
 
         public static String getInfo(byte[] data) {
-            String dataAsString = PrintUtil.toHexString(false, data).trim().replaceAll(" ", "");
-            ;
+            String dataAsString = PrintUtil.toHexString(false, data).trim().replace(" ", "");
+
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
                     .findAny().map(matchingType -> matchingType.toString() + "(" + matchingType.value + ")")

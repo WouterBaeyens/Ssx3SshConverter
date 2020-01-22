@@ -17,7 +17,7 @@ public class Ssh2ColorTable {
         this.sshFile = sshFile;
         this.filePosition = filePosition;
         this.ssh2ColorTableHeader = deserializeColorTableHeader();
-        this.actualTable = deserializeColourTableTable(ssh2ColorTableHeader.getActualTableStartPosition(), ssh2ColorTableHeader.getActualTableSize());
+        this.actualTable = deserializeColourTableTable(ssh2ColorTableHeader.getTableStartPosition(), ssh2ColorTableHeader.getTableSize());
     }
 
     private Ssh2ColorTableHeader deserializeColorTableHeader() throws IOException {
@@ -28,7 +28,16 @@ public class Ssh2ColorTable {
         return new Ssh2ColorTableTable(sshFile, filePosition, tableSize);
     }
 
+    public long getEndPosition() {
+        return ssh2ColorTableHeader.getTableEndPosition();
+    }
+
     public Pixel2 getPixelFromByte(byte byte_) {
         return actualTable.getPixelFromByte(byte_);
+    }
+
+    public void printFormatted() {
+        ssh2ColorTableHeader.printFormatted();
+        actualTable.printFormatted();
     }
 }

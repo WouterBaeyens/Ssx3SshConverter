@@ -2,7 +2,6 @@ package image.ssh2.fileheader;
 
 import image.ImgSubComponent;
 import util.ByteUtil;
-import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -10,32 +9,14 @@ import java.io.RandomAccessFile;
 /**
  * This tag describes the size of the full ssh file.
  */
-public class FileSizeTag implements ImgSubComponent {
+public class FileSizeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
-    private final long startPosition;
-    private final byte[] data;
     private final long actualFileSize;
 
     public FileSizeTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        this.startPosition = startPosition;
-        data = read(file, getStartPos());
+        super(file, startPosition, DEFAULT_SIZE);
         actualFileSize = file.length();
-    }
-
-    @Override
-    public long getSize() {
-        return DEFAULT_SIZE;
-    }
-
-    @Override
-    public long getStartPos() {
-        return startPosition;
-    }
-
-    @Override
-    public String getHexData() {
-        return PrintUtil.toHexString(false, data);
     }
 
     @Override
@@ -50,7 +31,7 @@ public class FileSizeTag implements ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongLE(data);
+        return ByteUtil.convertToLongLE(getBytes());
     }
 
     public boolean isCompressed() {

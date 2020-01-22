@@ -24,13 +24,12 @@ public class MainConverter2 {
     public static void main(String[] args) throws IOException {
         final Set<ImageDataSource> imageDataSourceSet = ImageDataSourceCollector.collectFilesAndGroupByImage();
         for (ImageDataSource imageDataSource : imageDataSourceSet) {
-            createBmpFile(imageDataSource);
 //            if (imageDataSource.sshBackupFile == null && imageDataSource.sshFile != null) {
 //                imageDataSource.createSshBackupFile();
 //            }
-//            if (imageDataSource.bmpFile == null) {
-//                createBmpFile(imageDataSource);
-//            } else {
+            if (imageDataSource.bmpFile == null) {
+                createBmpFile(imageDataSource);
+            } //else {
 //                createSshFile(imageDataSource);
 //            }
         }

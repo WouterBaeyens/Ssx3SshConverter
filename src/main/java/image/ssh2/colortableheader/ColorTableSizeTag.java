@@ -2,7 +2,6 @@ package image.ssh2.colortableheader;
 
 import image.ImgSubComponent;
 import util.ByteUtil;
-import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -11,30 +10,12 @@ import java.io.RandomAccessFile;
  * This tag describes the full size of the table.
  * full size = table header + table data.
  */
-public class ColorTableSizeTag implements ImgSubComponent {
+public class ColorTableSizeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 3;
-    private final long startPosition;
-    private final byte[] data;
 
     public ColorTableSizeTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        this.startPosition = startPosition;
-        data = read(file, getStartPos());
-    }
-
-    @Override
-    public long getSize() {
-        return DEFAULT_SIZE;
-    }
-
-    @Override
-    public long getStartPos() {
-        return startPosition;
-    }
-
-    @Override
-    public String getHexData() {
-        return PrintUtil.toHexString(false, data);
+        super(file, startPosition, DEFAULT_SIZE);
     }
 
     @Override
@@ -44,7 +25,7 @@ public class ColorTableSizeTag implements ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongLE(data);
+        return ByteUtil.convertToLongLE(getBytes());
     }
 
 }

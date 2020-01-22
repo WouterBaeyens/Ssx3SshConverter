@@ -52,8 +52,6 @@ public class Ssh2ImageHeader {
         encodingType = encodingTypeTag.getEncodingType();
         this.imageHeaderEndPosition = encodingTypeTag.getEndPos();
         subComponents.add(encodingTypeTag);
-
-        printFormatted();
     }
 
     public int getImageHeight() {

@@ -2,7 +2,6 @@ package image.ssh2.fileheader;
 
 import image.ImgSubComponent;
 import util.ByteUtil;
-import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -12,30 +11,14 @@ import java.util.Arrays;
  * This tag describes: the image name & location of the image header
  * of an image inside the ssh
  */
-public class ImageHeaderInfoTag implements ImgSubComponent {
+public class ImageHeaderInfoTag extends ImgSubComponent {
 
-    private static final long DEFAULT_SIZE = 8;
-    private final long startPosition;
-    private final byte[] data;
+    private static final int NAME_SIZE = 4;
+    private static final int HEADER_LOCATION_SIZE = 4;
+    private static final int DEFAULT_SIZE = NAME_SIZE + HEADER_LOCATION_SIZE;
 
     public ImageHeaderInfoTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        this.startPosition = startPosition;
-        data = read(file, startPosition);
-    }
-
-    @Override
-    public long getSize() {
-        return DEFAULT_SIZE;
-    }
-
-    @Override
-    public long getStartPos() {
-        return startPosition;
-    }
-
-    @Override
-    public String getHexData() {
-        return PrintUtil.toHexString(false, data);
+        super(file, startPosition, DEFAULT_SIZE);
     }
 
     @Override
@@ -44,10 +27,10 @@ public class ImageHeaderInfoTag implements ImgSubComponent {
     }
 
     public String getName() {
-        return new String(Arrays.copyOf(data, 4));
+        return new String(Arrays.copyOf(getBytes(), NAME_SIZE));
     }
 
     public long getHeaderLocation() {
-        return ByteUtil.convertToLongLE(Arrays.copyOfRange(data, 4, 8));
+        return ByteUtil.convertToLongLE(Arrays.copyOfRange(getBytes(), 4, 8));
     }
 }

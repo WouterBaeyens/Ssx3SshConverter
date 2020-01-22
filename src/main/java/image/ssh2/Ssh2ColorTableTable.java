@@ -19,7 +19,6 @@ public class Ssh2ColorTableTable {
 
     public Ssh2ColorTableTable(final RandomAccessFile sshFile, final long filePosition, final long size) throws IOException {
         readTable(sshFile, filePosition, size);
-        printFormatted();
     }
 
     private void readTable(final RandomAccessFile sshFile, final long filePosition, final long size) throws IOException {
@@ -74,8 +73,8 @@ public class Ssh2ColorTableTable {
 
     public void printFormatted() {
         System.out.println("--COLOR TABLE--");
-        System.out.println("colours: " + amountOfEntries);
-        System.out.println("Empty colours: " + amountOfZeroEntries);
-        System.out.println("Special colours: " + getAmountOfSpecialEntries());
+        System.out.print("colours: " + amountOfEntries);
+        System.out.print(" | Empty colours: " + amountOfZeroEntries);
+        System.out.println(" | Alpha colours: " + getAmountOfSpecialEntries());
     }
 }
