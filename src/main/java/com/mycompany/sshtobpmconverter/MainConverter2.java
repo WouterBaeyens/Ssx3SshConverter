@@ -2,6 +2,7 @@ package com.mycompany.sshtobpmconverter;
 
 import filecollection.ImageDataSource;
 import filecollection.ImageDataSourceCollector;
+import filecollection.SourceFileWrapperBmp;
 import filecollection.SourceFileWrapperSsh;
 
 import java.io.IOException;
@@ -27,11 +28,12 @@ public class MainConverter2 {
 //            if (imageDataSource.sshBackupFile == null && imageDataSource.sshFile != null) {
 //                imageDataSource.createSshBackupFile();
 //            }
-            if (imageDataSource.bmpFile == null) {
-                createBmpFile(imageDataSource);
-            } //else {
-//                createSshFile(imageDataSource);
+//            if (imageDataSource.bmpFile == null) {
+//                createBmpFile(imageDataSource);
 //            }
+            if (imageDataSource.bmpFile != null) {
+                createSshFile(imageDataSource);
+            }
         }
     }
 
@@ -46,7 +48,8 @@ public class MainConverter2 {
         BmpFileCreator.create(referenceSshFile);
     }
 
-    private static void createSshFile(ImageDataSource imageDataSource) {
-        // todo call converter
+    private static void createSshFile(ImageDataSource imageDataSource) throws IOException {
+        final SourceFileWrapperBmp referenceBmpFile = imageDataSource.bmpFile;
+        SshFileCreator.create(referenceBmpFile);
     }
 }

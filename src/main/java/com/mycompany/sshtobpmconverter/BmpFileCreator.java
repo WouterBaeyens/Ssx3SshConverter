@@ -11,6 +11,10 @@ import java.io.IOException;
 
 public class BmpFileCreator {
 
+    private BmpFileCreator() {
+        //utility class, should not be initialized
+    }
+
     public static void create(SourceFileWrapperSsh sshFileWrapper) throws IOException {
         createDir("output");
         final String bmpFilePathBase = "output/" + sshFileWrapper.getFileNameWithoutExtension();

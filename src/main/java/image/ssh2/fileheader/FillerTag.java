@@ -26,6 +26,8 @@ public class FillerTag extends ImgSubComponent {
     // This is the position to which this buffer should fill the file with 0's
     private static final long DESIRED_START_ADDRESS = 112;
 
+    private static final byte[] BUY_ERTS_AS_BYTE = {0x42, 0x75, 0x79, 0x20, 0x45, 0x52, 0x54, 0x53};
+
     /**
      * If the {@link DESIRED_START_ADDRESS} is already surpassed, the next desired start address is
      * {@link DESIRED_START_ADDRESS} + a multiple of this value.
@@ -43,10 +45,10 @@ public class FillerTag extends ImgSubComponent {
 
     @Override
     public String getHexData() {
-        if (hasNonZeroBytes()) {
+        if (!startsWithBuy_ERTS() || hasNonZeroBytesAfterBuy_Erts() || getSize() < 16) {
             return PrintUtil.toHexString(false, getBytes());
         } else {
-            return "00 00 00 00 ........ 00";
+            return "\"Buy ERTS\"  00 00 00 ........ 00";
         }
     }
 
@@ -58,7 +60,7 @@ public class FillerTag extends ImgSubComponent {
             sizeInfo += "(Not equal to expected size(" + getNeededFillerSize() + ")!!)";
         }
         String contentInfo;
-        if (hasNonZeroBytes()) {
+        if (!startsWithBuy_ERTS() || hasNonZeroBytesAfterBuy_Erts()) {
             contentInfo = "contains unknown info!!!!";
         } else {
             contentInfo = "all 0's";
@@ -74,8 +76,19 @@ public class FillerTag extends ImgSubComponent {
         return getNeededFillerSize(getStartPos());
     }
 
-    private boolean hasNonZeroBytes() {
-        return IntStream.range(0, getBytes().length).map(i -> getBytes()[i])
+    private boolean startsWithBuy_ERTS() {
+        byte[] hexData = getBytes();
+        final int minLength = Math.min(BUY_ERTS_AS_BYTE.length, hexData.length);
+        for (int i = 0; i < minLength; i++) {
+            if (hexData[i] != BUY_ERTS_AS_BYTE[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean hasNonZeroBytesAfterBuy_Erts() {
+        return IntStream.range(BUY_ERTS_AS_BYTE.length, getBytes().length).map(length -> getBytes()[length])
                 .anyMatch(value -> value != 0);
     }
 }

@@ -2,7 +2,6 @@ package image.ssh2;
 
 import image.ImgSubComponent;
 import image.ssh2.fileheader.ArchiveTag;
-import image.ssh2.fileheader.EaTag;
 import image.ssh2.fileheader.FileSizeTag;
 import image.ssh2.fileheader.FileTypeTag;
 import image.ssh2.fileheader.FillerTag;
@@ -30,7 +29,8 @@ public class Ssh2FileHeader {
     private final ArchiveTag archiveTag;
     private final VersionTag versionTag;
     private final List<ImageHeaderInfoTag> imageHeaderInfoTags;
-    private final EaTag eaTag;
+    //    private final EaTag eaTag;
+//    private final FillerTag fillerTag;
     private final FillerTag fillerTag;
 
     private final List<ImgSubComponent> componentsOrdered;
@@ -41,12 +41,12 @@ public class Ssh2FileHeader {
         this.archiveTag = new ArchiveTag(sshFile, fileSizeTag.getEndPos());
         this.versionTag = new VersionTag(sshFile, archiveTag.getEndPos());
         this.imageHeaderInfoTags = readImageInfoList(sshFile, versionTag.getEndPos());
-        this.eaTag = new EaTag(sshFile, imageHeaderInfoTags.get(imageHeaderInfoTags.size() - 1).getEndPos());
-        long headerSpaceLeft = getStartOfImageFiles() - eaTag.getEndPos();
-        this.fillerTag = new FillerTag(sshFile, eaTag.getEndPos(), headerSpaceLeft);
 
+        final long fillerStart = imageHeaderInfoTags.get(imageHeaderInfoTags.size() - 1).getEndPos();
+        final long headerSpaceLeft = getStartOfImageFiles() - fillerStart;
+        this.fillerTag = new FillerTag(sshFile, fillerStart, headerSpaceLeft);
         this.componentsOrdered = List.of(
-                Stream.of(List.of(this.fileTypeTag, fileSizeTag, archiveTag, versionTag), imageHeaderInfoTags, List.of(eaTag, fillerTag))
+                Stream.of(List.of(this.fileTypeTag, fileSizeTag, archiveTag, versionTag), imageHeaderInfoTags, List.of(fillerTag))
                         .flatMap(List::stream)
                         .toArray(ImgSubComponent[]::new)
         );
