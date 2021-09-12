@@ -6,8 +6,10 @@ import filecollection.SourceFileWrapperBmp;
 import filecollection.SourceFileWrapperSsh;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.Set;
+import java.nio.MappedByteBuffer;
 
 public class MainConverter2 {
 
@@ -23,17 +25,18 @@ public class MainConverter2 {
      * @param args ignored (it is mandatory to have this parameter for main functions, even if it is not used.)
      */
     public static void main(String[] args) throws IOException {
+        // todo use ByteBuffer for in-between and mappedByteBuffer to combo with RandomAccess
         final Set<ImageDataSource> imageDataSourceSet = ImageDataSourceCollector.collectFilesAndGroupByImage();
         for (ImageDataSource imageDataSource : imageDataSourceSet) {
 //            if (imageDataSource.sshBackupFile == null && imageDataSource.sshFile != null) {
 //                imageDataSource.createSshBackupFile();
 //            }
-//            if (imageDataSource.bmpFile == null) {
-//                createBmpFile(imageDataSource);
-//            }
-            if (imageDataSource.bmpFile != null) {
-                createSshFile(imageDataSource);
+            if (imageDataSource.bmpFile == null) {
+                createBmpFile(imageDataSource);
             }
+//            if (imageDataSource.bmpFile != null) {
+//                createSshFile(imageDataSource);
+//            }
         }
     }
 

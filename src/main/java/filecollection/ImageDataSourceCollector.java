@@ -21,7 +21,10 @@ public class ImageDataSourceCollector {
     Map<String, ImageDataSource> imageDataList = new HashMap<>();
 
     private static final BiPredicate<Path, BasicFileAttributes> NORMAL_SSH_MATCHER = (path, attr) ->
-            path.toString().endsWith(FileExtension.SSH_EXTENSION.value) && !path.toString().endsWith(FileExtension.SSH_BACKUP_EXTENSION.value);
+    {
+        // System.out.println(path.toString() + " " + (path.toString().endsWith(FileExtension.SSH_EXTENSION.value) && !path.toString().endsWith(FileExtension.SSH_BACKUP_EXTENSION.value)));
+        return path.toString().endsWith(FileExtension.SSH_EXTENSION.value) && !path.toString().endsWith(FileExtension.SSH_BACKUP_EXTENSION.value);
+    };
 
     private static final BiPredicate<Path, BasicFileAttributes> SSH_BACKUP_MATCHER = (path, attr) ->
             path.toString().endsWith(FileExtension.SSH_BACKUP_EXTENSION.value);

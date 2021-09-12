@@ -4,6 +4,7 @@ import com.mycompany.sshtobpmconverter.IPixel;
 import converter.Image;
 import image.ssh2.fileheader.ImageHeaderInfoTag;
 
+import java.awt.image.Raster;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -101,9 +102,10 @@ public class Ssh2Image implements Image {
     @Override
     public void printFormatted() {
         String imageTitle = "* image: " + imageName + " *";
-        System.out.println("\n" + imageTitle.replaceAll(".", "*"));
+        System.out.println("\n" + "*".repeat(imageTitle.length() + 2));
         System.out.println(imageTitle);
-        System.out.println(imageTitle.replaceAll(".", "*") + "\n");
+        System.out.println("*".repeat(imageTitle.length() + 2) + "\n");
+
         ssh2ImageHeader.printFormatted();
         ssh2ColorTable.printFormatted();
         ssh2ImageFooter.printFormatted();

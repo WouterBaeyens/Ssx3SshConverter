@@ -13,8 +13,20 @@ public class ArchiveTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
 
+    /**
+     * If this number is exceeded, I assume something went wrong.
+     */
+    private static final int REASONABLE_MAX_NUMBER_OF_IMAGES_IN_FILE = 1000;
+
     public ArchiveTag(final RandomAccessFile file, final long startPosition) throws IOException {
         super(file, startPosition, DEFAULT_SIZE);
+        checkAssertions();
+    }
+
+    private void checkAssertions(){
+        if(getConvertedValue() > 1000) {
+            throw new IllegalStateException("Likely something went wrong reading the data: The meta-data describes this ssh-file contains " + getConvertedValue() + " images (anything above "+ REASONABLE_MAX_NUMBER_OF_IMAGES_IN_FILE + " is considered unreasonably high).");
+        }
     }
 
     @Override
