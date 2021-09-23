@@ -4,6 +4,7 @@ import image.ImgSubComponent;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -14,8 +15,8 @@ public class FileTypeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
 
-    public FileTypeTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public FileTypeTag(final MappedByteBuffer buffer) throws IOException {
+        super(buffer, DEFAULT_SIZE);
     }
 
     @Override

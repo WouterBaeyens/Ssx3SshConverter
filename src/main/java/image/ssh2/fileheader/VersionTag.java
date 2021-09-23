@@ -4,6 +4,7 @@ import image.ImgSubComponent;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -15,8 +16,8 @@ public class VersionTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
 
-    public VersionTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public VersionTag(final MappedByteBuffer buffer) throws IOException {
+        super(buffer, DEFAULT_SIZE);
     }
 
     @Override
@@ -38,7 +39,7 @@ public class VersionTag extends ImgSubComponent {
             String dataAsString = new String(data);
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
-                    .findAny().map(matchingType -> matchingType.toString() + "(" + matchingType.value + ")")
+                    .findAny().map(matchingType -> matchingType + "(" + matchingType.value + ")")
                     .orElseGet(() -> "Unknown (" + dataAsString + ")");
         }
     }

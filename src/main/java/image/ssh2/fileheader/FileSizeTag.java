@@ -5,6 +5,7 @@ import util.ByteUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 
 /**
  * This tag describes the size of the full ssh file.
@@ -14,9 +15,9 @@ public class FileSizeTag extends ImgSubComponent {
     private static final long DEFAULT_SIZE = 4;
     private final long actualFileSize;
 
-    public FileSizeTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
-        actualFileSize = file.length();
+    public FileSizeTag(final MappedByteBuffer buffer) throws IOException {
+        super(buffer, DEFAULT_SIZE);
+        actualFileSize = buffer.remaining() + buffer.position();
     }
 
     @Override

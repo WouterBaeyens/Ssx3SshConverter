@@ -5,6 +5,7 @@ import util.ByteUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -17,8 +18,8 @@ public class ImageHeaderInfoTag extends ImgSubComponent {
     private static final int HEADER_LOCATION_SIZE = 4;
     private static final int DEFAULT_SIZE = NAME_SIZE + HEADER_LOCATION_SIZE;
 
-    public ImageHeaderInfoTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public ImageHeaderInfoTag(final MappedByteBuffer file) throws IOException {
+        super(file, DEFAULT_SIZE);
     }
 
     @Override

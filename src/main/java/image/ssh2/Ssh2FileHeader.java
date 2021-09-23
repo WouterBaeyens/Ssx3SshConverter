@@ -10,7 +10,7 @@ import image.ssh2.fileheader.VersionTag;
 import util.PrintUtil;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -30,21 +30,20 @@ public class Ssh2FileHeader {
     private final VersionTag versionTag;
     private final List<ImageHeaderInfoTag> imageHeaderInfoTags;
     //    private final EaTag eaTag;
-//    private final FillerTag fillerTag;
     private final FillerTag fillerTag;
 
     private final List<ImgSubComponent> componentsOrdered;
 
-    public Ssh2FileHeader(final RandomAccessFile sshFile, final long filePosition) throws IOException {
-        this.fileTypeTag = new FileTypeTag(sshFile, filePosition);
-        this.fileSizeTag = new FileSizeTag(sshFile, fileTypeTag.getEndPos());
-        this.archiveTag = new ArchiveTag(sshFile, fileSizeTag.getEndPos());
-        this.versionTag = new VersionTag(sshFile, archiveTag.getEndPos());
-        this.imageHeaderInfoTags = readImageInfoList(sshFile, versionTag.getEndPos());
+    public Ssh2FileHeader(final MappedByteBuffer sshFileBuffer) throws IOException {
+        this.fileTypeTag = new FileTypeTag(sshFileBuffer);
+        this.fileSizeTag = new FileSizeTag(sshFileBuffer);
+        this.archiveTag = new ArchiveTag(sshFileBuffer);
+        this.versionTag = new VersionTag(sshFileBuffer);
+        this.imageHeaderInfoTags = readImageInfoList(sshFileBuffer);
 
         final long fillerStart = imageHeaderInfoTags.get(imageHeaderInfoTags.size() - 1).getEndPos();
         final long headerSpaceLeft = getStartOfImageFiles() - fillerStart;
-        this.fillerTag = new FillerTag(sshFile, fillerStart, headerSpaceLeft);
+        this.fillerTag = new FillerTag(sshFileBuffer, fillerStart, headerSpaceLeft);
         this.componentsOrdered = List.of(
                 Stream.of(List.of(this.fileTypeTag, fileSizeTag, archiveTag, versionTag), imageHeaderInfoTags, List.of(fillerTag))
                         .flatMap(List::stream)
@@ -52,12 +51,11 @@ public class Ssh2FileHeader {
         );
     }
 
-    private List<ImageHeaderInfoTag> readImageInfoList(final RandomAccessFile sshFile, long positionInFile) throws IOException {
+    private List<ImageHeaderInfoTag> readImageInfoList(final MappedByteBuffer buffer) throws IOException {
         List<ImageHeaderInfoTag> imageHeaders = new ArrayList<>();
         for (int imageNr = 0; imageNr < getNumberOfImages(); imageNr++) {
-            final ImageHeaderInfoTag imageHeaderInfoTag = new ImageHeaderInfoTag(sshFile, positionInFile);
+            final ImageHeaderInfoTag imageHeaderInfoTag = new ImageHeaderInfoTag(buffer);
             imageHeaders.add(imageHeaderInfoTag);
-            positionInFile = imageHeaderInfoTag.getEndPos();
         }
         return imageHeaders;
     }

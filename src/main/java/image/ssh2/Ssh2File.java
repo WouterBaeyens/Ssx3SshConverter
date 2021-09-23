@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ public class Ssh2File {
 
     private static final String READ_ONLY_MODE = "r";
     private final RandomAccessFile sshFile;
+    private final MappedByteBuffer sshFileBuffer;
 
     private final Ssh2FileHeader ssh2FileHeader;
     private final List<Ssh2Image> images;
@@ -21,6 +24,7 @@ public class Ssh2File {
     public Ssh2File(File sshFile) throws IOException {
         System.out.println("Deserialising ssh file");
         this.sshFile = openStream(sshFile);
+        this.sshFileBuffer = attachBuffer(this.sshFile);
         this.ssh2FileHeader = deserializeFileHeader(0);
         this.images = deserializeImages(ssh2FileHeader.getImageInfoList());
         printFormatted();
@@ -30,8 +34,16 @@ public class Ssh2File {
         return new RandomAccessFile(sshFile, READ_ONLY_MODE);
     }
 
-    private Ssh2FileHeader deserializeFileHeader(long filePosition) throws IOException {
-        return new Ssh2FileHeader(sshFile, filePosition);
+    private MappedByteBuffer attachBuffer(RandomAccessFile raf) throws IOException {
+        final FileChannel ch = raf.getChannel();
+        int fileLength = Math.toIntExact(ch.size());
+        return ch.map(FileChannel.MapMode.READ_ONLY, 0,
+                fileLength);
+    }
+
+    private Ssh2FileHeader deserializeFileHeader(long fileHeaderPosition) throws IOException {
+        sshFileBuffer.position(Math.toIntExact(fileHeaderPosition));
+        return new Ssh2FileHeader(sshFileBuffer);
     }
 
     private List<Ssh2Image> deserializeImages(List<ImageHeaderInfoTag> imageInfoList) throws IOException {
@@ -51,8 +63,7 @@ public class Ssh2File {
     }
 
     private Ssh2Image deserializeImage(final ImageHeaderInfoTag imageInfo) throws IOException {
-        final Ssh2Image ssh2Image = new Ssh2Image(sshFile, imageInfo);
-        return ssh2Image;
+        return new Ssh2Image(sshFile, imageInfo);
     }
 
     public void printFormatted() {

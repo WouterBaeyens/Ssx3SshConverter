@@ -5,6 +5,7 @@ import util.ByteUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 
 /**
  * This tag describes the number of images contained within the ssh file
@@ -18,8 +19,8 @@ public class ArchiveTag extends ImgSubComponent {
      */
     private static final int REASONABLE_MAX_NUMBER_OF_IMAGES_IN_FILE = 1000;
 
-    public ArchiveTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public ArchiveTag(final MappedByteBuffer buffer) throws IOException {
+        super(buffer, DEFAULT_SIZE);
         checkAssertions();
     }
 
