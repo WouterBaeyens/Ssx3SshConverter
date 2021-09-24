@@ -9,6 +9,7 @@ import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 public class Ssh2ImageFooterFooter {
@@ -20,11 +21,11 @@ public class Ssh2ImageFooterFooter {
 
     private final List<ImgSubComponent> componentsOrdered;
 
-    public Ssh2ImageFooterFooter(final RandomAccessFile sshFile, final long startPosition) throws IOException {
-        this.footerBodyTypeTag = new FooterBodyTypeTag(sshFile, startPosition);
-        this.footerBodyUnknown1Tag = new FooterBodyUnknown1Tag(sshFile, footerBodyTypeTag.getEndPos());
-        this.footerBodyNameTag = new FooterBodyNameTag(sshFile, footerBodyUnknown1Tag.getEndPos());
-        this.footerBodyUnknown2Tag = new FooterBodyUnknown2Tag(sshFile, footerBodyNameTag.getEndPos());
+    public Ssh2ImageFooterFooter(final ByteBuffer sshFileBuffer) throws IOException {
+        this.footerBodyTypeTag = new FooterBodyTypeTag(sshFileBuffer);
+        this.footerBodyUnknown1Tag = new FooterBodyUnknown1Tag(sshFileBuffer);
+        this.footerBodyNameTag = new FooterBodyNameTag(sshFileBuffer);
+        this.footerBodyUnknown2Tag = new FooterBodyUnknown2Tag(sshFileBuffer);
 
         this.componentsOrdered = List.of(footerBodyTypeTag, footerBodyUnknown1Tag, footerBodyNameTag, footerBodyUnknown2Tag);
     }

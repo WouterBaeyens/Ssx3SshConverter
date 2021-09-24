@@ -5,6 +5,7 @@ import util.ByteUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 /**
  * This tag describes the height of the image.
@@ -13,8 +14,8 @@ public class ImageHeightTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 2;
 
-    public ImageHeightTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public ImageHeightTag(final ByteBuffer sshFileBuffer) throws IOException {
+        super(sshFileBuffer, DEFAULT_SIZE);
     }
 
     @Override

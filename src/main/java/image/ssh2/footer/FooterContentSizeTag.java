@@ -5,6 +5,7 @@ import util.ByteUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 /**
  * This tag describes the size of the full ssh file.
@@ -13,8 +14,8 @@ public class FooterContentSizeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 3;
 
-    public FooterContentSizeTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public FooterContentSizeTag(final ByteBuffer buffer) throws IOException {
+        super(buffer, DEFAULT_SIZE);
     }
 
     @Override

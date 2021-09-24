@@ -8,8 +8,12 @@ import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.List;
 
+/**
+ * Example footer of allegra (single-picture) : p���allegra�����
+ */
 public class Ssh2ImageFooterHeader {
 
     private final FooterHeaderTypeTag footerHeaderTypeTag;
@@ -18,10 +22,10 @@ public class Ssh2ImageFooterHeader {
 
     private final List<ImgSubComponent> componentsOrdered;
 
-    public Ssh2ImageFooterHeader(final RandomAccessFile sshFile, final long startPosition) throws IOException {
-        this.footerHeaderTypeTag = new FooterHeaderTypeTag(sshFile, startPosition);
-        this.footerContentSizeTag = new FooterContentSizeTag(sshFile, footerHeaderTypeTag.getEndPos());
-        this.footerHeaderUnknown1Tag = new FooterHeaderUnknown1Tag(sshFile, footerContentSizeTag.getEndPos());
+    public Ssh2ImageFooterHeader(final ByteBuffer sshFileBuffer) throws IOException {
+        this.footerHeaderTypeTag = new FooterHeaderTypeTag(sshFileBuffer);
+        this.footerContentSizeTag = new FooterContentSizeTag(sshFileBuffer);
+        this.footerHeaderUnknown1Tag = new FooterHeaderUnknown1Tag(sshFileBuffer);
         componentsOrdered = List.of(footerHeaderTypeTag, footerContentSizeTag, footerHeaderUnknown1Tag);
     }
 

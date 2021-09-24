@@ -5,6 +5,7 @@ import util.ByteUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 /**
  * My initial guess would be that this number refers to the nr of defined colors. (the nr is lower when size is lower)
@@ -16,8 +17,8 @@ public class ColorTableEntriesTag extends ImgSubComponent {
     private static final long DEFAULT_SIZE = 2;
 
 
-    public ColorTableEntriesTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public ColorTableEntriesTag(final ByteBuffer buffer) throws IOException {
+        super(buffer, DEFAULT_SIZE);
     }
 
     @Override

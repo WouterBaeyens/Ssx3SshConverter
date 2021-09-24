@@ -5,6 +5,7 @@ import util.ByteUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 /**
  * This tag describes the full size of the table.
@@ -14,8 +15,8 @@ public class ColorTableSizeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 3;
 
-    public ColorTableSizeTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public ColorTableSizeTag(final ByteBuffer buffer) throws IOException {
+        super(buffer, DEFAULT_SIZE);
     }
 
     @Override

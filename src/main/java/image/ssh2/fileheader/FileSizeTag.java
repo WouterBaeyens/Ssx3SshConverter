@@ -5,6 +5,7 @@ import util.ByteUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 
 /**
@@ -15,7 +16,7 @@ public class FileSizeTag extends ImgSubComponent {
     private static final long DEFAULT_SIZE = 4;
     private final long actualFileSize;
 
-    public FileSizeTag(final MappedByteBuffer buffer) throws IOException {
+    public FileSizeTag(final ByteBuffer buffer) throws IOException {
         super(buffer, DEFAULT_SIZE);
         actualFileSize = buffer.remaining() + buffer.position();
     }

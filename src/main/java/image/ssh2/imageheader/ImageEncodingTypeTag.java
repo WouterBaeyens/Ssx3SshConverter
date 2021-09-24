@@ -8,6 +8,7 @@ import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -21,8 +22,8 @@ public class ImageEncodingTypeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
 
-    public ImageEncodingTypeTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public ImageEncodingTypeTag(final ByteBuffer sshFileBuffer) throws IOException {
+        super(sshFileBuffer, DEFAULT_SIZE);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class ImageEncodingTypeTag extends ImgSubComponent {
         public static String getInfo(byte[] data) {
             String dataAsString = PrintUtil.toHexString(false, data).trim().replace(" ", "");
             return getEncodingType(data)
-                    .map(matchingType -> matchingType.toString() + "(" + matchingType.value + ")")
+                    .map(matchingType -> matchingType + "(" + matchingType.value + ")")
                     .orElseGet(() -> "Unknown encoding (" + dataAsString + ")");
         }
     }

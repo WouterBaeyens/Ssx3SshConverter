@@ -5,6 +5,7 @@ import util.ByteUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -17,16 +18,15 @@ public class Ssh2ColorTableTable {
     //private BiMap<Byte, Pixel2> colorMap = HashBiMap.create();
     private HashMap<Byte, Pixel2> colorMap = new HashMap<>();
 
-    public Ssh2ColorTableTable(final RandomAccessFile sshFile, final long filePosition, final long size) throws IOException {
-        readTable(sshFile, filePosition, size);
+    public Ssh2ColorTableTable(final ByteBuffer buffer, final long size) {
+        readTable(buffer, size);
     }
 
-    private void readTable(final RandomAccessFile sshFile, final long filePosition, final long size) throws IOException {
-        sshFile.seek(filePosition);
+    private void readTable(final ByteBuffer buffer, final long size) {
         this.amountOfEntries = (int) (size / DEFAULT_BYTES_PER_TABLE_ENTRY);
         byte[] entry = new byte[DEFAULT_BYTES_PER_TABLE_ENTRY];
         for (int entryNr = 0; entryNr < amountOfEntries; entryNr++) {
-            sshFile.read(entry);
+            buffer.get(entry);
             Pixel2 pixel = Pixel2.createPixelFromLE(entry);
             if (pixel.isPixelEmpty()) {
                 amountOfZeroEntries++;

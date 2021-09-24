@@ -4,13 +4,14 @@ import image.ImgSubComponent;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class FooterBodyTypeTag extends ImgSubComponent {
     private static final long DEFAULT_SIZE = 1;
 
-    public FooterBodyTypeTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public FooterBodyTypeTag(final ByteBuffer buffer) throws IOException {
+        super(buffer, DEFAULT_SIZE);
     }
 
     @Override

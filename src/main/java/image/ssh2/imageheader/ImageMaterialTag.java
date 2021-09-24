@@ -5,6 +5,7 @@ import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -17,8 +18,8 @@ public class ImageMaterialTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
 
-    public ImageMaterialTag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public ImageMaterialTag(final ByteBuffer sshFileBuffer) throws IOException {
+        super(sshFileBuffer, DEFAULT_SIZE);
     }
 
     @Override
@@ -41,7 +42,7 @@ public class ImageMaterialTag extends ImgSubComponent {
 
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
-                    .findAny().map(matchingType -> matchingType.toString() + "(" + matchingType.value + ")")
+                    .findAny().map(matchingType -> matchingType + "(" + matchingType.value + ")")
                     .orElseGet(() -> "Unknown Material (" + dataAsString + ")");
         }
     }

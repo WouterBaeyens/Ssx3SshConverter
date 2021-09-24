@@ -2,6 +2,7 @@ package util;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 
 public class FileUtil {
@@ -19,7 +20,7 @@ public class FileUtil {
     /**
      * Reads the data like a stream - updating the position for the next read
      */
-    public static byte[] readAndConsume(MappedByteBuffer file, int length) {
+    public static byte[] readAndConsume(ByteBuffer file, int length) {
         byte[] data = new byte[length];
         file.get(data);
         return data;

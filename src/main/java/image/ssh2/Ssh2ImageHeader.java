@@ -12,79 +12,83 @@ import util.ByteUtil;
 import util.PrintUtil;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Ssh2ImageHeader {
 
-    private final List<ImgSubComponent> subComponents = new ArrayList<>();
 
     private final long imageHeaderStartPosition;
-    private final long imageHeaderEndPosition;
-    private final long imageWithHeaderSize;
-    private final int imageWidth;
-    private final int imageHeight;
-    private final ImageEncodingTypeTag.EncodingType encodingType;
 
-    public Ssh2ImageHeader(final RandomAccessFile sshFile, final long filePosition) throws IOException {
-        this.imageHeaderStartPosition = filePosition;
+    private final ImageTypeTag imageTypeTag;
+    private final ImageSizeTag imageSizeTag;
+    private final ImageWidthTag imageWidthTag;
+    private final ImageHeightTag imageHeightTag;
+    private final ImageMaterialTag imageMaterialTag;
+    private final ImageEncodingTypeTag encodingTypeTag;
 
-        final ImageTypeTag imageTypeTag = new ImageTypeTag(sshFile, filePosition);
-        subComponents.add(imageTypeTag);
+    private final List<ImgSubComponent> componentsOrdered;
 
-        final ImageSizeTag imageSizeTag = new ImageSizeTag(sshFile, imageTypeTag.getEndPos());
-        this.imageWithHeaderSize = imageSizeTag.getConvertedValue();
-        subComponents.add(imageSizeTag);
+    public Ssh2ImageHeader(final ByteBuffer sshFileBuffer) throws IOException {
+        this.imageHeaderStartPosition = sshFileBuffer.position();
 
-        final ImageWidthTag imageWidthTag = new ImageWidthTag(sshFile, imageSizeTag.getEndPos());
-        imageWidth = imageWidthTag.getConvertedValue();
-        subComponents.add(imageWidthTag);
+        this.imageTypeTag = new ImageTypeTag(sshFileBuffer);
 
-        final ImageHeightTag imageHeightTag = new ImageHeightTag(sshFile, imageWidthTag.getEndPos());
-        imageHeight = imageHeightTag.getConvertedValue();
-        subComponents.add(imageHeightTag);
+        this.imageSizeTag = new ImageSizeTag(sshFileBuffer);
 
-        final ImageMaterialTag imageMaterialTag = new ImageMaterialTag(sshFile, imageHeightTag.getEndPos());
-        subComponents.add(imageMaterialTag);
+        this.imageWidthTag = new ImageWidthTag(sshFileBuffer);
 
-        final ImageEncodingTypeTag encodingTypeTag = new ImageEncodingTypeTag(sshFile, imageMaterialTag.getEndPos());
-        encodingType = encodingTypeTag.getEncodingType();
-        this.imageHeaderEndPosition = encodingTypeTag.getEndPos();
-        subComponents.add(encodingTypeTag);
+        this.imageHeightTag = new ImageHeightTag(sshFileBuffer);
+
+        this.imageMaterialTag = new ImageMaterialTag(sshFileBuffer);
+
+        this.encodingTypeTag = new ImageEncodingTypeTag(sshFileBuffer);
+
+        // todo check calculated image_with_header_size equals value of sizeTag (or find another meaning)
+
+        componentsOrdered = List.of(imageTypeTag, imageSizeTag, imageWidthTag, imageHeightTag, imageMaterialTag, encodingTypeTag);
     }
 
     public int getImageHeight() {
-        return imageHeight;
+        return imageHeightTag.getConvertedValue();
     }
 
     public int getImageWidth() {
-        return imageWidth;
+        return imageWidthTag.getConvertedValue();
+    }
+
+    public int getImageSize(){
+        return getImageWidth() * getImageHeight();
+    }
+
+    public long getImageWithHeaderSize(){
+        return imageSizeTag.getConvertedValue();
     }
 
     public long getImageHeaderEndPosition() {
-        return imageHeaderEndPosition;
+        return componentsOrdered.get(componentsOrdered.size() - 1).getEndPos();
     }
 
     public long getImageEndPosition() {
-        return imageHeaderStartPosition + imageWithHeaderSize;
+        return imageHeaderStartPosition + getImageWithHeaderSize();
     }
 
     public SshImageDecoderStrategy getImageDecodingStrategy() {
-        return encodingType.getDecoderStrategy();
+        return encodingTypeTag.getEncodingType().getDecoderStrategy();
     }
 
     public void printFormatted() {
         System.out.println("--SSH IMG HEADER--");
 
-        long endOfImagePixels = imageHeaderEndPosition + imageHeight * imageWidth;
-        System.out.println("header_start(" + ByteUtil.printLongWithHex(imageHeaderStartPosition) + ") | header_end/img_pixels_start(" + ByteUtil.printLongWithHex(imageHeaderEndPosition) + ") | img_pixels_end(" + ByteUtil.printLongWithHex(endOfImagePixels) + ")");
-        long calculatedImageWithHeaderSize = imageHeaderEndPosition - imageHeaderStartPosition + imageWidth * imageWidth;
-        if (calculatedImageWithHeaderSize != imageWithHeaderSize) {
-            System.out.println("ERROR: image_size+header_size=" + calculatedImageWithHeaderSize + "; should be " + imageWithHeaderSize);
+        long endOfImagePixels = getImageHeaderEndPosition() + getImageSize();
+        System.out.println("header_start(" + ByteUtil.printLongWithHex(imageHeaderStartPosition) + ") | header_end/img_pixels_start(" + ByteUtil.printLongWithHex(getImageHeaderEndPosition()) + ") | img_pixels_end(" + ByteUtil.printLongWithHex(endOfImagePixels) + ")");
+        long calculatedImageWithHeaderSize = getImageHeaderEndPosition() - imageHeaderStartPosition + getImageSize();
+        if (calculatedImageWithHeaderSize != getImageWithHeaderSize()) {
+            System.out.println("ERROR: image_size+header_size=" + calculatedImageWithHeaderSize + "; should be " + getImageWithHeaderSize());
         }
-        System.out.println(PrintUtil.toRainbow(subComponents.stream().map(ImgSubComponent::getInfo).map(componentInfo -> componentInfo + " | ").toArray(String[]::new)));
-        final String[] hexStrings = subComponents.stream().map(ImgSubComponent::getHexData).toArray(String[]::new);
+        System.out.println(PrintUtil.toRainbow(componentsOrdered.stream().map(ImgSubComponent::getInfo).map(componentInfo -> componentInfo + " | ").toArray(String[]::new)));
+        final String[] hexStrings = componentsOrdered.stream().map(ImgSubComponent::getHexData).toArray(String[]::new);
         System.out.println(PrintUtil.insertForColouredString(PrintUtil.toRainbow(hexStrings), "\n", 16 * 3));
     }
 }

@@ -5,6 +5,7 @@ import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 
 public abstract class ImgSubComponent {
@@ -20,11 +21,11 @@ public abstract class ImgSubComponent {
     }
 
 
-    public ImgSubComponent(final MappedByteBuffer buffer, final long size) throws IOException {
+    public ImgSubComponent(final ByteBuffer buffer, final long size) throws IOException {
         this(buffer, buffer.position(), size);
     }
 
-    public ImgSubComponent(final MappedByteBuffer buffer, final long startPosition, final long size) throws IOException {
+    public ImgSubComponent(final ByteBuffer buffer, final long startPosition, final long size) throws IOException {
         this.startPosition = startPosition;
         this.componentSize = Math.toIntExact(size);
         this.data = FileUtil.readAndConsume(buffer, componentSize);

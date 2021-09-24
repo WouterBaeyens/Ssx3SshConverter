@@ -25,6 +25,7 @@ public class Ssh2File {
         System.out.println("Deserialising ssh file");
         this.sshFile = openStream(sshFile);
         this.sshFileBuffer = attachBuffer(this.sshFile);
+        // todo - consider static read methods instead to improve readability
         this.ssh2FileHeader = deserializeFileHeader(0);
         this.images = deserializeImages(ssh2FileHeader.getImageInfoList());
         printFormatted();
@@ -63,7 +64,7 @@ public class Ssh2File {
     }
 
     private Ssh2Image deserializeImage(final ImageHeaderInfoTag imageInfo) throws IOException {
-        return new Ssh2Image(sshFile, imageInfo);
+        return new Ssh2Image(sshFileBuffer, imageInfo);
     }
 
     public void printFormatted() {

@@ -4,28 +4,16 @@ import com.mycompany.sshtobpmconverter.Pixel2;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 public class Ssh2ColorTable {
-
-    private final RandomAccessFile sshFile;
-    private final long filePosition;
 
     private final Ssh2ColorTableHeader ssh2ColorTableHeader;
     private final Ssh2ColorTableTable actualTable;
 
-    public Ssh2ColorTable(final RandomAccessFile sshFile, final long filePosition) throws IOException {
-        this.sshFile = sshFile;
-        this.filePosition = filePosition;
-        this.ssh2ColorTableHeader = deserializeColorTableHeader();
-        this.actualTable = deserializeColourTableTable(ssh2ColorTableHeader.getTableStartPosition(), ssh2ColorTableHeader.getTableSize());
-    }
-
-    private Ssh2ColorTableHeader deserializeColorTableHeader() throws IOException {
-        return new Ssh2ColorTableHeader(sshFile, filePosition);
-    }
-
-    private Ssh2ColorTableTable deserializeColourTableTable(long filePosition, long tableSize) throws IOException {
-        return new Ssh2ColorTableTable(sshFile, filePosition, tableSize);
+    public Ssh2ColorTable(final ByteBuffer sshFileBuffer) throws IOException {
+        this.ssh2ColorTableHeader = new Ssh2ColorTableHeader(sshFileBuffer);
+        this.actualTable = new Ssh2ColorTableTable(sshFileBuffer, ssh2ColorTableHeader.getTableSize());
     }
 
     public long getEndPosition() {

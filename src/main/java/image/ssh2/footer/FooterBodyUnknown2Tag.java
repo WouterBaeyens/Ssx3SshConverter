@@ -5,14 +5,15 @@ import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class FooterBodyUnknown2Tag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 8;
 
-    public FooterBodyUnknown2Tag(final RandomAccessFile file, final long startPosition) throws IOException {
-        super(file, startPosition, DEFAULT_SIZE);
+    public FooterBodyUnknown2Tag(final ByteBuffer buffer) throws IOException {
+        super(buffer, DEFAULT_SIZE);
     }
 
     @Override
@@ -34,7 +35,7 @@ public class FooterBodyUnknown2Tag extends ImgSubComponent {
 
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
-                    .findAny().map(matchingType -> matchingType.toString() + "(" + matchingType.value + ")")
+                    .findAny().map(matchingType -> matchingType + "(" + matchingType.value + ")")
                     .orElseGet(() -> "Unknown type (" + dataAsString + ")");
         }
     }

@@ -12,6 +12,7 @@ import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 public class Ssh2ColorTableHeader {
@@ -26,13 +27,13 @@ public class Ssh2ColorTableHeader {
 
     private final List<ImgSubComponent> componentsOrdered;
 
-    public Ssh2ColorTableHeader(final RandomAccessFile sshFile, final long startPosition) throws IOException {
-        this.typeTag = new ColorTableTypeTag(sshFile, startPosition);
-        this.sizeTag = new ColorTableSizeTag(sshFile, typeTag.getEndPos());
-        this.amountOfEntriesTag = new ColorTableEntriesTag(sshFile, sizeTag.getEndPos());
-        this.actualTableLocation = new ColorTableType2(sshFile, amountOfEntriesTag.getEndPos());
-        this.amountOfEntriesCopyTag = new ColorTableEntriesCopyTag(sshFile, actualTableLocation.getEndPos(), amountOfEntriesTag.getConvertedValue());
-        this.colorTableType3 = new ColorTableType3(sshFile, amountOfEntriesCopyTag.getEndPos());
+    public Ssh2ColorTableHeader(final ByteBuffer sshFileBuffer) throws IOException {
+        this.typeTag = new ColorTableTypeTag(sshFileBuffer);
+        this.sizeTag = new ColorTableSizeTag(sshFileBuffer);
+        this.amountOfEntriesTag = new ColorTableEntriesTag(sshFileBuffer);
+        this.actualTableLocation = new ColorTableType2(sshFileBuffer);
+        this.amountOfEntriesCopyTag = new ColorTableEntriesCopyTag(sshFileBuffer, amountOfEntriesTag.getConvertedValue());
+        this.colorTableType3 = new ColorTableType3(sshFileBuffer);
 
         this.componentsOrdered = List.of(typeTag, sizeTag, amountOfEntriesTag, actualTableLocation, amountOfEntriesCopyTag, colorTableType3);
     }
