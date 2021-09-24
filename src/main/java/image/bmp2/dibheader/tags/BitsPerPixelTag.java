@@ -19,8 +19,7 @@ public class BitsPerPixelTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        String info = getConvertedValue() + "/0x" + Long.toHexString(getConvertedValue());
-        return "# Bits/pixel: " + info;
+        return "# Bits/pixel: " + ByteUtil.printLongWithHex(getConvertedValue());
     }
 
     public int getConvertedValue() {

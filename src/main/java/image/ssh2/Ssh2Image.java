@@ -3,6 +3,7 @@ package image.ssh2;
 import com.mycompany.sshtobpmconverter.IPixel;
 import converter.Image;
 import image.ssh2.fileheader.ImageHeaderInfoTag;
+import util.ByteUtil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -11,9 +12,7 @@ import java.util.List;
 
 public class Ssh2Image implements Image {
 
-    private final ByteBuffer sshFileBuffer;
-    private final String imageName;
-    private final long filePosition;
+    private final ImageHeaderInfoTag imageInfo;
 
     private final Ssh2ImageHeader ssh2ImageHeader;
     private final ByteBuffer imageByteBuffer;
@@ -22,10 +21,8 @@ public class Ssh2Image implements Image {
 
 
     public Ssh2Image(final ByteBuffer sshFileBuffer, final ImageHeaderInfoTag imageInfo) throws IOException {
-        this.sshFileBuffer = sshFileBuffer;
-        // todo check the image header location vs the current position
-        this.filePosition = imageInfo.getHeaderLocation();
-        this.imageName = imageInfo.getName();
+        this.imageInfo = imageInfo;
+        assertBufferAtStartOfImage(sshFileBuffer, imageInfo);
         this.ssh2ImageHeader = new Ssh2ImageHeader(sshFileBuffer);
         // todo replace by raster if possible
         this.imageByteBuffer = copyRawImageDataToBufferAndSkip(sshFileBuffer, ssh2ImageHeader);
@@ -106,7 +103,7 @@ public class Ssh2Image implements Image {
 
     @Override
     public void printFormatted() {
-        String imageTitle = "* image: " + imageName + " *";
+        String imageTitle = "* image: " + getImageName() + " *";
         System.out.println("\n" + "*".repeat(imageTitle.length() + 2));
         System.out.println(imageTitle);
         System.out.println("*".repeat(imageTitle.length() + 2) + "\n");
@@ -118,6 +115,15 @@ public class Ssh2Image implements Image {
 
     @Override
     public String getImageName() {
-        return imageName;
+        return imageInfo.getName();
+    }
+
+
+    private void assertBufferAtStartOfImage(final ByteBuffer buffer, final ImageHeaderInfoTag imageInfo){
+        int expectedStartOfImage = buffer.position();
+        int actualStartOfImage = Math.toIntExact(imageInfo.getHeaderLocation());
+        if(expectedStartOfImage != actualStartOfImage){
+            throw new IllegalStateException("Likely something went wrong reading the data: location of " + imageInfo.getInfo() + "does not align with the current position of the buffer: " + ByteUtil.printLongWithHex(actualStartOfImage));
+        }
     }
 }

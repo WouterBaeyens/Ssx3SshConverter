@@ -25,7 +25,7 @@ public class ImageHeaderInfoTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        return "Img:(name=" + getName() + "; headerLocation=" + getHeaderLocation() + "/0x" + Long.toHexString(getHeaderLocation()) + ")";
+        return "Img:(name=" + getName() + "; headerLocation=" + ByteUtil.printLongWithHex(getHeaderLocation()) + ")";
     }
 
     public String getName() {

@@ -1,6 +1,7 @@
 package image.ssh2.fileheader;
 
 import image.ImgSubComponent;
+import util.ByteUtil;
 import util.PrintUtil;
 
 import java.io.IOException;
@@ -55,7 +56,7 @@ public class FillerTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        String sizeInfo = "size=" + getSize() + "/0x" + Long.toHexString(getSize());
+        String sizeInfo = "size=" + ByteUtil.printLongWithHex(getSize());
 
         if (getSize() != getNeededFillerSize()) {
             sizeInfo += "(Not equal to expected size(" + getNeededFillerSize() + ")!!)";

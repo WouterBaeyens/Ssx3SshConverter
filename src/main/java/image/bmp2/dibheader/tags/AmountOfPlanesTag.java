@@ -19,8 +19,7 @@ public class AmountOfPlanesTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        String info = getConvertedValue() + "/0x" + Long.toHexString(getConvertedValue());
-        return "# Planes: " + info;
+        return "# Planes: " + ByteUtil.printLongWithHex(getConvertedValue());
     }
 
     public int getConvertedValue() {

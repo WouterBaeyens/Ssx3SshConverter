@@ -20,8 +20,7 @@ public class ImageHeightTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        String info = getConvertedValue() + "/0x" + Long.toHexString(getConvertedValue());
-        return "ImageHeight: " + info;
+        return "ImageHeight: " + ByteUtil.printLongWithHex(getConvertedValue());
     }
 
     public int getConvertedValue() {

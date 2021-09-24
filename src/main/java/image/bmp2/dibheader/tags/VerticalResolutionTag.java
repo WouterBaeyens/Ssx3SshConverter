@@ -19,8 +19,7 @@ public class VerticalResolutionTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        String info = getConvertedValue() + "/0x" + Long.toHexString(getConvertedValue());
-        return "Vertical res.: " + info;
+        return "Vertical res.: " + ByteUtil.printLongWithHex(getConvertedValue());
     }
 
     public int getConvertedValue() {

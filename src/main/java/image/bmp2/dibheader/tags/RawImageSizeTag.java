@@ -21,8 +21,7 @@ public class RawImageSizeTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        String info = getConvertedValue() + "/0x" + Long.toHexString(getConvertedValue());
-        return "Raw fileSize: " + info;
+        return "Raw fileSize: " + ByteUtil.printLongWithHex(getConvertedValue());
     }
 
     public long getConvertedValue() {

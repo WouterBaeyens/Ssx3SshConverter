@@ -18,8 +18,7 @@ public class ImagePointerTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        String info = getConvertedValue() + "/0x" + Long.toHexString(getConvertedValue());
-        return "Pixel array location: " + info;
+        return "Pixel array location: " + ByteUtil.printLongWithHex(getConvertedValue());
     }
 
     public long getConvertedValue() {

@@ -15,6 +15,10 @@ public class FooterHeaderTypeTag extends ImgSubComponent {
         super(buffer, DEFAULT_SIZE);
     }
 
+    public static boolean isRecognizedFooterHeaderTag(byte tag){
+        return FooterHeaderType.DEFAULT.value.equals(new String(new byte[]{tag}));
+    }
+
     @Override
     public String getInfo() {
         return "Footer header type: " + FooterHeaderType.getInfo(getBytes());

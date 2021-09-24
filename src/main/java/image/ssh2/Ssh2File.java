@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class Ssh2File {
         this.ssh2FileHeader = deserializeFileHeader(0);
         this.images = deserializeImages(ssh2FileHeader.getImageInfoList());
         printFormatted();
+        assertFileFullyConsumed(sshFileBuffer);
     }
 
     private RandomAccessFile openStream(File sshFile) throws FileNotFoundException {
@@ -80,5 +82,11 @@ public class Ssh2File {
 
     public void close() throws IOException {
         sshFile.close();
+    }
+
+    private void assertFileFullyConsumed(final ByteBuffer buffer){
+        if(buffer.hasRemaining()){
+            throw new IllegalStateException("Likely something went wrong reading the data: The file should be fully read, but the buffer has " + buffer.remaining() + " bytes not consumed.");
+        }
     }
 }

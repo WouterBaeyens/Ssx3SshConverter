@@ -21,7 +21,7 @@ public class FileSizeTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        String info = getConvertedValue() + "/0x" + Long.toHexString(getConvertedValue());
+        String info = ByteUtil.printLongWithHex(getConvertedValue());
         if (isCompressed()) {
             info += " warning: compressed file!! - actual size: " + actualFileSize + "(0x" + Long.toHexString(actualFileSize) + ")";
         } else if (getConvertedValue() < actualFileSize) {

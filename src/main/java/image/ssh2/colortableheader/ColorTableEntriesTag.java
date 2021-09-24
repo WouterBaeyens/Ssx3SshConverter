@@ -23,8 +23,7 @@ public class ColorTableEntriesTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        String info = ByteUtil.printLongWithHex(getConvertedValue());
-        return "#Colors: " + info;
+        return "#Colors: " + ByteUtil.printLongWithHex(getConvertedValue());
     }
 
     public int getConvertedValue() {

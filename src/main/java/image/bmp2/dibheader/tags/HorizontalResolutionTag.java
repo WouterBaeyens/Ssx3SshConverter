@@ -19,8 +19,7 @@ public class HorizontalResolutionTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        String info = getConvertedValue() + "/0x" + Long.toHexString(getConvertedValue());
-        return "Horizontal res.: " + info;
+        return "Horizontal res.: " + ByteUtil.printLongWithHex(getConvertedValue());
     }
 
     public int getConvertedValue() {
