@@ -4,7 +4,6 @@ import image.ImgSubComponent;
 import util.PrintUtil;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -29,11 +28,19 @@ public class ColorTableType3 extends ImgSubComponent {
     }
 
     public enum ImageType {
+        /**
+         * This type could refer to the amount of bits per pixel (4), or the way to interpret the info in the table
+         * So far I have only found this value in "crwd.ssh" (crowd textures) - where ImageTypeTag is also unique
+         */
+        LOW_RES("000000000000"),
+
+        /**
+         */
         DEFAULT("000000200000");
 
         final String value;
 
-        ImageType(String value) {
+        ImageType(final String value) {
             this.value = value;
         }
 

@@ -8,7 +8,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 /**
- * This tag describes the height of the image.
+ * This tag describes the height of the image in number of pixels.
  */
 public class ImageHeightTag extends ImgSubComponent {
 

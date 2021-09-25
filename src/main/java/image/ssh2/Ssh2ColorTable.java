@@ -20,7 +20,7 @@ public class Ssh2ColorTable {
         return ssh2ColorTableHeader.getTableEndPosition();
     }
 
-    public Pixel2 getPixelFromByte(byte byte_) {
+    public Pixel2 getPixelsFromByte(byte byte_) {
         return actualTable.getPixelFromByte(byte_);
     }
 

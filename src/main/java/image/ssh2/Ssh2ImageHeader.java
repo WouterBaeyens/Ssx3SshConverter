@@ -2,6 +2,7 @@ package image.ssh2;
 
 import image.ImgSubComponent;
 import image.ssh.SshImageDecoderStrategy;
+import image.ssh2.colortableheader.strategies.ByteToPixelStrategy;
 import image.ssh2.imageheader.ImageEncodingTypeTag;
 import image.ssh2.imageheader.ImageHeightTag;
 import image.ssh2.imageheader.ImageMaterialTag;
@@ -13,7 +14,6 @@ import util.PrintUtil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Ssh2ImageHeader {
@@ -62,6 +62,14 @@ public class Ssh2ImageHeader {
         return getImageWidth() * getImageHeight();
     }
 
+    public int getImageMemorySize(){
+        return (int) (getImageSize() * getBytesPerPixel());
+    }
+
+    public double getBytesPerPixel(){
+        return imageTypeTag.getImageType().getBytesPerPixel();
+    }
+
     public long getImageWithHeaderSize(){
         return imageSizeTag.getConvertedValue();
     }
@@ -78,12 +86,16 @@ public class Ssh2ImageHeader {
         return encodingTypeTag.getEncodingType().getDecoderStrategy();
     }
 
+    public ByteToPixelStrategy getByteToPixelStrategy(){
+        return imageTypeTag.getImageType().getByteToPixelStrategy();
+    }
+
     public void printFormatted() {
         System.out.println("--SSH IMG HEADER--");
 
         long endOfImagePixels = getImageHeaderEndPosition() + getImageSize();
         System.out.println("header_start(" + ByteUtil.printLongWithHex(imageHeaderStartPosition) + ") | header_end/img_pixels_start(" + ByteUtil.printLongWithHex(getImageHeaderEndPosition()) + ") | img_pixels_end(" + ByteUtil.printLongWithHex(endOfImagePixels) + ")");
-        long calculatedImageWithHeaderSize = getImageHeaderEndPosition() - imageHeaderStartPosition + getImageSize();
+        long calculatedImageWithHeaderSize = getImageHeaderEndPosition() - imageHeaderStartPosition + getImageMemorySize();
         if (calculatedImageWithHeaderSize != getImageWithHeaderSize()) {
             System.out.println("ERROR: image_size+header_size=" + calculatedImageWithHeaderSize + "; should be " + getImageWithHeaderSize());
         }

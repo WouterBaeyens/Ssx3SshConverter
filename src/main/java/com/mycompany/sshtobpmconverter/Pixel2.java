@@ -8,7 +8,12 @@ import java.util.Arrays;
 public class Pixel2 implements IPixel {
 
     private static final Pixel2 BLACK_PIXEL = new Pixel2(new byte[4]);
-    private static final byte DEFAULT_A_VALUE = (byte) 0x80;
+    private static final Pixel2 WHITE_PIXEL = new Pixel2(new byte[]{(byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff});
+
+    /**
+     * This is the value used when the "alpha-level" is completely neutral.
+     */
+    private static final byte DEFAULT_ALPHA_VALUE = (byte) 0x80;
 
     /**
      * for this class to correctly function I assume the given byteArray will be 4 bytes long
@@ -39,7 +44,7 @@ public class Pixel2 implements IPixel {
 
     public static Pixel2 createPixelFromRGB(byte[] bytes) {
         final byte[] rgba = Arrays.copyOf(bytes, 4);
-        rgba[3] = DEFAULT_A_VALUE;
+        rgba[3] = DEFAULT_ALPHA_VALUE;
         return new Pixel2(rgba);
     }
 
@@ -49,10 +54,10 @@ public class Pixel2 implements IPixel {
     }
 
     public boolean isSpecialAlpha() {
-        return rgba[3] != DEFAULT_A_VALUE;
+        return rgba[3] != DEFAULT_ALPHA_VALUE;
     }
 
-    public static Pixel2 getBlackPixel() {
+    public static Pixel2 getDefaultPixel() {
         return BLACK_PIXEL;
     }
 

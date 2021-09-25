@@ -3,8 +3,6 @@ package image.ssh2;
 import com.mycompany.sshtobpmconverter.Pixel2;
 import util.ByteUtil;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Optional;
@@ -49,7 +47,7 @@ public class Ssh2ColorTableTable {
     }
 
     public Pixel2 getPixelFromByte(byte byte_) {
-        return Optional.ofNullable(colorMap.get(byte_)).orElse(Pixel2.getBlackPixel());
+        return Optional.ofNullable(colorMap.get(byte_)).orElse(Pixel2.getDefaultPixel());
     }
 
     /**
@@ -74,7 +72,7 @@ public class Ssh2ColorTableTable {
     public void printFormatted() {
         System.out.println("--COLOR TABLE--");
         System.out.print("colours: " + amountOfEntries);
-        System.out.print(" | Empty colours: " + amountOfZeroEntries);
+        System.out.print(" | Empty colours: " + getAmountOfNullEntries());
         System.out.println(" | Alpha colours: " + getAmountOfSpecialEntries());
     }
 }

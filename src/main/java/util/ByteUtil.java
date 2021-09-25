@@ -7,6 +7,7 @@ package util;
 
 import com.google.common.primitives.Longs;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -54,7 +55,7 @@ public class ByteUtil {
         return value;
     }
 
-    public static final void swap(byte[] a, int i, int j) {
+    public static void swap(byte[] a, int i, int j) {
         byte t = a[i];
         a[i] = a[j];
         a[j] = t;
@@ -63,7 +64,6 @@ public class ByteUtil {
     /**
      * Returns a string that also includes the hex representation as it can often help deciphering ssh files.
      *
-     * @param value
      * @return a string representation that includes the value as hex
      * ex: 17584 -> "17584/0x44b0"
      */
@@ -102,8 +102,6 @@ public class ByteUtil {
      * To clarify (since off by 1 is often a problem here)
      * 0001 1000 -> the bits that have a one, are bits 4 and 5
      *
-     * @param byte_
-     * @return
      */
     public static byte switchBit4And5(final byte byte_) {
         if (getBitFromByte(byte_, 4) == getBitFromByte(byte_, 5)) {
@@ -124,5 +122,15 @@ public class ByteUtil {
         byte result = byte_;
         result ^= 0x18; // binary: 0001 1000
         return result;
+    }
+
+    public static byte getLeftNibble(final byte _byte){
+        byte tmpByte = _byte;
+        return (byte) ((tmpByte &= 0xF0) >>> 4);
+    }
+
+    public static byte getRightNibble(final byte _byte){
+        byte tmpByte = _byte;
+        return tmpByte &= 0x0F;
     }
 }

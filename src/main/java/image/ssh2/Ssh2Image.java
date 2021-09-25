@@ -2,6 +2,7 @@ package image.ssh2;
 
 import com.mycompany.sshtobpmconverter.IPixel;
 import converter.Image;
+import image.ssh2.colortableheader.strategies.ByteToPixelStrategy;
 import image.ssh2.fileheader.ImageHeaderInfoTag;
 import util.ByteUtil;
 
@@ -49,8 +50,8 @@ public class Ssh2Image implements Image {
     }
 
     private ByteBuffer copyRawImageDataToBufferAndSkip(final ByteBuffer sshFileBuffer, final Ssh2ImageHeader ssh2ImageHeader){
-        ByteBuffer imageBuffer = slice(sshFileBuffer, ssh2ImageHeader.getImageSize());
-        sshFileBuffer.position(sshFileBuffer.position() + ssh2ImageHeader.getImageSize());
+        ByteBuffer imageBuffer = slice(sshFileBuffer, ssh2ImageHeader.getImageMemorySize());
+        sshFileBuffer.position(sshFileBuffer.position() + ssh2ImageHeader.getImageMemorySize());
         return imageBuffer;
     }
 
@@ -77,12 +78,16 @@ public class Ssh2Image implements Image {
         for (int rowNr = 0; rowNr < imgHeight; rowNr++) {
             List<IPixel> imageRow = new ArrayList<>();
             for (int i = 0; i < imgWidth; i++) {
-                byte pixelCode = tmpImageByteBuffer.get();
-                imageRow.add(ssh2ColorTable.getPixelFromByte(pixelCode));
+                IPixel pixel = getByteToPixelStrategy().readNextPixel(tmpImageByteBuffer, ssh2ColorTable, i);
+                imageRow.add(pixel);
             }
             image.add(imageRow);
         }
         return ssh2ImageHeader.getImageDecodingStrategy().decodeImage(image);
+    }
+
+    private ByteToPixelStrategy getByteToPixelStrategy(){
+        return ssh2ImageHeader.getByteToPixelStrategy();
     }
 
     /**
