@@ -4,6 +4,7 @@ import image.ImgSubComponent;
 import image.ssh.InterleafedDecoderStrategy;
 import image.ssh.NoneDecoderStrategy;
 import image.ssh.SshImageDecoderStrategy;
+import util.ByteUtil;
 import util.PrintUtil;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class ImageEncodingTypeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
 
-    public ImageEncodingTypeTag(final ByteBuffer sshFileBuffer) throws IOException {
+    public ImageEncodingTypeTag(final ByteBuffer sshFileBuffer) {
         super(sshFileBuffer, DEFAULT_SIZE);
     }
 
@@ -59,14 +60,14 @@ public class ImageEncodingTypeTag extends ImgSubComponent {
         }
 
         public static Optional<EncodingType> getEncodingType(byte[] data) {
-            String dataAsString = PrintUtil.toHexString(false, data).trim().replace(" ", "");
+            String dataAsString = ByteUtil.bytesToHex(data);
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
                     .findAny();
         }
 
         public static String getInfo(byte[] data) {
-            String dataAsString = PrintUtil.toHexString(false, data).trim().replace(" ", "");
+            String dataAsString = ByteUtil.bytesToHex(data);
             return getEncodingType(data)
                     .map(matchingType -> matchingType + "(" + matchingType.value + ")")
                     .orElseGet(() -> "Unknown encoding (" + dataAsString + ")");

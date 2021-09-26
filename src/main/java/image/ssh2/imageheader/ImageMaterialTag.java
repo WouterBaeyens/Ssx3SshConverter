@@ -1,6 +1,7 @@
 package image.ssh2.imageheader;
 
 import image.ImgSubComponent;
+import util.ByteUtil;
 import util.PrintUtil;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class ImageMaterialTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
 
-    public ImageMaterialTag(final ByteBuffer sshFileBuffer) throws IOException {
+    public ImageMaterialTag(final ByteBuffer sshFileBuffer) {
         super(sshFileBuffer, DEFAULT_SIZE);
     }
 
@@ -38,7 +39,7 @@ public class ImageMaterialTag extends ImgSubComponent {
 
         public static String getInfo(byte[] data) {
             //todo check if Hex.encodeHexString(data); is sufficient
-            String dataAsString = PrintUtil.toHexString(false, data).trim().replace(" ", "");
+            String dataAsString = ByteUtil.bytesToHex(data);
 
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))

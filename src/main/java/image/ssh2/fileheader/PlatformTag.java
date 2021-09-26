@@ -8,30 +8,33 @@ import java.nio.MappedByteBuffer;
 import java.util.Arrays;
 
 /**
- * (uncertain)
- * This tag seems to describe the version of .ssh being used. (eg. G357)
- * It can give an idea about the relative age of this file.
+ * This tag describes the platform the .ssh is targeting.
+ * It will most likely be "SHPS" for PS2.
  */
-public class VersionTag extends ImgSubComponent {
+public class PlatformTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
 
-    public VersionTag(final MappedByteBuffer buffer) throws IOException {
+    public PlatformTag(final MappedByteBuffer buffer) {
         super(buffer, DEFAULT_SIZE);
     }
 
     @Override
     public String getInfo() {
-        return "version: " + VersionType.getInfo(getBytes());
+        return "FileType: " + FileType.getInfo(getBytes());
     }
 
-    public enum VersionType {
-        SSX3("G357"),
-        SSX3_ALPHA("G352");
+    public enum FileType {
+        PC_FILE("SHPI"),
+        PS1_FILE("SHPP"),
+        PS2_FILE("SHPS"),
+        XBOX_FILE("SHPX"),
+        Xbox_FILE("ShpX"),
+        PSP_FILE("SHPM");
 
         final String value;
 
-        VersionType(String value) {
+        FileType(String value) {
             this.value = value;
         }
 
@@ -39,8 +42,8 @@ public class VersionTag extends ImgSubComponent {
             String dataAsString = new String(data);
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
-                    .findAny().map(matchingType -> matchingType + "(" + matchingType.value + ")")
-                    .orElseGet(() -> "Unknown (" + dataAsString + ")");
+                    .findAny().map(fileType -> fileType + "(" + fileType.value + ")")
+                    .orElseGet(() -> "Unknown type (" + dataAsString + ")");
         }
     }
 }

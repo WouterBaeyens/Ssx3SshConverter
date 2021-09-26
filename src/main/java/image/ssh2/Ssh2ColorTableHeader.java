@@ -1,17 +1,16 @@
 package image.ssh2;
 
 import image.ImgSubComponent;
-import image.ssh2.colortableheader.ColorTableEntriesCopyTag;
 import image.ssh2.colortableheader.ColorTableEntriesTag;
+import image.ssh2.colortableheader.ColorTableWidthTag;
 import image.ssh2.colortableheader.ColorTableSizeTag;
+import image.ssh2.colortableheader.ColorTableHeightTag;
 import image.ssh2.colortableheader.ColorTableType2;
-import image.ssh2.colortableheader.ColorTableType3;
 import image.ssh2.colortableheader.ColorTableTypeTag;
 import util.ByteUtil;
 import util.PrintUtil;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -20,22 +19,22 @@ public class Ssh2ColorTableHeader {
     //these components (in this order) make up the complete tableHeader
     private final ColorTableTypeTag typeTag;
     private final ColorTableSizeTag sizeTag;
-    private final ColorTableEntriesTag amountOfEntriesTag;
-    private final ColorTableType2 actualTableLocation;
-    private final ColorTableEntriesCopyTag amountOfEntriesCopyTag;
-    private final ColorTableType3 colorTableType3;
+    private final ColorTableWidthTag amountOfEntriesTag;
+    private final ColorTableHeightTag actualTableLocation;
+    private final ColorTableEntriesTag amountOfEntriesCopyTag;
+    private final ColorTableType2 colorTableType2;
 
     private final List<ImgSubComponent> componentsOrdered;
 
     public Ssh2ColorTableHeader(final ByteBuffer sshFileBuffer) throws IOException {
         this.typeTag = new ColorTableTypeTag(sshFileBuffer);
         this.sizeTag = new ColorTableSizeTag(sshFileBuffer);
-        this.amountOfEntriesTag = new ColorTableEntriesTag(sshFileBuffer);
-        this.actualTableLocation = new ColorTableType2(sshFileBuffer);
-        this.amountOfEntriesCopyTag = new ColorTableEntriesCopyTag(sshFileBuffer, amountOfEntriesTag.getConvertedValue());
-        this.colorTableType3 = new ColorTableType3(sshFileBuffer);
+        this.amountOfEntriesTag = new ColorTableWidthTag(sshFileBuffer);
+        this.actualTableLocation = new ColorTableHeightTag(sshFileBuffer);
+        this.amountOfEntriesCopyTag = new ColorTableEntriesTag(sshFileBuffer, amountOfEntriesTag.getConvertedValue());
+        this.colorTableType2 = new ColorTableType2(sshFileBuffer);
 
-        this.componentsOrdered = List.of(typeTag, sizeTag, amountOfEntriesTag, actualTableLocation, amountOfEntriesCopyTag, colorTableType3);
+        this.componentsOrdered = List.of(typeTag, sizeTag, amountOfEntriesTag, actualTableLocation, amountOfEntriesCopyTag, colorTableType2);
     }
 
     public void printFormatted() {

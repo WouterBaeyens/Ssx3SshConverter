@@ -6,10 +6,8 @@ import filecollection.SourceFileWrapperBmp;
 import filecollection.SourceFileWrapperSsh;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.Set;
-import java.nio.MappedByteBuffer;
 
 public class MainConverter2 {
 

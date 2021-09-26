@@ -21,11 +21,11 @@ public abstract class ImgSubComponent {
     }
 
 
-    public ImgSubComponent(final ByteBuffer buffer, final long size) throws IOException {
+    public ImgSubComponent(final ByteBuffer buffer, final long size) {
         this(buffer, buffer.position(), size);
     }
 
-    public ImgSubComponent(final ByteBuffer buffer, final long startPosition, final long size) throws IOException {
+    public ImgSubComponent(final ByteBuffer buffer, final long startPosition, final long size) {
         this.startPosition = startPosition;
         this.componentSize = Math.toIntExact(size);
         this.data = FileUtil.readAndConsume(buffer, componentSize);

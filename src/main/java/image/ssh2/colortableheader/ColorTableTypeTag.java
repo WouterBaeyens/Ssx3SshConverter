@@ -1,6 +1,7 @@
 package image.ssh2.colortableheader;
 
 import image.ImgSubComponent;
+import util.ByteUtil;
 import util.PrintUtil;
 
 import java.io.IOException;
@@ -9,22 +10,20 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
- * The purpose and info within this tag are completely unknown.
- * The only thing to go off is that it's value is always 0x02 so far
- * <p>
- * Note: even the name ImageTypeTag is just a wild guess
+ * This tag describes the type of table.
+ * So far it looks to always be 0x21
  */
 public class ColorTableTypeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 1;
 
-    public ColorTableTypeTag(final ByteBuffer buffer) throws IOException {
+    public ColorTableTypeTag(final ByteBuffer buffer) {
         super(buffer, DEFAULT_SIZE);
     }
 
     @Override
     public String getInfo() {
-        return "?TableType?: " + ImageType.getInfo(getBytes());
+        return "TableType: " + ImageType.getInfo(getBytes());
     }
 
     public enum ImageType {
@@ -37,7 +36,7 @@ public class ColorTableTypeTag extends ImgSubComponent {
         }
 
         public static String getInfo(byte[] data) {
-            String dataAsString = PrintUtil.toHexString(false, data).trim().replace(" ", "");
+            String dataAsString = ByteUtil.bytesToHex(data);
 
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))

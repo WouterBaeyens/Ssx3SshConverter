@@ -1,12 +1,12 @@
 package image.ssh2;
 
 import image.ImgSubComponent;
-import image.ssh2.fileheader.ArchiveTag;
-import image.ssh2.fileheader.FileSizeTag;
-import image.ssh2.fileheader.FileTypeTag;
+import image.ssh2.fileheader.NumberOfEntriesTag;
+import image.ssh2.fileheader.TotalFileSizeTag;
+import image.ssh2.fileheader.PlatformTag;
 import image.ssh2.fileheader.FillerTag;
 import image.ssh2.fileheader.ImageHeaderInfoTag;
-import image.ssh2.fileheader.VersionTag;
+import image.ssh2.fileheader.FileTypeTag;
 import util.PrintUtil;
 
 import java.io.IOException;
@@ -17,17 +17,12 @@ import java.util.stream.Stream;
 
 public class Ssh2FileHeader {
 
-//    private final List<ImgSubComponent> subComponents = new ArrayList<>();
-//    private final List<ImageHeaderInfoTag> imageInfoList = new ArrayList<>();
-//    private final long fileSize;
-//    private final long amountOfImages;
-
     //these components (in this order) make up the complete fileHeader
 
+    private final PlatformTag platformTag;
+    private final TotalFileSizeTag totalFileSizeTag;
+    private final NumberOfEntriesTag numberOfEntriesTag;
     private final FileTypeTag fileTypeTag;
-    private final FileSizeTag fileSizeTag;
-    private final ArchiveTag archiveTag;
-    private final VersionTag versionTag;
     private final List<ImageHeaderInfoTag> imageHeaderInfoTags;
     //    private final EaTag eaTag;
     private final FillerTag fillerTag;
@@ -35,23 +30,23 @@ public class Ssh2FileHeader {
     private final List<ImgSubComponent> componentsOrdered;
 
     public Ssh2FileHeader(final MappedByteBuffer sshFileBuffer) throws IOException {
+        this.platformTag = new PlatformTag(sshFileBuffer);
+        this.totalFileSizeTag = new TotalFileSizeTag(sshFileBuffer);
+        this.numberOfEntriesTag = new NumberOfEntriesTag(sshFileBuffer);
         this.fileTypeTag = new FileTypeTag(sshFileBuffer);
-        this.fileSizeTag = new FileSizeTag(sshFileBuffer);
-        this.archiveTag = new ArchiveTag(sshFileBuffer);
-        this.versionTag = new VersionTag(sshFileBuffer);
         this.imageHeaderInfoTags = readImageInfoList(sshFileBuffer);
 
         final long fillerStart = imageHeaderInfoTags.get(imageHeaderInfoTags.size() - 1).getEndPos();
         final long headerSpaceLeft = getStartOfImageFiles() - fillerStart;
         this.fillerTag = new FillerTag(sshFileBuffer, fillerStart, headerSpaceLeft);
         this.componentsOrdered = List.of(
-                Stream.of(List.of(this.fileTypeTag, fileSizeTag, archiveTag, versionTag), imageHeaderInfoTags, List.of(fillerTag))
+                Stream.of(List.of(this.platformTag, totalFileSizeTag, numberOfEntriesTag, fileTypeTag), imageHeaderInfoTags, List.of(fillerTag))
                         .flatMap(List::stream)
                         .toArray(ImgSubComponent[]::new)
         );
     }
 
-    private List<ImageHeaderInfoTag> readImageInfoList(final MappedByteBuffer buffer) throws IOException {
+    private List<ImageHeaderInfoTag> readImageInfoList(final MappedByteBuffer buffer) {
         List<ImageHeaderInfoTag> imageHeaders = new ArrayList<>();
         for (int imageNr = 0; imageNr < getNumberOfImages(); imageNr++) {
             final ImageHeaderInfoTag imageHeaderInfoTag = new ImageHeaderInfoTag(buffer);
@@ -65,7 +60,7 @@ public class Ssh2FileHeader {
     }
 
     public long getNumberOfImages() {
-        return archiveTag.getConvertedValue();
+        return numberOfEntriesTag.getConvertedValue();
     }
 
     public long getStartOfImageFiles() {
@@ -73,7 +68,7 @@ public class Ssh2FileHeader {
     }
 
     public long getFileSize() {
-        return fileSizeTag.getConvertedValue();
+        return totalFileSizeTag.getConvertedValue();
     }
 
     public void printFormatted() {

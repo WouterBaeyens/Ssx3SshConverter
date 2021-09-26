@@ -1,9 +1,11 @@
 package image.ssh2.imageheader;
 
 import image.ImgSubComponent;
+import image.ssh2.colortableheader.ColorTableType2;
 import image.ssh2.colortableheader.strategies.ByteToPixelStrategy;
 import image.ssh2.colortableheader.strategies._4BitByteToPixelStrategy;
 import image.ssh2.colortableheader.strategies._8BitByteToPixelStrategy;
+import util.ByteUtil;
 import util.PrintUtil;
 
 import java.io.IOException;
@@ -12,27 +14,24 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * The purpose and info within this tag are completely unknown.
- * The only thing to go off is that it's value is always 0x02 so far
- * <p>
- * Note: even the name ImageTypeTag is just a wild guess
+ * This tag describes the type of image (bits per pixel etc.) that the data contains.
  */
 public class ImageTypeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 1;
 
-    public ImageTypeTag(final ByteBuffer sshFileBuffer) throws IOException {
+    public ImageTypeTag(final ByteBuffer sshFileBuffer) {
         super(sshFileBuffer, DEFAULT_SIZE);
     }
 
     public ImageType getImageType() {
         return ImageType.getImageType(getBytes())
-                .orElse(ImageType.DEFAULT);
+                .orElse(ImageType.DEFAULT_8BPP);
     }
 
     @Override
     public String getInfo() {
-        return "?ImageType?: " + ImageType.getInfo(getBytes());
+        return "ImageType: " + ImageType.getInfo(getBytes());
     }
 
     public enum ImageType {
@@ -41,15 +40,15 @@ public class ImageTypeTag extends ImgSubComponent {
          * Only 16 colours are used, that way each byte contains the info for 2 pixels (each described by 4 bits).
          * An example image of this type would be "crwd.ssh" (crowd textures)
          *
-         * Note: for now I'm just guessing it's this value and not {@link image.ssh2.colortableheader.ColorTableType3} describing this property
+         * Note: for now I'm just guessing it's this value and not {@link ColorTableType2} describing this property
          *          as I have not found an example where they change independently
          */
-        LOW_RES("01", new _4BitByteToPixelStrategy(), 0.5),
+        LOW_RES_4BPP("01", new _4BitByteToPixelStrategy(), 0.5),
 
         /**
          * 256 colours are used, each byte contains the info for exactly 1 pixel.
          */
-        DEFAULT("02", new _8BitByteToPixelStrategy(), 1);
+        DEFAULT_8BPP("02", new _8BitByteToPixelStrategy(), 1);
 
         final String value;
         final ByteToPixelStrategy byteToPixelStrategy;
@@ -62,7 +61,7 @@ public class ImageTypeTag extends ImgSubComponent {
         }
 
         public static String getInfo(byte[] data) {
-            String dataAsString = PrintUtil.toHexString(false, data).trim().replace(" ", "");
+            String dataAsString = ByteUtil.bytesToHex(data);
 
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
@@ -79,7 +78,7 @@ public class ImageTypeTag extends ImgSubComponent {
         }
 
         public static Optional<ImageType> getImageType(byte[] data) {
-            String dataAsString = PrintUtil.toHexString(false, data).trim().replace(" ", "");
+            String dataAsString = ByteUtil.bytesToHex(data);
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
                     .findAny();

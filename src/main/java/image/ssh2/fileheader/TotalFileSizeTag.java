@@ -11,12 +11,12 @@ import java.nio.MappedByteBuffer;
 /**
  * This tag describes the size of the full ssh file.
  */
-public class FileSizeTag extends ImgSubComponent {
+public class TotalFileSizeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
     private final long actualFileSize;
 
-    public FileSizeTag(final ByteBuffer buffer) throws IOException {
+    public TotalFileSizeTag(final ByteBuffer buffer) {
         super(buffer, DEFAULT_SIZE);
         actualFileSize = buffer.remaining() + buffer.position();
     }
@@ -29,7 +29,7 @@ public class FileSizeTag extends ImgSubComponent {
         } else if (getConvertedValue() < actualFileSize) {
             info += " warning: does NOT match actual file size!! " + actualFileSize + "(0x" + Long.toHexString(actualFileSize) + ")";
         }
-        return "FileSize: " + info;
+        return "TotalFileSize: " + info;
     }
 
     public long getConvertedValue() {

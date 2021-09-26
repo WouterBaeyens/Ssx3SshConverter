@@ -18,7 +18,7 @@ public class Ssh2Image implements Image {
     private final Ssh2ImageHeader ssh2ImageHeader;
     private final ByteBuffer imageByteBuffer;
     private final Ssh2ColorTable ssh2ColorTable;
-    private final Ssh2ImageFooter ssh2ImageFooter;
+    private final Ssh2ImageAttachments ssh2ImageAttachments;
 
 
     public Ssh2Image(final ByteBuffer sshFileBuffer, final ImageHeaderInfoTag imageInfo) throws IOException {
@@ -28,7 +28,7 @@ public class Ssh2Image implements Image {
         // todo replace by raster if possible
         this.imageByteBuffer = copyRawImageDataToBufferAndSkip(sshFileBuffer, ssh2ImageHeader);
         this.ssh2ColorTable = new Ssh2ColorTable(sshFileBuffer);
-        this.ssh2ImageFooter = new Ssh2ImageFooter(sshFileBuffer);
+        this.ssh2ImageAttachments = new Ssh2ImageAttachments(sshFileBuffer);
     }
 
     public long getImageEndPosition() {
@@ -108,14 +108,14 @@ public class Ssh2Image implements Image {
 
     @Override
     public void printFormatted() {
-        String imageTitle = "* image: " + getImageName() + " *";
-        System.out.println("\n" + "*".repeat(imageTitle.length() + 2));
+        String imageTitle = "* image: " + getImageName() + "   *";
+        System.out.println("\n" + "*".repeat(imageTitle.length()));
         System.out.println(imageTitle);
-        System.out.println("*".repeat(imageTitle.length() + 2) + "\n");
+        System.out.println("*".repeat(imageTitle.length()) + "\n");
 
         ssh2ImageHeader.printFormatted();
         ssh2ColorTable.printFormatted();
-        ssh2ImageFooter.printFormatted();
+        ssh2ImageAttachments.printFormatted();
     }
 
     @Override

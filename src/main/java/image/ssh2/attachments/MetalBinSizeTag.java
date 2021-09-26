@@ -1,26 +1,25 @@
-package image.ssh2.footer;
+package image.ssh2.attachments;
 
 import image.ImgSubComponent;
 import util.ByteUtil;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 /**
  * This tag describes the size of the full ssh file.
  */
-public class FooterContentSizeTag extends ImgSubComponent {
+public class MetalBinSizeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 3;
 
-    public FooterContentSizeTag(final ByteBuffer buffer) throws IOException {
+    public MetalBinSizeTag(final ByteBuffer buffer) {
         super(buffer, DEFAULT_SIZE);
     }
 
     @Override
     public String getInfo() {
-        return "FooterSize: " + ByteUtil.printLongWithHex(getConvertedValue());
+        return "Attachment size: " + ByteUtil.printLongWithHex(getConvertedValue());
     }
 
     public long getConvertedValue() {

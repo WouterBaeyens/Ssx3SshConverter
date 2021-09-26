@@ -10,7 +10,7 @@ import java.nio.MappedByteBuffer;
 /**
  * This tag describes the number of images contained within the ssh file
  */
-public class ArchiveTag extends ImgSubComponent {
+public class NumberOfEntriesTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
 
@@ -19,13 +19,13 @@ public class ArchiveTag extends ImgSubComponent {
      */
     private static final int REASONABLE_MAX_NUMBER_OF_IMAGES_IN_FILE = 1000;
 
-    public ArchiveTag(final MappedByteBuffer buffer) throws IOException {
+    public NumberOfEntriesTag(final MappedByteBuffer buffer) {
         super(buffer, DEFAULT_SIZE);
         checkAssertions();
     }
 
     private void checkAssertions(){
-        if(getConvertedValue() > 1000) {
+        if(getConvertedValue() > REASONABLE_MAX_NUMBER_OF_IMAGES_IN_FILE) {
             throw new IllegalStateException("Likely something went wrong reading the data: The meta-data describes this ssh-file contains " + getConvertedValue() + " images (anything above "+ REASONABLE_MAX_NUMBER_OF_IMAGES_IN_FILE + " is considered unreasonably high).");
         }
     }

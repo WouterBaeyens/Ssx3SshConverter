@@ -19,13 +19,13 @@ public class ImageHeaderInfoTag extends ImgSubComponent {
     private static final int HEADER_LOCATION_SIZE = 4;
     private static final int DEFAULT_SIZE = NAME_SIZE + HEADER_LOCATION_SIZE;
 
-    public ImageHeaderInfoTag(final ByteBuffer file) throws IOException {
+    public ImageHeaderInfoTag(final ByteBuffer file) {
         super(file, DEFAULT_SIZE);
     }
 
     @Override
     public String getInfo() {
-        return "Img:(name=" + getName() + "; headerLocation=" + ByteUtil.printLongWithHex(getHeaderLocation()) + ")";
+        return "Img:(nameTag=" + getName() + "; headerLocation=" + ByteUtil.printLongWithHex(getHeaderLocation()) + ")";
     }
 
     public String getName() {

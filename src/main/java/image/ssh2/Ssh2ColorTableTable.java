@@ -74,5 +74,6 @@ public class Ssh2ColorTableTable {
         System.out.print("colours: " + amountOfEntries);
         System.out.print(" | Empty colours: " + getAmountOfNullEntries());
         System.out.println(" | Alpha colours: " + getAmountOfSpecialEntries());
+        System.out.println();
     }
 }
