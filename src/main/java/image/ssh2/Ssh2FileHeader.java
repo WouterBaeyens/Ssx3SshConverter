@@ -10,7 +10,7 @@ import image.ssh2.fileheader.FileTypeTag;
 import util.PrintUtil;
 
 import java.io.IOException;
-import java.nio.MappedByteBuffer;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -29,7 +29,7 @@ public class Ssh2FileHeader {
 
     private final List<ImgSubComponent> componentsOrdered;
 
-    public Ssh2FileHeader(final MappedByteBuffer sshFileBuffer) throws IOException {
+    public Ssh2FileHeader(final ByteBuffer sshFileBuffer) {
         this.platformTag = new PlatformTag(sshFileBuffer);
         this.totalFileSizeTag = new TotalFileSizeTag(sshFileBuffer);
         this.numberOfEntriesTag = new NumberOfEntriesTag(sshFileBuffer);
@@ -46,7 +46,7 @@ public class Ssh2FileHeader {
         );
     }
 
-    private List<ImageHeaderInfoTag> readImageInfoList(final MappedByteBuffer buffer) {
+    private List<ImageHeaderInfoTag> readImageInfoList(final ByteBuffer buffer) {
         List<ImageHeaderInfoTag> imageHeaders = new ArrayList<>();
         for (int imageNr = 0; imageNr < getNumberOfImages(); imageNr++) {
             final ImageHeaderInfoTag imageHeaderInfoTag = new ImageHeaderInfoTag(buffer);

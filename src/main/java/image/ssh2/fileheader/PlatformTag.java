@@ -4,6 +4,7 @@ import image.ImgSubComponent;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.Arrays;
 
@@ -15,7 +16,7 @@ public class PlatformTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
 
-    public PlatformTag(final MappedByteBuffer buffer) {
+    public PlatformTag(final ByteBuffer buffer) {
         super(buffer, DEFAULT_SIZE);
     }
 

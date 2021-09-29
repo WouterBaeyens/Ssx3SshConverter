@@ -1,5 +1,6 @@
 package image.ssh2;
 
+import image.ssh2.compression.CompressedFile;
 import image.ssh2.fileheader.ImageHeaderInfoTag;
 import util.ByteUtil;
 
@@ -17,7 +18,7 @@ public class Ssh2File {
 
     private static final String READ_ONLY_MODE = "r";
     private final RandomAccessFile sshFile;
-    private final MappedByteBuffer sshFileBuffer;
+    private final ByteBuffer sshFileBuffer;
 
     private final Ssh2FileHeader ssh2FileHeader;
     private final List<Ssh2Image> images;
@@ -25,7 +26,7 @@ public class Ssh2File {
     public Ssh2File(File sshFile) throws IOException {
         System.out.println("Deserialising ssh file");
         this.sshFile = openStream(sshFile);
-        this.sshFileBuffer = attachBuffer(this.sshFile);
+        this.sshFileBuffer = decompressFile(this.sshFile);
         // todo - consider static read methods instead to improve readability
         this.ssh2FileHeader = deserializeFileHeader(0);
         this.images = deserializeImages(ssh2FileHeader.getImageInfoList());
@@ -37,12 +38,18 @@ public class Ssh2File {
         return new RandomAccessFile(sshFile, READ_ONLY_MODE);
     }
 
-    private MappedByteBuffer attachBuffer(RandomAccessFile raf) throws IOException {
+    private ByteBuffer decompressFile(final RandomAccessFile raf) throws IOException {
+        CompressedFile compressedFile = new CompressedFile(attachBuffer(raf));
+        return compressedFile.decompress();
+    }
+
+    private ByteBuffer attachBuffer(final RandomAccessFile raf) throws IOException {
         final FileChannel ch = raf.getChannel();
         int fileLength = Math.toIntExact(ch.size());
         return ch.map(FileChannel.MapMode.READ_ONLY, 0,
                 fileLength);
     }
+
 
     private Ssh2FileHeader deserializeFileHeader(long fileHeaderPosition) throws IOException {
         sshFileBuffer.position(Math.toIntExact(fileHeaderPosition));

@@ -5,6 +5,7 @@ import util.ByteUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 
 /**
@@ -19,7 +20,7 @@ public class NumberOfEntriesTag extends ImgSubComponent {
      */
     private static final int REASONABLE_MAX_NUMBER_OF_IMAGES_IN_FILE = 1000;
 
-    public NumberOfEntriesTag(final MappedByteBuffer buffer) {
+    public NumberOfEntriesTag(final ByteBuffer buffer) {
         super(buffer, DEFAULT_SIZE);
         checkAssertions();
     }

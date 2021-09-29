@@ -6,6 +6,7 @@ import util.PrintUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.stream.IntStream;
 
@@ -36,11 +37,11 @@ public class FillerTag extends ImgSubComponent {
      */
     private static final long DESIRED_START_ADDRESS_INCREMENT = 128;
 
-    public FillerTag(final MappedByteBuffer buffer, final long startPosition) throws IOException {
+    public FillerTag(final MappedByteBuffer buffer, final long startPosition) {
         this(buffer, startPosition, getNeededFillerSize(startPosition));
     }
 
-    public FillerTag(final MappedByteBuffer buffer, final long startPosition, long actualSize) throws IOException {
+    public FillerTag(final ByteBuffer buffer, final long startPosition, long actualSize) {
         super(buffer, startPosition, actualSize);
     }
 

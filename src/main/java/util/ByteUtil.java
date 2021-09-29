@@ -70,6 +70,14 @@ public class ByteUtil {
         return value;
     }
 
+    public static long convertToLongBE(byte[] bytes) {
+        long value = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            value += ((long) bytes[(bytes.length - 1) - i] & 0xffL) << (8 * i);
+        }
+        return value;
+    }
+
     public static void swap(byte[] a, int i, int j) {
         byte t = a[i];
         a[i] = a[j];
@@ -126,7 +134,7 @@ public class ByteUtil {
         }
     }
 
-    private static int getBitFromByte(final byte byte_, final int position) {
+    public static int getBitFromByte(final byte byte_, final int position) {
         byte result = byte_;
         result >>>= (position - 1);
         result &= 1;
