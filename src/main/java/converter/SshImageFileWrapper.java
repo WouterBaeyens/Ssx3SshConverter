@@ -6,8 +6,10 @@
 package converter;
 
 import com.google.common.io.Files;
+import com.mycompany.sshtobpmconverter.IPixel;
 import image.ssh.SshHeader;
 import image.ssh.SshImage;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,34 +23,34 @@ import java.util.Map;
  *
  * @author Wouter
  */
-public class SshImageFileWrapper implements ImageFileWrapper{
+public class SshImageFileWrapper implements Image {
 
+    private static final String READ_ONLY_MODE = "r";
     private RandomAccessFile file;
     private SshHeader header;
     private SshImage image;
     
     public SshImageFileWrapper(File sshFile) throws FileNotFoundException, IOException{
-        if(!isSshFile(sshFile))
+        if (!isSshFile(sshFile)) {
             throw new IllegalArgumentException("only ssh files allowed!");
-        String filePermissions = "r";
-        file = new RandomAccessFile(sshFile, filePermissions);
-        header = new SshHeader(file);
+        }
+        file = new RandomAccessFile(sshFile, READ_ONLY_MODE);
+        header = new SshHeader(file, 0);
         long imageOffset = header.getSize();
         image = new SshImage(file, imageOffset);
     }
-    
-    public SshImageFileWrapper(ImageFileWrapper wrapper) throws IOException{
+
+    public SshImageFileWrapper(Image wrapper) throws IOException {
         image = new SshImage(wrapper);
         header = new SshHeader(image, "");
     }
-    
-    @Override
-    public Map<Integer, List<Pixel>> getImageRow(int rowNr) throws IOException {
+
+    public Map<Integer, List<IPixel>> getImageRow(int rowNr) throws IOException {
         return image.getImageRow(rowNr);
     }
     
     @Override
-    public List<List<Pixel>> getImage() throws IOException{
+    public List<List<IPixel>> getImage() throws IOException {
         return image.getImage();
     }
 
@@ -68,7 +70,6 @@ public class SshImageFileWrapper implements ImageFileWrapper{
         return extension.equals("ssh");
     }
 
-    @Override
     public void writeToFile(OutputStream os) throws IOException {
         header.writeToFile(os);
         image.writeToFile(os);

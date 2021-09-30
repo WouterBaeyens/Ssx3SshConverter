@@ -7,8 +7,9 @@ package image.ssh;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import converter.Pixel;
-import java.awt.Point;
+import com.mycompany.sshtobpmconverter.IPixel;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +20,8 @@ import java.util.List;
 public class InterleafedDecoderStrategy implements SshImageDecoderStrategy{
 
     @Override
-    public List<List<Pixel>> decodeImage(List<List<Pixel>> encodedImage) {
-        List<List<Pixel>> decodedImage = new ArrayList<>();
+    public List<List<IPixel>> decodeImage(List<List<IPixel>> encodedImage) {
+        List<List<IPixel>> decodedImage = new ArrayList<>();
         int nrOfRows = encodedImage.size();
         int nrOfColumns = encodedImage.get(0).size();
         for(int rowNr = 0; rowNr < nrOfRows; rowNr ++){
@@ -33,8 +34,8 @@ public class InterleafedDecoderStrategy implements SshImageDecoderStrategy{
     }
     
     @Override
-    public List<List<Pixel>> encodeImage(List<List<Pixel>> decodedImage) {
-        List<List<Pixel>> encodedImage = new ArrayList<>();
+    public List<List<IPixel>> encodeImage(List<List<IPixel>> decodedImage) {
+        List<List<IPixel>> encodedImage = new ArrayList<>();
         int nrOfRows = decodedImage.size();
         int nrOfColumns = decodedImage.get(0).size();
         for(int rowNr = 0; rowNr < nrOfRows; rowNr ++){
@@ -45,8 +46,8 @@ public class InterleafedDecoderStrategy implements SshImageDecoderStrategy{
         }
         return encodedImage;
     }
- 
-    private Pixel getPixelDecodedImage(List<List<Pixel>> encodedImage, int rowNr, int colNr){
+
+    private IPixel getPixelDecodedImage(List<List<IPixel>> encodedImage, int rowNr, int colNr) {
         boolean rowIsEven = rowNr % 2 == 0;
         int imgLength = encodedImage.get(0).size();
         
@@ -84,7 +85,7 @@ public class InterleafedDecoderStrategy implements SshImageDecoderStrategy{
      * @param colNr The column for which you need the pixel in the encoded image
      * @return A point representing (row, col) of where to find the pixel.
      */
-    private Pixel getPixelInEncodedImage(List<List<Pixel>> image, int rowNr, int colNr){
+    private IPixel getPixelInEncodedImage(List<List<IPixel>> image, int rowNr, int colNr) {
             //2 parts:  1. find the base, where to generally find the Pixel
             //          2. find where in the encodingMap to find the offset
             //          3. find the exact offset using the map

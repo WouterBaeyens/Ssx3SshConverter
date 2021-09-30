@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mycompany</groupId>
     <artifactId>SshToBpmConverter</artifactId>
@@ -14,6 +15,7 @@
     <build>
   <plugins>
     <plugin>
+        <version>2.2.1.RELEASE</version>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-maven-plugin</artifactId>
     <executions>
@@ -24,32 +26,62 @@
             <configuration>
                 <classifier>spring-boot</classifier>
                 <mainClass>
-                  com.mycompany.sshtobpmconverter.MainConverter
+                    com.mycompany.sshtobpmconverter.MainConverter2
                 </mainClass>
             </configuration>
         </execution>
     </executions>
 </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+              <source>13</source>
+              <target>13</target>
+          </configuration>
+      </plugin>
   </plugins>
 </build>
     <dependencies>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.2</version>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>27.0-jre</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+        <!--         https://mvnrepository.com/artifact/commons-codec/commons-codec-->
+
         <dependency>
-            <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
+            <groupId>commons-codec</groupId>
             <version>1.11</version>
         </dependency>
-<dependency>
-  <groupId>org.fusesource.jansi</groupId>
-  <artifactId>jansi</artifactId>
-  <version>1.17.1</version>
-</dependency>
-<dependency>
+        <!-- https://mvnrepository.com/artifact/org.fusesource.jansi/jansi -->
+        <dependency>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>1.18</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-lang3</artifactId>
     <version>3.5</version>

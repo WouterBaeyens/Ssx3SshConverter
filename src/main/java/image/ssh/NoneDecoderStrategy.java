@@ -5,7 +5,8 @@
  */
 package image.ssh;
 
-import converter.Pixel;
+import com.mycompany.sshtobpmconverter.IPixel;
+
 import java.util.List;
 
 /**
@@ -15,12 +16,12 @@ import java.util.List;
 public class NoneDecoderStrategy implements SshImageDecoderStrategy{
 
     @Override
-    public List<List<Pixel>> decodeImage(List<List<Pixel>> image) {
+    public List<List<IPixel>> decodeImage(List<List<IPixel>> image) {
         return image;
     }
 
     @Override
-    public List<List<Pixel>> encodeImage(List<List<Pixel>> image) {
+    public List<List<IPixel>> encodeImage(List<List<IPixel>> image) {
         return image;
     }
     

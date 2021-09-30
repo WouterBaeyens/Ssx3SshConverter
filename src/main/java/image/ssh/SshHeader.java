@@ -6,20 +6,16 @@
 package image.ssh;
 
 //import com.mycompany.sshtobpmconverter.*;
+
 import image.ImgComponent;
 import util.ByteUtil;
 import util.PrintUtil;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 
 /**
  *
@@ -30,7 +26,8 @@ public class SshHeader implements ImgComponent{
     
     private long positionOffset;
     /*SSH HEADER*/
-    
+    //todo automatically recalculate
+    private static final byte[] prefix = new byte[6];
     //this is the hex value of "SHPS"
     private static final byte[] SHPS = {0x53, 0x48, 0x50, 0x53};
     //the total file size
@@ -102,7 +99,7 @@ public class SshHeader implements ImgComponent{
     }
     
     public byte[] toByteArray(){
-        byte[] header = ByteUtil.combineByteArrays(SHPS, fileSize, archive, g357, 
+        byte[] header = ByteUtil.combineByteArrays(SHPS, fileSize, archive, g357,
                 fileName, headerSize, buy_erts, unused1);
         return header;
     }

@@ -5,22 +5,20 @@
  */
 package image.ssh;
 
-import com.mycompany.sshtobpmconverter.*;
-import util.ByteUtil;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import converter.ImageFileWrapper;
+import com.mycompany.sshtobpmconverter.IPixel;
+import converter.Image;
 import converter.Pixel;
 import image.ImgComponent;
+import org.apache.commons.codec.DecoderException;
+import util.ByteUtil;
+import util.PrintUtil;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.List;
-import java.util.Map;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.ArrayUtils;
-import util.PrintUtil;
 
 /**
  *
@@ -36,7 +34,7 @@ public class SshColorTable implements ImgComponent {
     private int sshTableDelimiterSize = 1;
     private final byte sshTableDelimiter = (byte) 0x80;
 
-    private BiMap<Integer, Pixel> colorMap = HashBiMap.create();
+    private BiMap<Integer, IPixel> colorMap = HashBiMap.create();
 
     public SshColorTable(RandomAccessFile sshFile, long offset) throws IOException {
         this.offset = offset;
@@ -45,7 +43,6 @@ public class SshColorTable implements ImgComponent {
         for (int i = 0; i < nrOfTableEntries; i++) {
             int pixelCode = getPixelCodeFromTableIndexNr(i);
             sshFile.read(bgrValue);
-
 
             try {
                 colorMap.put(pixelCode, Pixel.createPixelFromBGR(bgrValue));
@@ -56,12 +53,12 @@ public class SshColorTable implements ImgComponent {
         }
     }
 
-    public SshColorTable(ImageFileWrapper wrapper) throws IOException {
+    public SshColorTable(Image wrapper) throws IOException {
         int width = wrapper.getImgWidth();
-        List<List<Pixel>> image = wrapper.getImage();
+        List<List<IPixel>> image = wrapper.getImage();
         int colorNr = 0;
-        for (List<Pixel> row : image) {
-            for (Pixel pixel : row) {
+        for (List<IPixel> row : image) {
+            for (IPixel pixel : row) {
                 if (!colorMap.containsValue(pixel)) {
                     colorMap.put(colorNr, pixel);
                     colorNr ++;
@@ -88,13 +85,14 @@ public class SshColorTable implements ImgComponent {
         return ByteUtil.simulateSwitching4th5thBit(pixelCode) % 256;
     }
 
-    public byte getByteFromPixel(Pixel pixel) {
+    public byte getByteFromPixel(IPixel pixel) {
         int result = colorMap.inverse().get(pixel);
         return (byte) result;
     }
 
-    public Pixel getPixelfromPixelCode(int charCode) {
+    public IPixel getPixelfromPixelCode(int charCode) {
         return colorMap.get(charCode);
+
     }
 
     @Override
@@ -106,7 +104,6 @@ public class SshColorTable implements ImgComponent {
      * Creates the table that ssh uses to determine the color Note: rgb-value is
      * noted as "brg"
      *
-     * @param colorTable
      * @return
      * @throws IOException
      * @throws DecoderException
@@ -120,8 +117,8 @@ public class SshColorTable implements ImgComponent {
             //convert to ssh-table order
             int pixelCode = getPixelCodeFromTableIndexNr(tableIndex);
             if (colorMap.containsKey(pixelCode)) {
-                Pixel pixel = colorMap.get(pixelCode);
-                currentPixelBGR = pixel.getBGRValue();
+                IPixel pixel = colorMap.get(pixelCode);
+                currentPixelBGR = pixel.getRGBValueLE();
             } else {
                 currentPixelBGR = new byte[3];
             }

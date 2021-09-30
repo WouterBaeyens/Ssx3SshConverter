@@ -7,6 +7,9 @@ package com.mycompany.sshtobpmconverter;
 
 import converter.BmpImageFileWrapper;
 import converter.SshImageFileWrapper;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,50 +19,48 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 //import java.util.stream.Stream;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.lang3.StringUtils;
-
 /**
- *
  * @author Wouter
  */
 public class MainConverter {
-public static final String BMP_EXT = ".bmp";
-public static final String SSH_EXT = ".ssh";
-public static final String SSH_ORIG_EXT = "_original.ssh";
-    public static void main(String[] args) throws FileNotFoundException, IOException, DecoderException {
+    static final String BMP_EXT = ".bmp";
+    static final String SSH_EXT = ".ssh";
+    static final String SSH_ORIG_EXT = "_original.ssh";
+
+    public static void mainOld(String[] args) throws FileNotFoundException, IOException, DecoderException {
 
         //basically a lot of if's to do the following:
         //convert bmp (if present) to ssh (keep the original ssh by renaming it to _original.ssh
         //otherwise convert ssh to bmp (converting _original.ssh gets president over converting .ssh)
-        
+
         //a lot of if-else and hardcoding extensions etc is not the best way, but it's how i get it done quick
         Optional<Path> bmpPath = findFile(BMP_EXT);
         Optional<Path> sshPath = findFile(SSH_EXT);
         Optional<Path> originalSshPath = findFile(SSH_ORIG_EXT);
+
+
         File bmpFile;
         File sshFile = null;
         //if no bmp is present, convert ssh to bmp
-        if(!bmpPath.isPresent()){
-        System.out.println("Converting ssh to bmp");
+        if (!bmpPath.isPresent()) {
+            System.out.println("Converting ssh to bmp");
             String bmpFileName = "";
             //if the _orignal.ssh is present, use this one for the conversion
-            if(originalSshPath.isPresent()){
+            if (originalSshPath.isPresent()) {
                 sshFile = originalSshPath.get().toFile();
                 String sshFileName = sshFile.getName();
-                bmpFileName  = replaceEnding(sshFileName, SSH_ORIG_EXT, BMP_EXT);
-            //else use the normal .ssh for converting
-            } else if(sshPath.isPresent()){
+                bmpFileName = replaceEnding(sshFileName, SSH_ORIG_EXT, BMP_EXT);
+                //else use the normal .ssh for converting
+            } else if (sshPath.isPresent()) {
                 sshFile = sshPath.get().toFile();
                 String sshFileName = sshFile.getName();
-                bmpFileName  = replaceEnding(sshFileName, SSH_EXT, BMP_EXT);
+                bmpFileName = replaceEnding(sshFileName, SSH_EXT, BMP_EXT);
             } else {
                 throw new IOException("No ssh file to convert from found");
             }
@@ -74,24 +75,24 @@ public static final String SSH_ORIG_EXT = "_original.ssh";
             bmpWrapper.writeToFile(bos);
         }
         //convert bmp to ssh
-        else{
+        else {
             System.out.println("converting bmp to ssh");
             bmpFile = bmpPath.get().toFile();
             String sshOutputFileName = "";
             //rename .ssh to _original.ssh in order not to overwrite it
-            if(!originalSshPath.isPresent()){
-                if(sshPath.isPresent()){
+            if (!originalSshPath.isPresent()) {
+                if (sshPath.isPresent()) {
                     sshOutputFileName = sshPath.get().getFileName().toString();
                     sshFile = sshPath.get().toFile();
                     String originalSshFileName = replaceEnding(sshOutputFileName, SSH_EXT, SSH_ORIG_EXT);
                     File originalSshFile = new File(originalSshFileName);
                     boolean success = sshFile.renameTo(originalSshFile);
                     sshFile = originalSshFile;
-                    if(!success)
+                    if (!success)
                         throw new IOException("renaming ssh file to _original failed");
-                //if no original ssh is present, do a standard conversion
-                } else{
-                   sshOutputFileName = replaceEnding(bmpFile.getName(), BMP_EXT, SSH_EXT);
+                    //if no original ssh is present, do a standard conversion
+                } else {
+                    sshOutputFileName = replaceEnding(bmpFile.getName(), BMP_EXT, SSH_EXT);
                 }
             } else {
                 sshFile = originalSshPath.get().toFile();
@@ -104,27 +105,27 @@ public static final String SSH_ORIG_EXT = "_original.ssh";
             bmpWrapper.printFormatted();
             SshImageFileWrapper sshWrapper = new SshImageFileWrapper(bmpWrapper);
             //check if the original ssh is available to copy metaData from
-            if(sshFile != null){
+            if (sshFile != null) {
                 SshImageFileWrapper originalSshWrapper = new SshImageFileWrapper(sshFile);
                 sshWrapper.updateMetaData(originalSshWrapper.getMetaData());
             }
             sshWrapper.printFormatted();
             sshWrapper.writeToFile(bos);
-            
+
         }
     }
-    
-    public static String getExtention(File file){
+
+    public static String getExtention(File file) {
         String fileName = file.getName();
-        int index = StringUtils.lastIndexOf(fileName,".");
-        if(index == -1){
+        int index = StringUtils.lastIndexOf(fileName, ".");
+        if (index == -1) {
             throw new RuntimeException("There isn't an extension to determine the type of file");
         } else {
-            return fileName.substring(index+1);
+            return fileName.substring(index + 1);
         }
     }
-    
-    public static Optional<Path> findFile(String extension) throws IOException{
+
+    public static Optional<Path> findFile(String extension) throws IOException {
         BiPredicate<Path, BasicFileAttributes> matcher = (path, attr) -> {
             return path.toString().endsWith(extension);
         };
@@ -132,13 +133,14 @@ public static final String SSH_ORIG_EXT = "_original.ssh";
             return paths.filter(Files::isRegularFile).findAny();
         }
     }
-    
+
     /**
      * This means finding the file that ends with .ssh, but not _original.ssh.
-     * @return 
-     * @throws java.io.IOException 
+     *
+     * @return
+     * @throws java.io.IOException
      */
-    public static Optional<Path> findNonOriginalSshFile() throws IOException{
+    public static Optional<Path> findNonOriginalSshFile() throws IOException {
         BiPredicate<Path, BasicFileAttributes> matcher = (path, attr) -> {
             return path.toString().endsWith(".ssh") && !path.toString().endsWith("_original.ssh");
         };
@@ -146,12 +148,12 @@ public static final String SSH_ORIG_EXT = "_original.ssh";
             return paths.filter(Files::isRegularFile).findAny();
         }
     }
-    
-    public static String replaceEnding(String fullString, String from, String to){
+
+    public static String replaceEnding(String fullString, String from, String to) {
         return fullString.substring(0, fullString.lastIndexOf(from)) + to;
     }
-    
-    public static String removeExtensionFromFileName(String fileName){
+
+    public static String removeExtensionFromFileName(String fileName) {
         String[] fileNameParts = fileName.split(".");
         String extension = fileNameParts[fileNameParts.length - 1];
         return fileName.substring(0, (fileName.length() - extension.length()) - 1);

@@ -6,9 +6,10 @@
 package converter;
 
 import com.google.common.io.Files;
+import com.mycompany.sshtobpmconverter.IPixel;
 import image.bmp.BmpHeader;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
@@ -22,13 +23,13 @@ import java.util.Map;
  *
  * @author Wouter
  */
-public class BmpImageFileWrapper implements ImageFileWrapper {
+public class BmpImageFileWrapper implements Image {
 
     private RandomAccessFile file;
     private BmpHeader header;
-    private ImageFileWrapper wrapper;
+    private Image wrapper;
 
-    public BmpImageFileWrapper(File bmpFile) throws FileNotFoundException, IOException {
+    public BmpImageFileWrapper(File bmpFile) throws IOException {
         if (!isBMPFile(bmpFile)) {
             throw new IllegalArgumentException("only bmp files allowed!");
         }
@@ -37,15 +38,14 @@ public class BmpImageFileWrapper implements ImageFileWrapper {
         header = new BmpHeader(file);
     }
 
-    public BmpImageFileWrapper(ImageFileWrapper wrapper) {
+    public BmpImageFileWrapper(Image wrapper) {
         this.wrapper = wrapper;
         header = new BmpHeader(wrapper.getImgWidth(), wrapper.getImgHeight());
     }
 
-    @Override
-    public Map<Integer, List<Pixel>> getImageRow(int rowNr) throws IOException {
-        Map<Integer, List<Pixel>> result = new HashMap<>();
-        List<Pixel> pixelList = new ArrayList<>();
+    public Map<Integer, List<IPixel>> getImageRow(int rowNr) throws IOException {
+        Map<Integer, List<IPixel>> result = new HashMap<>();
+        List<IPixel> pixelList = new ArrayList<>();
         if (rowNr >= getImgHeight()) {
             throw new IllegalArgumentException("given rowNr is bigger than the height of the img");
         }
@@ -62,12 +62,12 @@ public class BmpImageFileWrapper implements ImageFileWrapper {
     }
 
     @Override
-    public List<List<Pixel>> getImage() throws IOException {
-        List<List<Pixel>> image = new ArrayList<>();
+    public List<List<IPixel>> getImage() throws IOException {
+        List<List<IPixel>> image = new ArrayList<>();
         int imgHeight = (int) getImgHeight();
         int imgWidth = (int) getImgWidth();
         for (int rowNr = 0; rowNr < imgHeight; rowNr++) {
-            List<Pixel> pixelList = new ArrayList();
+            List<IPixel> pixelList = new ArrayList();
             long rowOffset = getImgOffset() + header.getImgRowLength() * ((getImgHeight() - 1) - rowNr);
             file.seek(rowOffset);
             byte[] pixelRGB = new byte[(int) header.getBytesPerPixel()];
@@ -99,17 +99,16 @@ public class BmpImageFileWrapper implements ImageFileWrapper {
         return extension.equals("bmp");
     }
 
-    @Override
     public void writeToFile(OutputStream os) throws IOException {
         if (file != null) {
             throw new FileAlreadyExistsException("No wrapper file to write from found. Are trying to write the same file you just read? (as in just copy-paste?)");
         }
         header.writeToFile(os);
         //New code usign getImage()
-        List<List<Pixel>> image = wrapper.getImage();
+        List<List<IPixel>> image = wrapper.getImage();
         for (int rowNr = getImgHeight() - 1; rowNr >= 0; rowNr--) {
-            List<Pixel> row = image.get(rowNr);
-            for(Pixel pixel: row){
+            List<IPixel> row = image.get(rowNr);
+            for (IPixel pixel : row) {
                 os.write(pixel.getRGBValue());
             }
         }
