@@ -62,7 +62,7 @@ public class ImageDataSourceCollector {
     }
 
     private static Stream<File> findFilesInCurrentDirectory(final BiPredicate<Path, BasicFileAttributes> matcher) throws IOException {
-        Stream<Path> paths = Files.find(Paths.get("./"), 2, matcher);
+        Stream<Path> paths = Files.find(Paths.get("./"), 3, matcher);
         return paths.filter(Files::isRegularFile).map(Path::toFile);
     }
 }

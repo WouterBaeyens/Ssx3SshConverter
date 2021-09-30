@@ -37,8 +37,8 @@ public class FillerTag extends ImgSubComponent {
      */
     private static final long DESIRED_START_ADDRESS_INCREMENT = 128;
 
-    public FillerTag(final MappedByteBuffer buffer, final long startPosition) {
-        this(buffer, startPosition, getNeededFillerSize(startPosition));
+    public FillerTag(final ByteBuffer buffer) {
+        this(buffer, buffer.position(), getNeededFillerSize(buffer.position()));
     }
 
     public FillerTag(final ByteBuffer buffer, final long startPosition, long actualSize) {

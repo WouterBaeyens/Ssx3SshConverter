@@ -11,6 +11,7 @@ import java.util.Set;
 
 public class MainConverter2 {
 
+    //todo consider launch4j to create an exec
     /**
      * Collect all ssh and bmp files inside the current directory,
      * group them by image name (eg: group image01.ssh; image01_original.ssh and image01.bmp)

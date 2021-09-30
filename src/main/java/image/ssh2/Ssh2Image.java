@@ -3,6 +3,7 @@ package image.ssh2;
 import com.mycompany.sshtobpmconverter.IPixel;
 import converter.Image;
 import image.ssh2.colortableheader.strategies.ByteToPixelStrategy;
+import image.ssh2.fileheader.FillerTag;
 import image.ssh2.fileheader.ImageHeaderInfoTag;
 import util.ByteUtil;
 
@@ -19,7 +20,7 @@ public class Ssh2Image implements Image {
     private final ByteBuffer imageByteBuffer;
     private final Ssh2ColorTable ssh2ColorTable;
     private final Ssh2ImageAttachments ssh2ImageAttachments;
-
+    private final FillerTag fillerTag;
 
     public Ssh2Image(final ByteBuffer sshFileBuffer, final ImageHeaderInfoTag imageInfo) throws IOException {
         this.imageInfo = imageInfo;
@@ -29,6 +30,7 @@ public class Ssh2Image implements Image {
         this.imageByteBuffer = copyRawImageDataToBufferAndSkip(sshFileBuffer, ssh2ImageHeader);
         this.ssh2ColorTable = new Ssh2ColorTable(sshFileBuffer);
         this.ssh2ImageAttachments = new Ssh2ImageAttachments(sshFileBuffer);
+        fillerTag = sshFileBuffer.hasRemaining() ? new FillerTag(sshFileBuffer) : null;
     }
 
     public long getImageEndPosition() {
@@ -128,7 +130,7 @@ public class Ssh2Image implements Image {
         int expectedStartOfImage = buffer.position();
         int actualStartOfImage = Math.toIntExact(imageInfo.getHeaderLocation());
         if(expectedStartOfImage != actualStartOfImage){
-            throw new IllegalStateException("Likely something went wrong reading the data: location of " + imageInfo.getInfo() + "does not align with the current position of the buffer: " + ByteUtil.printLongWithHex(actualStartOfImage));
+            throw new IllegalStateException("Likely something went wrong reading the data: location of " + imageInfo.getInfo() + "does not align with the current position of the buffer: " + ByteUtil.printLongWithHex(expectedStartOfImage));
         }
     }
 }
