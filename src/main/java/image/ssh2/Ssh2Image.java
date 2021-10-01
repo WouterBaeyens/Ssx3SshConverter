@@ -6,6 +6,7 @@ import image.ssh2.colortableheader.strategies.ByteToPixelStrategy;
 import image.ssh2.fileheader.FillerTag;
 import image.ssh2.fileheader.ImageHeaderInfoTag;
 import util.ByteUtil;
+import util.FileUtil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -52,15 +53,9 @@ public class Ssh2Image implements Image {
     }
 
     private ByteBuffer copyRawImageDataToBufferAndSkip(final ByteBuffer sshFileBuffer, final Ssh2ImageHeader ssh2ImageHeader){
-        ByteBuffer imageBuffer = slice(sshFileBuffer, ssh2ImageHeader.getImageMemorySize());
+        ByteBuffer imageBuffer = FileUtil.slice(sshFileBuffer, sshFileBuffer.position(), ssh2ImageHeader.getImageMemorySize());
         sshFileBuffer.position(sshFileBuffer.position() + ssh2ImageHeader.getImageMemorySize());
         return imageBuffer;
-    }
-
-    private ByteBuffer slice(final ByteBuffer buffer, final int size){
-        final ByteBuffer tmp = buffer.duplicate();
-        tmp.limit(tmp.position() + size);
-        return tmp.slice();
     }
 
     /**

@@ -1,4 +1,4 @@
-package image.bmp2.bmpheader;
+package archive.big.header;
 
 import image.ImgSubComponent;
 import util.ByteUtil;
@@ -10,17 +10,17 @@ import java.nio.ByteBuffer;
 /**
  * This tag describes the size of the full ssh file in bytes.
  */
-public class FileSizeTag extends ImgSubComponent {
+public class BigFileSizeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
     private final long actualFileSize;
 
-    public FileSizeTag(final ByteBuffer byteBuffer) {
+    public BigFileSizeTag(final ByteBuffer byteBuffer) {
         super(byteBuffer, DEFAULT_SIZE);
         actualFileSize = byteBuffer.limit();
     }
 
-    public FileSizeTag(final RandomAccessFile file, final long startPosition) throws IOException {
+    public BigFileSizeTag(final RandomAccessFile file, final long startPosition) throws IOException {
         super(file, startPosition, DEFAULT_SIZE);
         actualFileSize = file.length();
     }
