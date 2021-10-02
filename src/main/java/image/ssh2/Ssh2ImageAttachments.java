@@ -41,6 +41,10 @@ public class Ssh2ImageAttachments {
         }
     }
 
+    public String getFullName(){
+        return imageNameAttachment.getFullName();
+    }
+
     private void readAttachment(final ByteBuffer sshFileBuffer, final AttachmentTypeTag.AttachmentType attachmentType) {
         switch (attachmentType) {
             case IMAGE_NAME:

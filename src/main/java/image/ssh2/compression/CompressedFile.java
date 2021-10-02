@@ -26,7 +26,7 @@ public class CompressedFile {
         if(compressionType == CompressionType.REFPACK){
             ByteBuffer decompressedFb = ByteBuffer.wrap(new byte[Math.toIntExact(decompressedFileSizeTag.getConvertedValue())]);
             decompress(compressedFileBuffer, decompressedFb);
-            return decompressedFb;
+            return decompressedFb.flip();
         } else {
             return compressedFileBuffer;
         }

@@ -3,9 +3,13 @@ package archive.big;
 import com.google.common.io.Files;
 import com.mycompany.sshtobpmconverter.BmpFileCreator;
 import filecollection.FileExtension;
+import image.ssh2.compression.CompressedFile;
+import image.ssh2.fileheader.PlatformTag;
 import util.FileUtil;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -32,8 +36,21 @@ public class BigFileExtractor {
     }
 
     private void extractFile(final ByteBuffer bigFilebuffer, final BigSubFileInfo fileInfo, final Path destinationFolder) throws IOException {
-        final ByteBuffer sshFileBuffer = FileUtil.slice(bigFilebuffer, Math.toIntExact(fileInfo.getLocation()), fileInfo.getSize());
-        BmpFileCreator.create(sshFileBuffer, fileInfo.getName(), destinationFolder);
+        final ByteBuffer fileBuffer = FileUtil.slice(bigFilebuffer, Math.toIntExact(fileInfo.getLocation()), fileInfo.getSize());
+        final ByteBuffer decompressedFileBuffer = new CompressedFile(fileBuffer).decompress();
+        if(FileExtension.SSH_EXTENSION.getExtension().equals(fileInfo.getExtension())) {
+            BmpFileCreator.create(decompressedFileBuffer, fileInfo.getName(), destinationFolder);
+        } else {
+            writeToFile(decompressedFileBuffer, fileInfo.getFullName(), destinationFolder);
+        }
+    }
+
+    private void writeToFile(final ByteBuffer byteBuffer, final String fileName, final Path destinationFolder) throws IOException {
+        final Path filePath = FileUtil.prepareDirsAndReturnPath(fileName, destinationFolder);
+        FileChannel channel = new FileOutputStream(filePath.toFile()).getChannel();
+        byteBuffer.position(0);
+        channel.write(byteBuffer);
+        channel.close();
     }
 
     private void assertFileType(File bigFile) {

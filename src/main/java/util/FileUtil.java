@@ -29,6 +29,20 @@ public class FileUtil {
                 fileLength);
     }
 
+    /**
+     * Some filenames contain slashes, like "data/stuff/default.elf".
+     * In this case we need to prepare by creating "data" and "stuff".
+     */
+    public static Path prepareDirsAndReturnPath(String relativePathToFile,final Path destinationFolder){
+        String[] dirs = relativePathToFile.split("/");
+        Path currentLocation = destinationFolder;
+        for(int i = 0; i < dirs.length -1; i++){
+            currentLocation = currentLocation.resolve(dirs[i]);
+            createDir(currentLocation);
+        }
+        return currentLocation.resolve(dirs[dirs.length - 1]);
+    }
+
     public static Path createDir(String path) {
         File directory = new File(path);
         if (!directory.exists()) {

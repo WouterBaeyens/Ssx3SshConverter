@@ -3,6 +3,7 @@ package archive.big;
 import archive.big.subfileinfo.BigSubFileLocationTag;
 import archive.big.subfileinfo.BigSubFileNameTag;
 import archive.big.subfileinfo.BigSubFileSizeTag;
+import com.google.common.io.Files;
 import util.ByteUtil;
 import util.FileUtil;
 
@@ -33,8 +34,7 @@ public class BigSubFileInfo {
     }
 
     public String getExtension(){
-        int lastIndexOf = getFullName().lastIndexOf(".");
-        return getFullName().substring(lastIndexOf);
+        return Files.getFileExtension(getFullName());
     }
 
     public long getLocation(){

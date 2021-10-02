@@ -23,7 +23,7 @@ public class ImageNameContentTag extends ImgSubComponent {
     }
 
     public String getConvertedValue() {
-        return new String(Arrays.copyOf(getBytes(), DEFAULT_SIZE));
+        return new String(Arrays.copyOf(getBytes(), DEFAULT_SIZE)).replaceAll("\u0000", "");
     }
 
 }

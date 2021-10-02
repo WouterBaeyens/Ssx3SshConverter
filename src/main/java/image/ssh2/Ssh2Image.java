@@ -117,7 +117,7 @@ public class Ssh2Image implements Image {
 
     @Override
     public String getImageName() {
-        return imageInfo.getName();
+        return ssh2ImageAttachments.getFullName();
     }
 
 
