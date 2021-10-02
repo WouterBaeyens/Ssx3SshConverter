@@ -58,4 +58,9 @@ public abstract class ImgSubComponent {
     }
 
     public abstract String getInfo();
+
+    @Override
+    public String toString() {
+        return getInfo();
+    }
 }

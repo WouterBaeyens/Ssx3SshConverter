@@ -19,7 +19,11 @@ public class CompressedFile {
     public CompressedFile(final ByteBuffer compressedFileBuffer){
         this.compressedFileBuffer = compressedFileBuffer;
         this.compressionType = CompressionType.readImageType(compressedFileBuffer);
-        this.decompressedFileSizeTag = new DecompressedFileSizeTag(compressedFileBuffer);
+        if(compressionType == CompressionType.REFPACK){
+            this.decompressedFileSizeTag = new DecompressedFileSizeTag(compressedFileBuffer);
+        } else {
+            this.decompressedFileSizeTag = null;
+        }
     }
 
     public ByteBuffer decompress(){

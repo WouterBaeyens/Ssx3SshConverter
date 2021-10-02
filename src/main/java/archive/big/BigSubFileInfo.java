@@ -44,4 +44,9 @@ public class BigSubFileInfo {
     public int getSize(){
         return Math.toIntExact(sizeTag.getConvertedValue());
     }
+
+    @Override
+    public String toString() {
+        return getInfo();
+    }
 }

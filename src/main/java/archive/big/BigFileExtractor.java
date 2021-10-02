@@ -26,20 +26,26 @@ public class BigFileExtractor {
         try(FileChannel fileChannel = FileChannel.open(filePath, EnumSet.of(StandardOpenOption.READ))){
             final MappedByteBuffer bigFilebuffer = fileChannel
                     .map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size());
-            BigFile bigFile = new BigFile(bigFilebuffer);
-            final Path bigFolder = filePath.resolveSibling(FileUtil.getNameWithoutExtension(filePath));
-            FileUtil.createDir(bigFolder);
-            for(BigSubFileInfo fileInfo : bigFile.getFileInfoList()){
-                extractFile(bigFilebuffer, fileInfo, bigFolder);
-            }
+            extractBigFile(bigFilebuffer, filePath);
         }
     }
 
-    private void extractFile(final ByteBuffer bigFilebuffer, final BigSubFileInfo fileInfo, final Path destinationFolder) throws IOException {
-        final ByteBuffer fileBuffer = FileUtil.slice(bigFilebuffer, Math.toIntExact(fileInfo.getLocation()), fileInfo.getSize());
+    private void extractBigFile(final ByteBuffer bigFileBuffer, final Path filePath) throws IOException {
+        BigFile bigFile = new BigFile(bigFileBuffer);
+        final Path bigFolder = filePath.resolveSibling(FileUtil.getNameWithoutExtension(filePath));
+        FileUtil.createDir(bigFolder);
+        for(BigSubFileInfo fileInfo : bigFile.getFileInfoList()){
+            extractFile(bigFileBuffer, fileInfo, bigFolder);
+        }
+    }
+
+    private void extractFile(final ByteBuffer bigFileBuffer, final BigSubFileInfo fileInfo, final Path destinationFolder) throws IOException {
+        final ByteBuffer fileBuffer = FileUtil.slice(bigFileBuffer, Math.toIntExact(fileInfo.getLocation()), fileInfo.getSize());
         final ByteBuffer decompressedFileBuffer = new CompressedFile(fileBuffer).decompress();
         if(FileExtension.SSH_EXTENSION.getExtension().equals(fileInfo.getExtension())) {
             BmpFileCreator.create(decompressedFileBuffer, fileInfo.getName(), destinationFolder);
+        } else if(FileExtension.BIG_EXTENSION.getExtension().equals(fileInfo.getExtension())){
+            extractBigFile(decompressedFileBuffer, destinationFolder.resolve(fileInfo.getName()));
         } else {
             writeToFile(decompressedFileBuffer, fileInfo.getFullName(), destinationFolder);
         }

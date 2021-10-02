@@ -26,6 +26,11 @@ public class ImageNameAttachment implements Attachment {
         this.componentsOrdered = List.of(attachmentTypeTag, imageNameSizeTag, imageNameContentTag);
     }
 
+    public long getEndPosition() {
+        return componentsOrdered.get(componentsOrdered.size() - 1).getEndPos();
+    }
+
+
     public String getFullName(){
         return imageNameContentTag.getConvertedValue();
     }
