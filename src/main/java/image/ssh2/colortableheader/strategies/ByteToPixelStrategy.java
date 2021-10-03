@@ -18,5 +18,7 @@ public interface ByteToPixelStrategy {
      */
     IPixel readNextPixel(final ByteBuffer imageByteBuffer, final Ssh2ColorTable colorTable, final int pixelXPos);
 
-
+    default boolean requiresPalette(){
+        return true;
+    }
 }

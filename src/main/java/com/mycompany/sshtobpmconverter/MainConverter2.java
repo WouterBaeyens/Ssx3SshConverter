@@ -1,17 +1,38 @@
 package com.mycompany.sshtobpmconverter;
 
-import filecollection.ImageDataSource;
-import filecollection.ImageDataSourceCollector;
-import filecollection.SourceFileWrapperBmp;
-import filecollection.SourceFileWrapperSsh;
+import archive.big.BigFileExtractor;
+import filecollection.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
+import static util.FileUtil.findFilesInCurrentDirectory;
+
 public class MainConverter2 {
 
-    //todo consider launch4j to create an exec
+    public static void main(String[] args) throws IOException {
+        extractBigFiles();
+        convertSshFiles();
+    }
+
+    public static void extractBigFiles() throws IOException {
+        findFilesInCurrentDirectory(FileExtension.BIG_EXTENSION)
+                .forEach(MainConverter2::extractBigFile);
+    }
+
+    public static void extractBigFile(final File file) throws IllegalStateException {
+        BigFileExtractor extractor = new BigFileExtractor();
+        try {
+            extractor.extractBigFile(file);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+
+        //todo consider launch4j to create an exec
     /**
      * Collect all ssh and bmp files inside the current directory,
      * group them by image name (eg: group image01.ssh; image01_original.ssh and image01.bmp)
@@ -21,9 +42,8 @@ public class MainConverter2 {
      * 2. - [if no ".bmp" file exists yet] create ".bmp" from "_original.ssh"
      * - [if a ".bmp" exists already] create ".ssh" from ".bmp" (note: the existing ".ssh" will be overwritten, but the image from the game is still available as "_original.ssh")
      *
-     * @param args ignored (it is mandatory to have this parameter for main functions, even if it is not used.)
      */
-    public static void main(String[] args) throws IOException {
+    public static void convertSshFiles() throws IOException {
         // todo use ByteBuffer for in-between and mappedByteBuffer to combo with RandomAccess
         final Set<ImageDataSource> imageDataSourceSet = ImageDataSourceCollector.collectFilesAndGroupByImage();
         for (ImageDataSource imageDataSource : imageDataSourceSet) {

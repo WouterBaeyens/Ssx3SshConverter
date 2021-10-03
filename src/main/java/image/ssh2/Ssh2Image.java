@@ -3,14 +3,19 @@ package image.ssh2;
 import com.mycompany.sshtobpmconverter.IPixel;
 import converter.Image;
 import image.ssh2.colortableheader.strategies.ByteToPixelStrategy;
+import image.ssh2.compression.CompressedFile;
 import image.ssh2.fileheader.FillerTag;
 import image.ssh2.fileheader.ImageHeaderInfoTag;
+import image.ssh2.imageheader.ImageTypeTag;
 import util.ByteUtil;
+import util.FileUtil;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Ssh2Image implements Image {
 
@@ -18,7 +23,7 @@ public class Ssh2Image implements Image {
 
     private final Ssh2ImageHeader ssh2ImageHeader;
     private final ByteBuffer imageByteBuffer;
-    private final Ssh2ColorTable ssh2ColorTable;
+    @Nullable private final Ssh2ColorTable ssh2ColorTable;
     private final Ssh2ImageAttachments ssh2ImageAttachments;
     private final FillerTag fillerTag;
 
@@ -28,17 +33,23 @@ public class Ssh2Image implements Image {
         this.ssh2ImageHeader = new Ssh2ImageHeader(sshFileBuffer);
         // todo replace by raster if possible
         this.imageByteBuffer = copyRawImageDataToBufferAndSkip(sshFileBuffer, ssh2ImageHeader);
-        this.ssh2ColorTable = new Ssh2ColorTable(sshFileBuffer);
+        final boolean needsTable = ssh2ImageHeader.getByteToPixelStrategy().requiresPalette();
+        this.ssh2ColorTable = needsTable ? new Ssh2ColorTable(sshFileBuffer) : null;
         this.ssh2ImageAttachments = new Ssh2ImageAttachments(sshFileBuffer);
-        fillerTag = sshFileBuffer.hasRemaining() ? new FillerTag(sshFileBuffer) : null;
+        fillerTag = (sshFileBuffer.hasRemaining() && getImageType() != ImageTypeTag.ImageType.HIGH_REZ) ? new FillerTag(sshFileBuffer) : null;
     }
 
+    // WHEN THE IMAGE IS COMPRESSED THIS WON'T WORK!
     public long getImageEndPosition() {
         return ssh2ImageHeader.getImageEndPosition();
     }
 
+    private ImageTypeTag.ImageType getImageType(){
+        return ssh2ImageHeader.getImageType();
+    }
+
     public long getEndPosition() {
-        return ssh2ColorTable.getEndPosition();
+        return ssh2ImageAttachments.getEndPosition();
     }
 
     private long getImageStartPosition() {
@@ -52,15 +63,10 @@ public class Ssh2Image implements Image {
     }
 
     private ByteBuffer copyRawImageDataToBufferAndSkip(final ByteBuffer sshFileBuffer, final Ssh2ImageHeader ssh2ImageHeader){
-        ByteBuffer imageBuffer = slice(sshFileBuffer, ssh2ImageHeader.getImageMemorySize());
+        ByteBuffer compressedImageBuffer = FileUtil.slice(sshFileBuffer, sshFileBuffer.position(), ssh2ImageHeader.getImageMemorySize());
+        ByteBuffer decompressedImageBuffer = new CompressedFile(compressedImageBuffer).decompress();
         sshFileBuffer.position(sshFileBuffer.position() + ssh2ImageHeader.getImageMemorySize());
-        return imageBuffer;
-    }
-
-    private ByteBuffer slice(final ByteBuffer buffer, final int size){
-        final ByteBuffer tmp = buffer.duplicate();
-        tmp.limit(tmp.position() + size);
-        return tmp.slice();
+        return decompressedImageBuffer;
     }
 
     /**
@@ -92,6 +98,10 @@ public class Ssh2Image implements Image {
         return ssh2ImageHeader.getByteToPixelStrategy();
     }
 
+    private Optional<Ssh2ColorTable> getSsh2ColorTable(){
+        return Optional.ofNullable(ssh2ColorTable);
+    }
+
     /**
      * Get the width (in pixels) of the image.
      */
@@ -116,13 +126,14 @@ public class Ssh2Image implements Image {
         System.out.println("*".repeat(imageTitle.length()) + "\n");
 
         ssh2ImageHeader.printFormatted();
-        ssh2ColorTable.printFormatted();
+        getSsh2ColorTable().ifPresent(Ssh2ColorTable::printFormatted);
         ssh2ImageAttachments.printFormatted();
     }
 
     @Override
     public String getImageName() {
-        return imageInfo.getName();
+        return ssh2ImageAttachments.getFullName()
+                .orElse(imageInfo.getName());
     }
 
 

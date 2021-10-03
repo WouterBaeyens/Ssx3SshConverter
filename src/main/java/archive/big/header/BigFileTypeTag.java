@@ -1,36 +1,26 @@
-package image.ssh2.fileheader;
+package archive.big.header;
 
 import image.ImgSubComponent;
+import image.ssh2.fileheader.FileTypeTag;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.util.Arrays;
 
-/**
- * (uncertain)
- * This tag describes the type of .ssh being used. (eg. G357)
- * It can give an idea about the relative age of this file.
- */
-public class FileTypeTag extends ImgSubComponent {
+public class BigFileTypeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 4;
 
-    public FileTypeTag(final ByteBuffer buffer) {
+    public BigFileTypeTag(final ByteBuffer buffer) {
         super(buffer, DEFAULT_SIZE);
     }
 
     @Override
     public String getInfo() {
-        return "dir version: " + VersionType.getInfo(getBytes());
+        return "archive type: " + VersionType.getInfo(getBytes());
     }
 
     public enum VersionType {
-        SSX3_PRE_ALPHA1("G264"), // table size is not defined in header, no attachments
-        SSX3_PRE_ALPHA2("G268"), // table size is not defined in header, no attachments
-        SSX3_ALPHA("G352"),
-        SSX3("G357");
+        BIG("BIGF");
 
         final String value;
 
@@ -46,4 +36,5 @@ public class FileTypeTag extends ImgSubComponent {
                     .orElseGet(() -> "Unknown (" + dataAsString + ")");
         }
     }
+
 }

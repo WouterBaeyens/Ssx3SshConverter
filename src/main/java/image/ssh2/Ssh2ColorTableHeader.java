@@ -64,6 +64,17 @@ public class Ssh2ColorTableHeader {
 
     public long getTableEndPosition() {
         long fullColorTableComponentSize = sizeTag.getConvertedValue();
+        if(fullColorTableComponentSize == 0){ // content is missing - we need to calculate it ourselves (was only the case on G268 dir type)
+            fullColorTableComponentSize = calculateFullTableComponentSize();
+        }
         return getStartPosition() + fullColorTableComponentSize;
+    }
+
+    private long calculateFullTableComponentSize(){
+        final long calculatedHeaderSize = componentsOrdered.get(componentsOrdered.size() - 1).getEndPos() - componentsOrdered.get(0).getStartPos();
+        final long calculatedTableSize = amountOfEntriesTag.getConvertedValue() * 4; // I assume 4 bytes here. the info is probably available somewhere
+        final long fullColorTableComponentSize = calculatedHeaderSize + calculatedTableSize;
+        final long fullSizeWithBuffer = (long) Math.ceil((double)fullColorTableComponentSize/16) * 16; // lenght increases in groups of 16, 0x00 filled
+        return fullSizeWithBuffer;
     }
 }

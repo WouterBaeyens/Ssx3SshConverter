@@ -9,6 +9,6 @@ public class _8BitByteToPixelStrategy implements ByteToPixelStrategy {
 
     @Override
     public IPixel readNextPixel(ByteBuffer imageByteBuffer, Ssh2ColorTable colorTable, int pixelXPos) {
-        return colorTable.getPixelsFromByte(imageByteBuffer.get());
+        return colorTable.getPixelFromByte(imageByteBuffer.get());
     }
 }

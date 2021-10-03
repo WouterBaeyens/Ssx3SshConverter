@@ -30,7 +30,7 @@ public class Pixel2 implements IPixel {
         return new Pixel2(rgba);
     }
 
-    private static byte[] tintGreenForSpecialAlpha(final byte[] rgba) {
+    public static byte[] tintGreenForSpecialAlpha(final byte[] rgba) {
         byte[] rgbaGreenTinted = ArrayUtils.clone(rgba);
         rgbaGreenTinted[0] = rgba[3];
         rgbaGreenTinted[1] = rgba[3];

@@ -25,6 +25,12 @@ public abstract class ImgSubComponent {
         this(buffer, buffer.position(), size);
     }
 
+    public ImgSubComponent(final ByteBuffer buffer, final byte stopByte) {
+        this.startPosition = buffer.position();
+        this.data = FileUtil.readUntilStop(buffer, stopByte);
+        this.componentSize = data.length;
+    }
+
     public ImgSubComponent(final ByteBuffer buffer, final long startPosition, final long size) {
         this.startPosition = startPosition;
         this.componentSize = Math.toIntExact(size);
@@ -52,4 +58,9 @@ public abstract class ImgSubComponent {
     }
 
     public abstract String getInfo();
+
+    @Override
+    public String toString() {
+        return getInfo();
+    }
 }

@@ -63,6 +63,20 @@ public class Ssh2ImageHeader {
     }
 
     public int getImageMemorySize(){
+        // - If the ssh is of an early version sometimes the properties are not filled (0-filled) and need to be calculated
+        // - If the image is compressed; calculated size will not be accurate (as compression lowers size)
+        if(getImageWithHeaderSize() != 0) {
+            return getImageMemorySizeFromHeaderProperties();
+        } else {
+            return getCalculatedImageMemorySize();
+        }
+    }
+
+    private int getImageMemorySizeFromHeaderProperties(){
+        return (int) (getImageWithHeaderSize() - getImageHeaderSize());
+    }
+
+    private int getCalculatedImageMemorySize(){
         return (int) (getImageSize() * getBytesPerPixel());
     }
 
@@ -74,8 +88,16 @@ public class Ssh2ImageHeader {
         return imageSizeTag.getConvertedValue();
     }
 
+    public long getImageHeaderStartPosition() {
+        return componentsOrdered.get(0).getStartPos();
+    }
+
     public long getImageHeaderEndPosition() {
         return componentsOrdered.get(componentsOrdered.size() - 1).getEndPos();
+    }
+
+    public long getImageHeaderSize() {
+        return getImageHeaderEndPosition() - getImageHeaderStartPosition();
     }
 
     public long getImageEndPosition() {
@@ -86,8 +108,12 @@ public class Ssh2ImageHeader {
         return encodingTypeTag.getEncodingType().getDecoderStrategy();
     }
 
+    public ImageTypeTag.ImageType getImageType(){
+        return imageTypeTag.getImageType();
+    }
+
     public ByteToPixelStrategy getByteToPixelStrategy(){
-        return imageTypeTag.getImageType().getByteToPixelStrategy();
+        return getImageType().getByteToPixelStrategy();
     }
 
     public void printFormatted() {

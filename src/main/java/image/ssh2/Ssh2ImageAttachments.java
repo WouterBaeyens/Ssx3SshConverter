@@ -10,17 +10,28 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public class Ssh2ImageAttachments {
 
     // all these attachments are optional
+    private final int startPosition;
     private MetalBinAttachment metalBinAttachment;
     private ImageNameAttachment imageNameAttachment;
 
     private List<Attachment> attachments = new ArrayList<>();
 
     public Ssh2ImageAttachments(final ByteBuffer sshFileBuffer) {
+        this.startPosition = sshFileBuffer.position();
         readAttachments(sshFileBuffer);
+    }
+
+    public long getEndPosition(){
+        if(attachments.isEmpty()){
+            return startPosition;
+        } else {
+            return attachments.get(attachments.size() - 1).getEndPosition();
+        }
     }
 
     private void readAttachments(final ByteBuffer sshFileBuffer) {
@@ -39,6 +50,10 @@ public class Ssh2ImageAttachments {
                 break;
             }
         }
+    }
+
+    public Optional<String> getFullName(){
+        return Optional.ofNullable(imageNameAttachment).map(ImageNameAttachment::getFullName);
     }
 
     private void readAttachment(final ByteBuffer sshFileBuffer, final AttachmentTypeTag.AttachmentType attachmentType) {

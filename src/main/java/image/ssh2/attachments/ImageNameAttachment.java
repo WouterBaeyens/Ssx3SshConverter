@@ -26,6 +26,15 @@ public class ImageNameAttachment implements Attachment {
         this.componentsOrdered = List.of(attachmentTypeTag, imageNameSizeTag, imageNameContentTag);
     }
 
+    public long getEndPosition() {
+        return componentsOrdered.get(componentsOrdered.size() - 1).getEndPos();
+    }
+
+
+    public String getFullName(){
+        return imageNameContentTag.getConvertedValue();
+    }
+
     public void printFormatted() {
         System.out.println(PrintUtil.toRainbow(componentsOrdered.stream().map(ImgSubComponent::getInfo).map(componentInfo -> componentInfo + " | ").toArray(String[]::new)));
         final String[] hexStrings = componentsOrdered.stream().map(ImgSubComponent::getHexData).toArray(String[]::new);

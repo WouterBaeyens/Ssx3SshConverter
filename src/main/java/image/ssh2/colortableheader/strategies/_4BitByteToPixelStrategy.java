@@ -24,7 +24,7 @@ public class _4BitByteToPixelStrategy implements ByteToPixelStrategy {
         } else {
             imageNibble = ByteUtil.getLeftNibble(imageByte);
         }
-        return colorTable.getPixelsFromByte(imageNibble);
+        return colorTable.getPixelFromByte(imageNibble);
     }
 
     private void revertBufferPosition(final ByteBuffer imageByteBuffer){

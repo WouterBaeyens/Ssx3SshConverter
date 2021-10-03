@@ -3,6 +3,7 @@ package image.ssh2.imageheader;
 import image.ImgSubComponent;
 import image.ssh2.colortableheader.ColorTableType2;
 import image.ssh2.colortableheader.strategies.ByteToPixelStrategy;
+import image.ssh2.colortableheader.strategies._32BitByteToPixelWithoutPaletteStrategy;
 import image.ssh2.colortableheader.strategies._4BitByteToPixelStrategy;
 import image.ssh2.colortableheader.strategies._8BitByteToPixelStrategy;
 import util.ByteUtil;
@@ -48,7 +49,18 @@ public class ImageTypeTag extends ImgSubComponent {
         /**
          * 256 colours are used, each byte contains the info for exactly 1 pixel.
          */
-        DEFAULT_8BPP("02", new _8BitByteToPixelStrategy(), 1);
+        DEFAULT_8BPP("02", new _8BitByteToPixelStrategy(), 1),
+
+        /**
+         * Each 4 bytes contains the info for exactly 1 pixel. No Palette is used
+         */
+        NO_PALETTE_32BPP("05", new _32BitByteToPixelWithoutPaletteStrategy(), 4),
+
+        /**
+         * Not much is known; only used by "backs.ssh"
+         */
+        HIGH_REZ("82", new _8BitByteToPixelStrategy(), 4);
+
 
         final String value;
         final ByteToPixelStrategy byteToPixelStrategy;

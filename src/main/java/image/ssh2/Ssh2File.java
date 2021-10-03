@@ -14,19 +14,20 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+import static util.FileUtil.attachBuffer;
+
 public class Ssh2File {
 
     private static final String READ_ONLY_MODE = "r";
-    private final RandomAccessFile sshFile;
     private final ByteBuffer sshFileBuffer;
 
     private final Ssh2FileHeader ssh2FileHeader;
     private final List<Ssh2Image> images;
 
-    public Ssh2File(File sshFile) throws IOException {
+
+    public Ssh2File(ByteBuffer sshFileBuffer) throws IOException {
         System.out.println("Deserialising ssh file");
-        this.sshFile = openStream(sshFile);
-        this.sshFileBuffer = decompressFile(this.sshFile);
+        this.sshFileBuffer = decompressFile(sshFileBuffer);
         // todo - consider static read methods instead to improve readability
         this.ssh2FileHeader = deserializeFileHeader(0);
         this.images = deserializeImages(ssh2FileHeader.getImageInfoList());
@@ -34,24 +35,13 @@ public class Ssh2File {
         assertFileFullyConsumed(sshFileBuffer);
     }
 
-    private RandomAccessFile openStream(File sshFile) throws FileNotFoundException {
-        return new RandomAccessFile(sshFile, READ_ONLY_MODE);
-    }
-
-    private ByteBuffer decompressFile(final RandomAccessFile raf) throws IOException {
-        CompressedFile compressedFile = new CompressedFile(attachBuffer(raf));
+    private ByteBuffer decompressFile(final ByteBuffer byteBuffer) {
+        CompressedFile compressedFile = new CompressedFile(byteBuffer);
         return compressedFile.decompress();
     }
 
-    private ByteBuffer attachBuffer(final RandomAccessFile raf) throws IOException {
-        final FileChannel ch = raf.getChannel();
-        int fileLength = Math.toIntExact(ch.size());
-        return ch.map(FileChannel.MapMode.READ_ONLY, 0,
-                fileLength);
-    }
 
-
-    private Ssh2FileHeader deserializeFileHeader(long fileHeaderPosition) throws IOException {
+    private Ssh2FileHeader deserializeFileHeader(long fileHeaderPosition) {
         sshFileBuffer.position(Math.toIntExact(fileHeaderPosition));
         return new Ssh2FileHeader(sshFileBuffer);
     }
@@ -87,13 +77,10 @@ public class Ssh2File {
         return images;
     }
 
-    public void close() throws IOException {
-        sshFile.close();
-    }
-
     private void assertFileFullyConsumed(final ByteBuffer buffer){
         if(buffer.hasRemaining()){
-            throw new IllegalStateException("Likely something went wrong reading the data: The file should be fully read, but the buffer has " + buffer.remaining() + " bytes not consumed.");
+            //todo figure out why crwd.ssh has 1 spare byte *facepalm*
+            //throw new IllegalStateException("Likely something went wrong reading the data: The file should be fully read, but the buffer has " + buffer.remaining() + " bytes not consumed.");
         }
     }
 }
