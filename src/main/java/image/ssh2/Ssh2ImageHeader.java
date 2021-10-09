@@ -2,7 +2,7 @@ package image.ssh2;
 
 import image.ImgSubComponent;
 import image.ssh.SshImageDecoderStrategy;
-import image.ssh2.colortableheader.strategies.ByteToPixelStrategy;
+import image.ssh2.imageheader.strategies.ByteToPixelStrategy;
 import image.ssh2.imageheader.ImageEncodingTypeTag;
 import image.ssh2.imageheader.ImageHeightTag;
 import image.ssh2.imageheader.ImageMaterialTag;

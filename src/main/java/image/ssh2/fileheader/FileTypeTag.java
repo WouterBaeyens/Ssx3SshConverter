@@ -29,6 +29,7 @@ public class FileTypeTag extends ImgSubComponent {
     public enum VersionType {
         SSX3_PRE_ALPHA1("G264"), // table size is not defined in header, no attachments
         SSX3_PRE_ALPHA2("G268"), // table size is not defined in header, no attachments
+        SSX_TRICKY("G278"), // SSX_TRICKY, no attachments
         SSX3_ALPHA("G352"),
         SSX3("G357");
 

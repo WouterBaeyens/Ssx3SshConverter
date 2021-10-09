@@ -59,14 +59,14 @@ public class ImageEncodingTypeTag extends ImgSubComponent {
             return decoderStrategy;
         }
 
-        public static Optional<EncodingType> getEncodingType(byte[] data) {
+        public static Optional<EncodingType> getEncodingType(final byte[] data) {
             String dataAsString = ByteUtil.bytesToHex(data);
             return Arrays.stream(values())
                     .filter(fileType -> fileType.value.equals(dataAsString))
                     .findAny();
         }
 
-        public static String getInfo(byte[] data) {
+        public static String getInfo(final byte[] data) {
             String dataAsString = ByteUtil.bytesToHex(data);
             return getEncodingType(data)
                     .map(matchingType -> matchingType + "(" + matchingType.value + ")")

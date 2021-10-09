@@ -1,7 +1,6 @@
-package image.ssh2.colortableheader.strategies;
+package image.ssh2.imageheader.strategies;
 
 import com.mycompany.sshtobpmconverter.IPixel;
-import com.mycompany.sshtobpmconverter.Pixel2;
 import image.ssh2.Ssh2ColorTable;
 
 import java.nio.ByteBuffer;

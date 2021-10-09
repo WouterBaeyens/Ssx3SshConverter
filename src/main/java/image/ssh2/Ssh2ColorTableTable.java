@@ -1,6 +1,7 @@
 package image.ssh2;
 
 import com.mycompany.sshtobpmconverter.Pixel2;
+import image.ssh2.colortableheader.lookuptrategies.LookupStrategy;
 import util.ByteUtil;
 
 import java.nio.ByteBuffer;
@@ -16,11 +17,11 @@ public class Ssh2ColorTableTable {
     //private BiMap<Byte, Pixel2> colorMap = HashBiMap.create();
     private HashMap<Byte, Pixel2> colorMap = new HashMap<>();
 
-    public Ssh2ColorTableTable(final ByteBuffer buffer, final long size) {
-        readTable(buffer, size);
+    public Ssh2ColorTableTable(final ByteBuffer buffer, final long size, final LookupStrategy lookupStrategy) {
+        readTable(buffer, size, lookupStrategy);
     }
 
-    private void readTable(final ByteBuffer buffer, final long size) {
+    private void readTable(final ByteBuffer buffer, final long size, final LookupStrategy lookupStrategy) {
         this.amountOfEntries = (int) (size / DEFAULT_BYTES_PER_TABLE_ENTRY);
         byte[] entry = new byte[DEFAULT_BYTES_PER_TABLE_ENTRY];
         for (int entryNr = 0; entryNr < amountOfEntries; entryNr++) {
@@ -29,7 +30,7 @@ public class Ssh2ColorTableTable {
             if (pixel.isPixelEmpty()) {
                 amountOfZeroEntries++;
             } else {
-                colorMap.put(getByteLinkedToTableEntryNr(entryNr), Pixel2.createPixelFromLE(entry));
+                colorMap.put(lookupStrategy.getByteLinkedToTableEntryNr(entryNr), Pixel2.createPixelFromLE(entry));
             }
         }
     }
@@ -48,25 +49,6 @@ public class Ssh2ColorTableTable {
 
     public Pixel2 getPixelFromByte(byte byte_) {
         return Optional.ofNullable(colorMap.get(byte_)).orElse(Pixel2.getDefaultPixel());
-    }
-
-    /**
-     * Each table entry/index is linked to a certain byte or "PixelCode"
-     * This method finds this byte based on the entry number or index
-     * <p>
-     * PixelCode refers to the byte, whose pixel rgb value can be found at [index]
-     * <p>
-     * ex: - entry 0 is linked to byte 0x00
-     * - entry 1 is linked to byte 0x01
-     * - entry 9 is linked to byte 0x11
-     * - entry 16 is linked to byte 0x08
-     * ...
-     *
-     * @param index this is the position in the table
-     * @return the Hex-code that is linked to the value in this table
-     */
-    private byte getByteLinkedToTableEntryNr(int index) {
-        return ByteUtil.switchBit4And5((byte) index);
     }
 
     public void printFormatted() {
