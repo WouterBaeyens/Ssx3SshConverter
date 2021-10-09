@@ -13,7 +13,7 @@ public class Ssh2ColorTable {
 
     public Ssh2ColorTable(final ByteBuffer sshFileBuffer) throws IOException {
         this.ssh2ColorTableHeader = new Ssh2ColorTableHeader(sshFileBuffer);
-        this.actualTable = new Ssh2ColorTableTable(sshFileBuffer, ssh2ColorTableHeader.getTableSize());
+        this.actualTable = new Ssh2ColorTableTable(sshFileBuffer, ssh2ColorTableHeader.getTableSize(), ssh2ColorTableHeader.getLookupStrategy());
     }
 
     public long getEndPosition() {

@@ -2,7 +2,7 @@ package image.ssh2;
 
 import com.mycompany.sshtobpmconverter.IPixel;
 import converter.Image;
-import image.ssh2.colortableheader.strategies.ByteToPixelStrategy;
+import image.ssh2.imageheader.strategies.ByteToPixelStrategy;
 import image.ssh2.compression.CompressedFile;
 import image.ssh2.fileheader.FillerTag;
 import image.ssh2.fileheader.ImageHeaderInfoTag;

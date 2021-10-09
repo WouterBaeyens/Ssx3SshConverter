@@ -1,4 +1,4 @@
-package image.ssh2.colortableheader.strategies;
+package image.ssh2.imageheader.strategies;
 
 import com.mycompany.sshtobpmconverter.IPixel;
 import image.ssh2.Ssh2ColorTable;

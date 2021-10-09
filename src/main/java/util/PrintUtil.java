@@ -92,6 +92,10 @@ public static String insertForColouredString(
         return builder.toString();
     }
 
+    public static String toHexString(byte[]... bytes){
+        return toHexString(false, bytes);
+    }
+
     /**
      * Converts an array of bytes to a formatted hex string (seperated by a
      * space every 2 characters)

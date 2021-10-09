@@ -1,15 +1,13 @@
 package image.ssh2.imageheader;
 
 import image.ImgSubComponent;
-import image.ssh2.colortableheader.ColorTableType2;
-import image.ssh2.colortableheader.strategies.ByteToPixelStrategy;
-import image.ssh2.colortableheader.strategies._32BitByteToPixelWithoutPaletteStrategy;
-import image.ssh2.colortableheader.strategies._4BitByteToPixelStrategy;
-import image.ssh2.colortableheader.strategies._8BitByteToPixelStrategy;
+import image.ssh2.colortableheader.ColorTableLookupType;
+import image.ssh2.imageheader.strategies.ByteToPixelStrategy;
+import image.ssh2.imageheader.strategies._32BitByteToPixelWithoutPaletteStrategy;
+import image.ssh2.imageheader.strategies._4BitByteToPixelStrategy;
+import image.ssh2.imageheader.strategies._8BitByteToPixelStrategy;
 import util.ByteUtil;
-import util.PrintUtil;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Optional;
@@ -41,7 +39,7 @@ public class ImageTypeTag extends ImgSubComponent {
          * Only 16 colours are used, that way each byte contains the info for 2 pixels (each described by 4 bits).
          * An example image of this type would be "crwd.ssh" (crowd textures)
          *
-         * Note: for now I'm just guessing it's this value and not {@link ColorTableType2} describing this property
+         * Note: for now I'm just guessing it's this value and not {@link ColorTableLookupType} describing this property
          *          as I have not found an example where they change independently
          */
         LOW_RES_4BPP("01", new _4BitByteToPixelStrategy(), 0.5),

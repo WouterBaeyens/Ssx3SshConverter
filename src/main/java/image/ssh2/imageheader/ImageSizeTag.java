@@ -19,7 +19,7 @@ public class ImageSizeTag extends ImgSubComponent {
         super(file, startPosition, DEFAULT_SIZE);
     }
 
-    public ImageSizeTag(final ByteBuffer file) throws IOException {
+    public ImageSizeTag(final ByteBuffer file) {
         super(file, DEFAULT_SIZE);
     }
 

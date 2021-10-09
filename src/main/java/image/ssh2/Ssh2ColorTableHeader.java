@@ -5,8 +5,9 @@ import image.ssh2.colortableheader.ColorTableEntriesTag;
 import image.ssh2.colortableheader.ColorTableWidthTag;
 import image.ssh2.colortableheader.ColorTableSizeTag;
 import image.ssh2.colortableheader.ColorTableHeightTag;
-import image.ssh2.colortableheader.ColorTableType2;
+import image.ssh2.colortableheader.ColorTableLookupType;
 import image.ssh2.colortableheader.ColorTableTypeTag;
+import image.ssh2.colortableheader.lookuptrategies.LookupStrategy;
 import util.ByteUtil;
 import util.PrintUtil;
 
@@ -22,7 +23,7 @@ public class Ssh2ColorTableHeader {
     private final ColorTableWidthTag amountOfEntriesTag;
     private final ColorTableHeightTag actualTableLocation;
     private final ColorTableEntriesTag amountOfEntriesCopyTag;
-    private final ColorTableType2 colorTableType2;
+    private final ColorTableLookupType colorTableLookupType;
 
     private final List<ImgSubComponent> componentsOrdered;
 
@@ -32,9 +33,9 @@ public class Ssh2ColorTableHeader {
         this.amountOfEntriesTag = new ColorTableWidthTag(sshFileBuffer);
         this.actualTableLocation = new ColorTableHeightTag(sshFileBuffer);
         this.amountOfEntriesCopyTag = new ColorTableEntriesTag(sshFileBuffer, amountOfEntriesTag.getConvertedValue());
-        this.colorTableType2 = new ColorTableType2(sshFileBuffer);
+        this.colorTableLookupType = new ColorTableLookupType(sshFileBuffer);
 
-        this.componentsOrdered = List.of(typeTag, sizeTag, amountOfEntriesTag, actualTableLocation, amountOfEntriesCopyTag, colorTableType2);
+        this.componentsOrdered = List.of(typeTag, sizeTag, amountOfEntriesTag, actualTableLocation, amountOfEntriesCopyTag, colorTableLookupType);
     }
 
     public void printFormatted() {
@@ -60,6 +61,10 @@ public class Ssh2ColorTableHeader {
 
     public long getTableSize() {
         return getTableEndPosition() - getTableStartPosition();
+    }
+
+    public LookupStrategy getLookupStrategy(){
+        return colorTableLookupType.getLookupType().getLookupStrategy();
     }
 
     public long getTableEndPosition() {

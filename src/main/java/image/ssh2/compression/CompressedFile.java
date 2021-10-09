@@ -5,6 +5,7 @@ import image.bmp2.dibheader.tags.CompressionTypeTag;
 import image.ssh2.fileheader.TotalFileSizeTag;
 import image.ssh2.imageheader.ImageTypeTag;
 import util.ByteUtil;
+import util.JavaCompatibility;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -69,7 +70,7 @@ public class CompressedFile {
 
         private static boolean fileIsOfCompressionType(ByteBuffer fileByteBuffer, CompressedFile.CompressionType compressionType){
             byte[] startOfFile = new byte[compressionType.identifierTag.length()/2];
-            fileByteBuffer.get(0, startOfFile);
+            JavaCompatibility.get(fileByteBuffer, 0, startOfFile);
             return compressionType.identifierTag.equals(ByteUtil.bytesToHex(startOfFile));
         }
     }
