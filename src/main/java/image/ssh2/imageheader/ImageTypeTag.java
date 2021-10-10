@@ -73,9 +73,7 @@ public class ImageTypeTag extends ImgSubComponent {
         public static String getInfo(byte[] data) {
             String dataAsString = ByteUtil.bytesToHex(data);
 
-            return Arrays.stream(values())
-                    .filter(fileType -> fileType.value.equals(dataAsString))
-                    .findAny().map(matchingType -> matchingType + "(" + matchingType.value + ")")
+            return getImageType(data).map(matchingType -> matchingType + "(" + matchingType.value + ")")
                     .orElseGet(() -> "Unknown type (" + dataAsString + ")");
         }
 

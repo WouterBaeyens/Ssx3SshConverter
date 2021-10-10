@@ -10,7 +10,8 @@ public enum FileExtension {
     SSH_EXTENSION(".ssh",(path, attr) -> path.toString().toLowerCase().endsWith(".ssh") && !path.toString().toLowerCase().endsWith("_original.ssh")),
     SSH_BACKUP_EXTENSION("_original.ssh", (path, attr) -> path.toString().toLowerCase().endsWith("_original.ssh")),
     BIG_EXTENSION(".big", (path, attr) -> path.toString().toLowerCase().endsWith(".big")),
-    MPF_EXTENSION(".mpf", (path, attr) -> path.toString().toLowerCase().toLowerCase().endsWith(".mpf"));
+    MPF_EXTENSION(".mpf", (path, attr) -> path.toString().toLowerCase().toLowerCase().endsWith(".mpf")),
+    SSB_EXTENSION(".ssb", (path, attr) -> path.toString().toLowerCase().toLowerCase().endsWith(".ssb"));
 
     public final String value;
     public final BiPredicate<Path, BasicFileAttributes> matcher;

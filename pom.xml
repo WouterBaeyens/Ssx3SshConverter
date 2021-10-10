@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mycompany</groupId>
     <artifactId>SshToBpmConverter</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1.1-OLD-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
         <jdk.version>1.8</jdk.version>
@@ -37,8 +37,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

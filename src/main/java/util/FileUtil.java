@@ -3,6 +3,7 @@ package util;
 import filecollection.FileExtension;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -66,6 +67,14 @@ public class FileUtil {
     public static String getNameWithoutExtension(final String fileName){
         final int indexStartOfExtension = fileName.lastIndexOf(".");
         return indexStartOfExtension > 0 ? fileName.substring(0, indexStartOfExtension) : fileName;
+    }
+
+    public static void writeToFile(final ByteBuffer byteBuffer, final String fileName, final Path destinationFolder) throws IOException {
+        final Path filePath = FileUtil.prepareDirsAndReturnPath(fileName, destinationFolder);
+        FileChannel channel = new FileOutputStream(filePath.toFile()).getChannel();
+        byteBuffer.position(0);
+        channel.write(byteBuffer);
+        channel.close();
     }
 
     public static ByteBuffer slice(final ByteBuffer buffer, final int startPosition, final int size){
