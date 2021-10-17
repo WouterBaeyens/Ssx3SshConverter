@@ -52,7 +52,7 @@ public class DataFileExtractor {
     }
 
     private Path specifyDestinationPath(final Path path, int number){
-        final String fileName = path.getFileName().toString() + "_" + number + "_0" + FileExtension.BMP_EXTENSION.value;
+        final String fileName = path.getFileName().toString() + "_" + number + "_2" + FileExtension.BMP_EXTENSION.value;
         return path.getParent().resolve(fileName);
     }
 }
