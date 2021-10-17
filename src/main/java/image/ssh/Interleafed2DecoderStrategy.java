@@ -159,6 +159,9 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
         m5.put(new Point(1, 14), new Point(2,14));
         m5.put(new Point(1, 15), new Point(2,15));
 
+        m5.put(new Point(2, 0), new Point(2,0));
+        m5.put(new Point(2, 1), new Point(2,1));
+
         m5.put(new Point(2, 2), new Point(1,2));
         m5.put(new Point(2, 3), new Point(1,3));
         m5.put(new Point(2, 4), new Point(1,4));
