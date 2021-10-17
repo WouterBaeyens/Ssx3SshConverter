@@ -3,6 +3,7 @@ package image.ssh;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.mycompany.sshtobpmconverter.IPixel;
+import com.mycompany.sshtobpmconverter.Pixel2;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -22,8 +23,18 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
         for(int rowNr = 0; rowNr < nrOfRows; rowNr ++){
             decodedImage.add(new ArrayList<>());
             for(int colNr = 0; colNr < nrOfColumns; colNr++){
-                Point pxlLocation = mask[rowNr][colNr];
-                decodedImage.get(rowNr).add(colNr, encodedImage.get(pxlLocation.x).get(pxlLocation.y));
+                if(rowNr % 16 == 1){
+                    if(colNr % 16 == 0){
+                        decodedImage.get(rowNr).add(Pixel2.GREY_PIXEL);
+                    } else if(colNr%4==0) {
+                        decodedImage.get(rowNr).add(Pixel2.DARK_GREY_PIXEL);
+                    } else {
+                        decodedImage.get(rowNr).add(Pixel2.getDefaultPixel());
+                    }
+                } else {
+                    Point pxlLocation = mask[rowNr][colNr];
+                    decodedImage.get(rowNr).add(colNr, encodedImage.get(pxlLocation.x).get(pxlLocation.y));
+                }
             }
         }
         return decodedImage;
@@ -136,10 +147,23 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
     private static final BiMap<Point, Point> m5 = HashBiMap.create();
     Decoder switchBlocks8 = new Decoder(m5, 16,16);
     static{
-        m5.put(new Point(0, 0), new Point(0,2));
-        m5.put(new Point(0, 1), new Point(0,3));
-        m5.put(new Point(0, 2), new Point(0,0));
+        m5.put(new Point(0, 2), new Point(0,0)); // OK
         m5.put(new Point(0, 3), new Point(0,1));
+        m5.put(new Point(0, 10), new Point(0,2));
+        m5.put(new Point(0, 11), new Point(0,3));
+        m5.put(new Point(0, 0), new Point(0,4));
+        m5.put(new Point(0, 1), new Point(0,5));
+        m5.put(new Point(0, 8), new Point(0,6));
+        m5.put(new Point(0, 9), new Point(0,7));
+        m5.put(new Point(0, 6), new Point(0,8));
+        m5.put(new Point(0, 7), new Point(0,9));
+        m5.put(new Point(0, 14), new Point(0,10));
+        // --------------------------------------------------------------
+        m5.put(new Point(0, 15), new Point(0,11));      //END
+        m5.put(new Point(0, 4), new Point(0,12));
+        m5.put(new Point(0, 5), new Point(0,13));
+        m5.put(new Point(0, 12), new Point(0,14)); //5
+        m5.put(new Point(0, 13), new Point(0,15));
 
 
         m5.put(new Point(1, 0), new Point(3,0));
@@ -329,9 +353,9 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
         m5.put(new Point(14, 13), new Point(13,13));
         m5.put(new Point(14, 14), new Point(13,14));
         m5.put(new Point(14, 15), new Point(13,15));
-
-
     }
+
+
 
     private Point splitEvenUnevenColumnes(int rowSize,final Point point){
         boolean isEven = point.y % 2 == 0;

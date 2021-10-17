@@ -8,7 +8,9 @@ import java.util.Arrays;
 public class Pixel2 implements IPixel {
 
     private static final Pixel2 BLACK_PIXEL = new Pixel2(new byte[4]);
-    private static final Pixel2 WHITE_PIXEL = new Pixel2(new byte[]{(byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff});
+    public static final Pixel2 WHITE_PIXEL = new Pixel2(new byte[]{(byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff});
+    public static final Pixel2 GREY_PIXEL = new Pixel2(new byte[]{(byte) 0x78, (byte) 0x78, (byte) 0x78, (byte) 0x78});
+    public static final Pixel2 DARK_GREY_PIXEL = new Pixel2(new byte[]{(byte) 0x30, (byte) 0x30, (byte) 0x30, (byte) 0x30});
 
     /**
      * This is the value used when the "alpha-level" is completely neutral.
