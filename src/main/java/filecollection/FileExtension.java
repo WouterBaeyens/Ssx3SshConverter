@@ -11,7 +11,8 @@ public enum FileExtension {
     SSH_BACKUP_EXTENSION("_original.ssh", (path, attr) -> path.toString().toLowerCase().endsWith("_original.ssh")),
     BIG_EXTENSION(".big", (path, attr) -> path.toString().toLowerCase().endsWith(".big")),
     MPF_EXTENSION(".mpf", (path, attr) -> path.toString().toLowerCase().toLowerCase().endsWith(".mpf")),
-    SSB_EXTENSION(".ssb", (path, attr) -> path.toString().toLowerCase().toLowerCase().endsWith(".ssb"));
+    SSB_EXTENSION(".ssb", (path, attr) -> path.toString().toLowerCase().toLowerCase().endsWith(".ssb")),
+    DATA_EXTENSION(".data", (path, attr) -> path.toString().toLowerCase().toLowerCase().endsWith(".data")); // self-created type for extracted ssb components
 
     public final String value;
     public final BiPredicate<Path, BasicFileAttributes> matcher;

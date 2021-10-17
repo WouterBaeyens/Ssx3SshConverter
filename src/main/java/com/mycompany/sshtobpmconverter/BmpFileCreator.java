@@ -57,6 +57,11 @@ public class BmpFileCreator {
         }
     }
 
+    public static void create(Image image, final Path destionationPath) throws IOException {
+        BmpImageFileWrapper bmpWrapper = new BmpImageFileWrapper(image);
+        writeToFile(bmpWrapper, destionationPath);
+    }
+
 
 
     public static void writeToFile(BmpImageFileWrapper bmpWrapper, final Path filePath) throws IOException {

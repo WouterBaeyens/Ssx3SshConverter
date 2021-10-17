@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class FileUtil {
 
     public static Stream<File> findFilesInCurrentDirectory(FileExtension fileExtension) throws IOException {
-        Stream<Path> paths = Files.find(Paths.get("./"), 3, fileExtension.matcher);
+        Stream<Path> paths = Files.find(Paths.get("./"), 1, fileExtension.matcher);
         return paths.filter(Files::isRegularFile).map(Path::toFile);
     }
 
@@ -75,6 +75,12 @@ public class FileUtil {
         byteBuffer.position(0);
         channel.write(byteBuffer);
         channel.close();
+    }
+
+    public static ByteBuffer sliceAndSkip(final ByteBuffer buffer, final int size){
+        ByteBuffer slicedBuffer = slice(buffer, buffer.position(), size);
+        buffer.position(buffer.position() + size);
+        return slicedBuffer;
     }
 
     public static ByteBuffer slice(final ByteBuffer buffer, final int startPosition, final int size){

@@ -90,4 +90,11 @@ public class Pixel2 implements IPixel {
         hash = 53 * hash + Arrays.hashCode(this.rgba);
         return hash;
     }
+
+    @Override
+    public String toString() {
+        return "Pixel2{" +
+                "rgba=" + Arrays.toString(rgba) +
+                '}';
+    }
 }

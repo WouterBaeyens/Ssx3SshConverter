@@ -1,5 +1,6 @@
 package archive.big;
 
+import bam.data.image.BamImageComponent;
 import bam.ssb.SsbFile;
 import bam.ssb.SsbFileCreator;
 import com.google.common.io.Files;

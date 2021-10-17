@@ -1,6 +1,7 @@
 package image.ssh2.imageheader;
 
 import image.ImgSubComponent;
+import image.ssh.Interleafed2DecoderStrategy;
 import image.ssh.InterleafedDecoderStrategy;
 import image.ssh.NoneDecoderStrategy;
 import image.ssh.SshImageDecoderStrategy;
@@ -43,9 +44,11 @@ public class ImageEncodingTypeTag extends ImgSubComponent {
                 .orElse(EncodingType.NONE);
     }
 
+    //Take the closest power of 2 rounded down. divide by 4 for a lower rez
     public enum EncodingType {
         NONE("00000000", new NoneDecoderStrategy()),
-        INTERLACED("00200000", new InterleafedDecoderStrategy());
+        INTERLACED("00200000", new InterleafedDecoderStrategy()),
+        SCRAMBLED("XXXXXX", new Interleafed2DecoderStrategy());
 
         final String value;
         private final SshImageDecoderStrategy decoderStrategy;

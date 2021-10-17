@@ -1,6 +1,7 @@
 package image.ssh2.imageheader.strategies;
 
 import com.mycompany.sshtobpmconverter.IPixel;
+import image.ColorTable;
 import image.ssh2.Ssh2ColorTable;
 import util.ByteUtil;
 
@@ -14,7 +15,7 @@ import java.nio.ByteBuffer;
 public class _4BitByteToPixelStrategy implements ByteToPixelStrategy {
 
     @Override
-    public IPixel readNextPixel(final ByteBuffer imageByteBuffer, final Ssh2ColorTable colorTable, int pixelXPos) {
+    public IPixel readNextPixel(final ByteBuffer imageByteBuffer, final ColorTable colorTable, int pixelXPos) {
         final byte imageByte = imageByteBuffer.get();
         final byte imageNibble;
         final boolean pixelNumberIsEven = (pixelXPos % 2 == 0);

@@ -27,7 +27,7 @@ public class Ssh2ColorTableHeader {
 
     private final List<ImgSubComponent> componentsOrdered;
 
-    public Ssh2ColorTableHeader(final ByteBuffer sshFileBuffer) throws IOException {
+    public Ssh2ColorTableHeader(final ByteBuffer sshFileBuffer) {
         this.typeTag = new ColorTableTypeTag(sshFileBuffer);
         this.sizeTag = new ColorTableSizeTag(sshFileBuffer);
         this.amountOfEntriesTag = new ColorTableWidthTag(sshFileBuffer);
@@ -75,8 +75,12 @@ public class Ssh2ColorTableHeader {
         return getStartPosition() + fullColorTableComponentSize;
     }
 
+    public int getTableHeaderSize(){
+        return Math.toIntExact(componentsOrdered.get(componentsOrdered.size() - 1).getEndPos() - componentsOrdered.get(0).getStartPos());
+    }
+
     private long calculateFullTableComponentSize(){
-        final long calculatedHeaderSize = componentsOrdered.get(componentsOrdered.size() - 1).getEndPos() - componentsOrdered.get(0).getStartPos();
+        final long calculatedHeaderSize = getTableHeaderSize();
         final long calculatedTableSize = amountOfEntriesTag.getConvertedValue() * 4; // I assume 4 bytes here. the info is probably available somewhere
         final long fullColorTableComponentSize = calculatedHeaderSize + calculatedTableSize;
         final long fullSizeWithBuffer = (long) Math.ceil((double)fullColorTableComponentSize/16) * 16; // lenght increases in groups of 16, 0x00 filled

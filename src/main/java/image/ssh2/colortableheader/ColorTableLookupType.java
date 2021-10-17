@@ -41,6 +41,12 @@ public class ColorTableLookupType extends ImgSubComponent {
         LOW_RES("000000000000", new IndexLookupStrategy()),
 
         /**
+         * No idea what this is supposed to do
+         */
+        BAM("000000100000", new IndexWithMiddleBitsSwitchedLookupStrategy()),
+
+
+        /**
          */
         DEFAULT("000000200000", new IndexWithMiddleBitsSwitchedLookupStrategy());
 
