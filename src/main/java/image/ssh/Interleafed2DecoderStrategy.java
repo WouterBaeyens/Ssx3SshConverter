@@ -170,20 +170,20 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
 
         // ---------------------------------------------------------------------
 
-        m5.put(new Point(2, 10), new Point(1,0));
-        m5.put(new Point(2, 11), new Point(1,1));
-        m5.put(new Point(2, 2), new Point(1,2));
-        m5.put(new Point(2, 3), new Point(1,3));
+        m5.put(new Point(2, 2), new Point(1,0));
+        m5.put(new Point(2, 3), new Point(1,1));
+        m5.put(new Point(2, 10), new Point(1,2));
+        m5.put(new Point(2, 11), new Point(1,3));
         m5.put(new Point(2, 0), new Point(1,4));
         m5.put(new Point(2, 1), new Point(1,5));
-        m5.put(new Point(3, 0), new Point(1,6));
-        m5.put(new Point(3, 1), new Point(1,7));
-        m5.put(new Point(2, 8), new Point(1,8));
-        m5.put(new Point(2, 9), new Point(1,9));
-        m5.put(new Point(3, 2), new Point(1,10));
-        m5.put(new Point(3, 3), new Point(1,11));
-        m5.put(new Point(3, 10), new Point(1,12));
-        m5.put(new Point(3, 11), new Point(1,13));
+        m5.put(new Point(2, 8), new Point(1,6));
+        m5.put(new Point(2, 9), new Point(1,7));
+        m5.put(new Point(3, 2), new Point(1,8));
+        m5.put(new Point(3, 3), new Point(1,9));
+        m5.put(new Point(3, 10), new Point(1,10));
+        m5.put(new Point(3, 11), new Point(1,11));
+        m5.put(new Point(3, 0), new Point(1,12));
+        m5.put(new Point(3, 1), new Point(1,13));
         m5.put(new Point(3, 8), new Point(1,14));
         m5.put(new Point(3, 9), new Point(1,15));
 
