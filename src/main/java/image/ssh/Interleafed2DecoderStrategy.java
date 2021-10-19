@@ -215,12 +215,12 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
         m5.put(new Point(2, 7), new Point(3,7));
         m5.put(new Point(3, 4), new Point(3,8));
         m5.put(new Point(3, 5), new Point(3,9));
-        m5.put(new Point(3, 14), new Point(3,10));
-        m5.put(new Point(3, 15), new Point(3,11));
-        m5.put(new Point(3, 12), new Point(3,12));
-        m5.put(new Point(3, 13), new Point(3,13));
-        m5.put(new Point(3, 6), new Point(3,14));
-        m5.put(new Point(3, 7), new Point(3,15));
+        m5.put(new Point(3, 12), new Point(3,10));
+        m5.put(new Point(3, 13), new Point(3,11));
+        m5.put(new Point(3, 6), new Point(3,12));
+        m5.put(new Point(3, 7), new Point(3,13));
+        m5.put(new Point(3, 14), new Point(3,14));
+        m5.put(new Point(3, 15), new Point(3,15));
 
         m5.put(new Point(4, 0), new Point(4,0));
         m5.put(new Point(4, 1), new Point(4,1));
@@ -336,12 +336,12 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
         m5.put(new Point(8, 7), new Point(10,7));
         m5.put(new Point(9, 12), new Point(10,8));
         m5.put(new Point(9, 13), new Point(10,9));
-        m5.put(new Point(9, 14), new Point(10,12));
-        m5.put(new Point(9, 15), new Point(10,13));
         m5.put(new Point(9, 4), new Point(10,10));
         m5.put(new Point(9, 5), new Point(10,11));
-        m5.put(new Point(9, 6), new Point(10,14));
-        m5.put(new Point(9, 7), new Point(10,15));
+        m5.put(new Point(9, 6), new Point(10,12));
+        m5.put(new Point(9, 7), new Point(10,13));
+        m5.put(new Point(9, 14), new Point(10,14));
+        m5.put(new Point(9, 15), new Point(10,15));
 
         m5.put(new Point(10, 4), new Point(11,0));
         m5.put(new Point(10, 5), new Point(11,1));
@@ -353,10 +353,10 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
         m5.put(new Point(10, 15), new Point(11,7));
         m5.put(new Point(11, 4), new Point(11,8));
         m5.put(new Point(11, 5), new Point(11,9));
-        m5.put(new Point(11, 6), new Point(11,12));
-        m5.put(new Point(11, 7), new Point(11,13));
         m5.put(new Point(11, 12), new Point(11,10));
         m5.put(new Point(11, 13), new Point(11,11));
+        m5.put(new Point(11, 6), new Point(11,12));
+        m5.put(new Point(11, 7), new Point(11,13));
         m5.put(new Point(11, 14), new Point(11,14));
         m5.put(new Point(11, 15), new Point(11,15));
 
