@@ -5,6 +5,7 @@ import converter.Image;
 import filecollection.FileExtension;
 import filecollection.SourceFileWrapperSsh;
 import image.ssh2.Ssh2File;
+import util.ConverterConfig;
 import util.FileUtil;
 
 import java.io.BufferedOutputStream;
@@ -58,8 +59,10 @@ public class BmpFileCreator {
     }
 
     public static void create(Image image, final Path destionationPath) throws IOException {
-        BmpImageFileWrapper bmpWrapper = new BmpImageFileWrapper(image);
-        writeToFile(bmpWrapper, destionationPath);
+        if(ConverterConfig.WRITE_IMAGES) {
+            BmpImageFileWrapper bmpWrapper = new BmpImageFileWrapper(image);
+            writeToFile(bmpWrapper, destionationPath);
+        }
     }
 
 

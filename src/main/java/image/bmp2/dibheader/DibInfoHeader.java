@@ -11,7 +11,7 @@ import image.bmp2.dibheader.tags.HorizontalResolutionTag;
 import image.bmp2.dibheader.tags.ImageHeightTag;
 import image.bmp2.dibheader.tags.ImageWidthTag;
 import image.bmp2.dibheader.tags.VerticalResolutionTag;
-import image.ssh2.imageheader.ImageSizeTag;
+import image.ssh2.imageheader.ImageComponentSizeTag;
 import util.PrintUtil;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class DibInfoHeader implements DibHeader {
     private final AmountOfPlanesTag amountOfPlanesTag;
     private final BitsPerPixelTag bitsPerPixelTag;
     private final CompressionTypeTag compressionTypeTag;
-    private final ImageSizeTag imageSizeTag;
+    private final ImageComponentSizeTag imageComponentSizeTag;
     private final HorizontalResolutionTag horizontalResolutionTag;
     private final VerticalResolutionTag verticalResolutionTag;
     private final AmountOfColoursTag amountOfColoursTag;
@@ -40,8 +40,8 @@ public class DibInfoHeader implements DibHeader {
         this.amountOfPlanesTag = new AmountOfPlanesTag(bmpFile, imageHeightTag.getEndPos());
         this.bitsPerPixelTag = new BitsPerPixelTag(bmpFile, amountOfPlanesTag.getEndPos());
         this.compressionTypeTag = new CompressionTypeTag(bmpFile, bitsPerPixelTag.getEndPos());
-        this.imageSizeTag = new ImageSizeTag(bmpFile, compressionTypeTag.getEndPos());
-        this.horizontalResolutionTag = new HorizontalResolutionTag(bmpFile, imageSizeTag.getEndPos());
+        this.imageComponentSizeTag = new ImageComponentSizeTag(bmpFile, compressionTypeTag.getEndPos());
+        this.horizontalResolutionTag = new HorizontalResolutionTag(bmpFile, imageComponentSizeTag.getEndPos());
         this.verticalResolutionTag = new VerticalResolutionTag(bmpFile, horizontalResolutionTag.getEndPos());
         this.amountOfColoursTag = new AmountOfColoursTag(bmpFile, verticalResolutionTag.getEndPos());
         this.amountOfImportantColoursTag = new AmountOfImportantColoursTag(bmpFile, amountOfColoursTag.getEndPos());
@@ -52,7 +52,7 @@ public class DibInfoHeader implements DibHeader {
                 amountOfPlanesTag,
                 bitsPerPixelTag,
                 compressionTypeTag,
-                imageSizeTag,
+                imageComponentSizeTag,
                 horizontalResolutionTag,
                 verticalResolutionTag,
                 amountOfColoursTag,

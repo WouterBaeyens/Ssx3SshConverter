@@ -31,7 +31,7 @@ public abstract class ImgSubComponent {
         this.componentSize = data.length;
     }
 
-    public ImgSubComponent(final ByteBuffer buffer, final long startPosition, final long size) {
+    private ImgSubComponent(final ByteBuffer buffer, final long startPosition, final long size) {
         this.startPosition = startPosition;
         this.componentSize = Math.toIntExact(size);
         this.data = FileUtil.readAndConsume(buffer, componentSize);

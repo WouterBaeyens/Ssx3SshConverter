@@ -33,16 +33,12 @@ public class Ssh2Image implements Image {
         this.ssh2ImageHeader = new Ssh2ImageHeader(sshFileBuffer);
         // todo replace by raster if possible
         this.imageByteBuffer = copyRawImageDataToBufferAndSkip(sshFileBuffer, ssh2ImageHeader);
-        final boolean needsTable = ssh2ImageHeader.getByteToPixelStrategy().requiresPalette();
+        final boolean needsTable = ssh2ImageHeader.requiresPalette();
         this.ssh2ColorTable = needsTable ? new Ssh2ColorTable(sshFileBuffer) : null;
         this.ssh2ImageAttachments = new Ssh2ImageAttachments(sshFileBuffer);
-        fillerTag = (sshFileBuffer.hasRemaining() && getImageType() != ImageTypeTag.ImageType.HIGH_REZ) ? new FillerTag(sshFileBuffer) : null;
+        fillerTag = (sshFileBuffer.hasRemaining() && getImageType() != ImageTypeTag.ImageType.HIGH_REZ) ? new FillerTag.Reader().withDesiredStartAddress(FillerTag.DESIRED_IMG_HEADER_START_ADDRESS).withPrefix(FillerTag.BUY_ERTS_AS_BYTE).read(sshFileBuffer) : null;
     }
 
-    // WHEN THE IMAGE IS COMPRESSED THIS WON'T WORK!
-    public long getImageEndPosition() {
-        return ssh2ImageHeader.getImageEndPosition();
-    }
 
     private ImageTypeTag.ImageType getImageType(){
         return ssh2ImageHeader.getImageType();

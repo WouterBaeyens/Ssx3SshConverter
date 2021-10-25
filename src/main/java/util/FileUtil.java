@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class FileUtil {
 
     public static Stream<File> findFilesInCurrentDirectory(FileExtension fileExtension) throws IOException {
-        Stream<Path> paths = Files.find(Paths.get("./"), 1, fileExtension.matcher);
+        Stream<Path> paths = Files.find(Paths.get("./"), ConverterConfig.FILE_SEARCH_DEPTH, fileExtension.matcher);
         return paths.filter(Files::isRegularFile).map(Path::toFile);
     }
 

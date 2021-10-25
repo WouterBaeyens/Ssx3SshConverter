@@ -5,17 +5,17 @@ import util.ByteUtil;
 
 import java.nio.ByteBuffer;
 
-public class BamImageRowsTag extends ImgSubComponent {
+public class BamImageWidthTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 2;
 
-    public BamImageRowsTag(final ByteBuffer buffer){
+    public BamImageWidthTag(final ByteBuffer buffer){
         super(buffer, DEFAULT_SIZE);
     }
 
     @Override
     public String getInfo() {
-        return "image #rows: " + ByteUtil.printLongWithHex(getConvertedValue());
+        return "image width (high_rez, in pixels): " + ByteUtil.printLongWithHex(getConvertedValue());
     }
 
     public int getConvertedValue(){
