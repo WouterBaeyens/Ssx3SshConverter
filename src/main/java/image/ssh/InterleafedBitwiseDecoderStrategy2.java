@@ -4,17 +4,13 @@ import com.mycompany.sshtobpmconverter.IPixel;
 import util.ConverterConfig;
 
 import java.awt.*;
-import java.awt.geom.Dimension2D;
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
-import static image.ssh2.imageheader.ImageEncodingTypeTag.EncodingType.BLOCK_SCRAMBLED;
 import static util.ByteUtil.*;
 
-public class InterleafedBitwiseDecoderStrategy implements SshImageDecoderStrategy{
+public class InterleafedBitwiseDecoderStrategy2 implements SshImageDecoderStrategy{
 
     @Override
     public List<List<IPixel>> decodeImage(List<List<IPixel>> encodedImage) {
@@ -24,7 +20,7 @@ public class InterleafedBitwiseDecoderStrategy implements SshImageDecoderStrateg
         for(int rowNr = 0; rowNr < nrOfRows; rowNr ++) {
             decodedImage.add(new ArrayList<>());
         }
-        Point imageBlockDimensions = new Point(ConverterConfig.BLOCK_DIMENSIONS,ConverterConfig.BLOCK_DIMENSIONS);
+        Dimension imageBlockDimensions = new Dimension(ConverterConfig.BLOCK_DIMENSIONS,ConverterConfig.BLOCK_DIMENSIONS);
         for(int rowNr = 0; rowNr < nrOfRows; rowNr ++) {
 //            rowNr = 2;
             for (int colNr = 0; colNr < nrOfColumns; colNr++) {
@@ -43,24 +39,24 @@ public class InterleafedBitwiseDecoderStrategy implements SshImageDecoderStrateg
         for(int rowNr = 0; rowNr < imageDimensionsInBytes.height; rowNr ++) {
             for (int colNr = 0; colNr < imageDimensionsInBytes.width; colNr++) {
                 Point pxlLocation = new Point(rowNr, colNr);
-                Point decodedpxlLocation = getDecodedPixelLocation(imageDimensionsInBytes, new Point(16,16), pxlLocation);
+                Point decodedpxlLocation = getDecodedPixelLocation(imageDimensionsInBytes, new Dimension(16,16), pxlLocation);
                 decodedBuffer.put(buffer.get(decodedpxlLocation.x * imageDimensionsInBytes.width + decodedpxlLocation.y));
             }
         }
         return decodedBuffer.rewind();
     }
 
-    private Point getDecodedPixelLocation(Dimension imageDimensions, Point imageBlockDimensions, Point pxlLocation) {
+    private Point getDecodedPixelLocation(Dimension imageDimensions, Dimension imageBlockDimensions, Point pxlLocation) {
         final int pixelLocation = pxlLocation.x * imageDimensions.width + pxlLocation.y;
 
         int result = pixelLocation;
-        result = swapRowBit0Bit1(imageDimensions, result);
-        if(!rowBit0EqualsRowBit2(imageDimensions, result)){
-            result = toggleBit(result, 2);
-        }
-        // result = rotateColumnBlockBitsLeft(imageBlockDimensions, result);
+//        result = swapRowBit0Bit1(imageDimensions, result);
+//        if(!rowBit0EqualsRowBit2(imageDimensions, result)){
+//            result = toggleBit(result, 2);
+//        }
+        result = rotateColumnBlockBitsLeft(imageDimensions, result, 3);
 
-        // result = rotateColumnWithOneBitOfRowLeft(imageDimensions, result);
+        //result = rotateColumnWithOneBitOfRowLeft(imageDimensions, result);
         return new Point(result / imageDimensions.width, result % imageDimensions.width);
     }
 
@@ -69,7 +65,7 @@ public class InterleafedBitwiseDecoderStrategy implements SshImageDecoderStrateg
      */
     private int rotateColumnWithOneBitOfRowLeft(final Dimension imageDimensions, int pixelLocation){
         int nrOfBitsInColumn = Integer.numberOfTrailingZeros(imageDimensions.width);
-        return rotateLeft(pixelLocation, 0, nrOfBitsInColumn + 1);
+        return rotateLeft(pixelLocation, 0, nrOfBitsInColumn + 1, 1);
     }
 
     private int swapRowBit0Bit1(final Dimension imageDimensions, int pixelLocation){
@@ -89,19 +85,23 @@ public class InterleafedBitwiseDecoderStrategy implements SshImageDecoderStrateg
     /**
      * pixelLocation = 1111 0001 (row=1111, column=0001) -> 1111 0010
      */
-    private int rotateColumnBlockBitsLeft(Point imageDimensions, int pixelLocation){
-        int nrOfBitsInColumn = Integer.numberOfTrailingZeros(imageDimensions.y);
-        return rotateLeft(pixelLocation, 0, nrOfBitsInColumn);
+    private int rotateColumnBlockBitsLeft(Dimension imageDimensions, int pixelLocation){
+        return rotateColumnBlockBitsLeft(imageDimensions, pixelLocation, 1);
     }
+
+    private int rotateColumnBlockBitsLeft(Dimension imageDimensions, int pixelLocation, int rotationAmount){
+        int nrOfBitsInColumn = Integer.numberOfTrailingZeros(imageDimensions.width);
+        return rotateLeft(pixelLocation, 0, nrOfBitsInColumn, rotationAmount);
+    }
+
+
 
     @Override
     public List<List<IPixel>> encodeImage(List<List<IPixel>> image) {
         return null;
     }
 
-    private int rotateLeft(final int input, int start, int end){
-        final int rotationAmount = 1;
-
+    private int rotateLeft(final int input, int start, int end, int rotationAmount){
         final int leftSideAfterRotation = getBits(input , start, end - rotationAmount);
         final int rightSideAfterRotation = getBits(input , end - rotationAmount, end);
 

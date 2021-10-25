@@ -11,6 +11,6 @@ public class ConverterConfig {
     public static final boolean PRINT_BAM_COMPONENT_INFO = false;
     public static final boolean PRINT_TABLE_INFO = true;
 
-    public static final int BLOCK_DIMENSIONS = 16;
-    public static final String PREFIX = "BIT";
+    public static final int BLOCK_DIMENSIONS = 32;
+    public static final String PREFIX = "2";
 }

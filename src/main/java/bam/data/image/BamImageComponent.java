@@ -8,6 +8,7 @@ import converter.Image;
 import image.ssh.InterleafedBitwiseDecoderStrategy;
 import image.ssh2.Ssh2ImageHeader;
 import image.ssh2.fileheader.FillerTag;
+import image.ssh2.imageheader.ImageTypeTag;
 import image.ssh2.imageheader.strategies.ByteToPixelStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,10 @@ public class BamImageComponent implements Image {
         if(PRINT_INFO){
             printFormatted();
         }
+    }
+
+    public ImageTypeTag.ImageType getImageType(){
+        return imageHeader.getImageType();
     }
 
     public boolean containsImage(){

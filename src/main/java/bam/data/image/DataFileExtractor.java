@@ -2,6 +2,7 @@ package bam.data.image;
 
 import com.mycompany.sshtobpmconverter.BmpFileCreator;
 import filecollection.FileExtension;
+import image.ssh2.imageheader.ImageTypeTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.ByteUtil;
@@ -46,7 +47,9 @@ public class DataFileExtractor {
                 if (!component.containsImage()) {
                     throw new UnsupportedEncodingException("Only image components are currently supported");
                 }
-                BmpFileCreator.create(component, specifyDestinationPath(filePath, component.getImageNr(), buffer.position()));
+                if(component.getImageType() == ImageTypeTag.ImageType.LOW_RES_4BPP) {
+                    BmpFileCreator.create(component, specifyDestinationPath(filePath, component.getImageNr(), buffer.position()));
+                }
             }
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("error extracting " + filePath.toString(), e);
