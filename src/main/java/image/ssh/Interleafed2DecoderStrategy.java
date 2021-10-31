@@ -7,60 +7,68 @@ import com.mycompany.sshtobpmconverter.Pixel2;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
 
     private static final boolean ENABLE_DEBUG_GRID_LINES = false;
-    public record Decoder(BiMap<Point, Point> map, int rows, int columns){}
+
+    /**
+     * The map defines for each innerBlock coordinate in outerBlock a new coordinate.
+     * ex: map = {{0,1}, {0,0}} ; outerBlock=(w:8,h:1) ; innerBlock=(w:4,h:1)
+     *      -----------------------------------           -----------------------------------
+     *     |  -------------    -------------   |         |  -------------    -------------   |
+     *     | | 1  2  3  4 |   |  5  6  7  8 |  |         | | 5  6  7  8 |   |  1  2  3  4 |  |
+     *     |  -------------    -------------   |         |  -------------    -------------   |
+     *     -------------------------------------   ->    -------------------------------------
+     *     -------------------------------------         -------------------------------------
+     *     |  -------------    -------------   |         |  -------------    -------------   |
+     *     | | 9  10 11 12 |   | 13 14 15 16|  |         | | 13 14 15 16 |   | 9 10 11 12 |  |
+     *     |  -------------    -------------   |         |  -------------    -------------   |
+     */
+    public record Decoder(BiMap<Point, Point> map, Dimension outerBlock, Dimension innerBlock){}
 
     @Override
     public List<List<IPixel>> decodeImage(List<List<IPixel>> encodedImage) {
-        List<List<IPixel>> decodedImage = new ArrayList<>();
-        int nrOfRows = encodedImage.size();
-        int nrOfColumns = encodedImage.get(0).size();
-        Point[][] mask = getDecodingMask(nrOfRows, nrOfColumns);
-        for(int rowNr = 0; rowNr < nrOfRows; rowNr ++){
-            decodedImage.add(new ArrayList<>());
-            for(int colNr = 0; colNr < nrOfColumns; colNr++){
-                if(ENABLE_DEBUG_GRID_LINES){
-                    if(colNr % 16 == 0){
-                        decodedImage.get(rowNr).add(Pixel2.GREY_PIXEL);
-                    } else if(colNr%4==0) {
-                        decodedImage.get(rowNr).add(Pixel2.DARK_GREY_PIXEL);
-                    } else {
-                        decodedImage.get(rowNr).add(Pixel2.getDefaultPixel());
-                    }
-                } else {
-                    Point pxlLocation = mask[rowNr][colNr];
-                    decodedImage.get(rowNr).add(colNr, encodedImage.get(pxlLocation.x).get(pxlLocation.y));
-                }
-            }
-        }
+        final Dimension imgDimensions = new Dimension(encodedImage.get(0).size(), encodedImage.size());
+        Point[][] mask = createLowRezDecodingMask(imgDimensions);
+        List<List<IPixel>> decodedImage = decodeImage(encodedImage, mask);
+        if(ENABLE_DEBUG_GRID_LINES) addDebugGridlines(decodedImage);
         return decodedImage;
     }
 
-    private Point[][] getDecodingMask(final int nrOfRows, final int nrOfColumns){
-        Point[][] mask = createDefaultmask(nrOfRows, nrOfColumns);
+    private Point[][] createDecodingMask(final Dimension imgDimension){
+        Point[][] mask = createDefaultmask(imgDimension);
         Point[][] mask2 = manipulateMask(mask, point -> decode(switchLeftBottomRightTop, point));
-        Point[][] mask3 = manipulateMask(mask2, point -> splitEvenUnevenColumnes(nrOfColumns, point));
-        Point[][] maskNew = manipulateMask(mask3, point -> decode(switchBlocksLow, point));
-
+        Point[][] mask3 = manipulateMask(mask2, point -> splitEvenUnevenColumnes(imgDimension.width, point));
+        Point[][] maskNew = manipulateMask(mask3, point -> decode(switchBlocksAll, point));
         return maskNew;
     }
 
-    private Point[][] createDefaultmask(final int nrOfRows, final int nrOfColumns){
-        Point[][] raster = new Point[nrOfRows][nrOfColumns];
-        for (int rowNr = 0; rowNr < nrOfRows; rowNr ++){
-            for (int colNr = 0; colNr < nrOfColumns; colNr ++){
-                raster[rowNr][colNr] = new Point(rowNr, colNr);
-            }
-        }
+    private Point[][] createLowRezDecodingMask(final Dimension imgDimension){
+        Point[][] mask = createDefaultmask(imgDimension);
+        var mask2 = manipulateMask(mask, point -> decodeVerticalUnrepeating(imgDimension, List.of(new Point(0, 0), new Point(1, 0), new Point(2, 0), new Point(3, 0)), point));
+        var mask3 = manipulateMask(mask2, point -> decode(testDecoderBlock, point));
+        var mask4 = manipulateMask(mask3, point -> decodeHorizontalUnrepeating(new Dimension(32, 1), List.of(new Point(0,0), new Point(0,1), new Point(0,2), new Point(0,3), new Point(0,4), new Point(0,5), new Point(0,6), new Point(0,7)), point));
+        var mask5 = manipulateMask(mask4, point -> decodeVerticalUnrepeating(new Dimension(1, 16), List.of(new Point(0, 0), new Point(1, 0), new Point(2, 0), new Point(3, 0), new Point(4, 0), new Point(5, 0), new Point(6, 0), new Point(7, 0)), point));
+        var mask6 = manipulateMask(mask5, point -> decode(testDecoderBlock2, point));
+        var mask7 = manipulateMask(mask6, point -> decode(testDecoderBlock3, point));
+        var maskNew = manipulateMask(mask7, point -> decode(testDecoderBlock4, point));
+        return maskNew;
+    }
+
+    Point[][] createDefaultmask(final Dimension imgDimension){
+        Point[][] raster = new Point[imgDimension.height][imgDimension.width];
+        IntStream.range(0, imgDimension.height)
+                .forEach(rowNr -> IntStream.range(0, imgDimension.width)
+                        .forEach(colNr -> raster[rowNr][colNr] = new Point(rowNr, colNr)));
         return raster;
     }
 
-    private Point[][] manipulateMask(Point[][] mask, Function<Point, Point> manipulationMethod){
+    Point[][] manipulateMask(Point[][] mask, Function<Point, Point> manipulationMethod){
         int rowTot = mask.length;
         int colTot = mask[0].length;
         Point[][] newMask = new Point[rowTot][colTot];//clone2dArray(mask);
@@ -73,8 +81,87 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
         return newMask;
     }
 
+    public List<List<IPixel>> decodeImage(List<List<IPixel>> encodedImage, Point[][] decodingMask) {
+        final Dimension imgDimensions = new Dimension(encodedImage.get(0).size(), encodedImage.size());
+        List<List<IPixel>> decodedImage = createNewImage(imgDimensions);
+        for(int rowNr = 0; rowNr < imgDimensions.height; rowNr ++){
+            for(int colNr = 0; colNr < imgDimensions.width; colNr++){
+                Point pxlLocation = decodingMask[rowNr][colNr];
+                decodedImage.get(rowNr).set(colNr, encodedImage.get(pxlLocation.x).get(pxlLocation.y));
+            }
+        }
+        return decodedImage;
+    }
+
+        private List<List<IPixel>> createNewImage(Dimension dimensions){
+        final List<List<IPixel>> newImage = new ArrayList<>(dimensions.height);
+        IntStream.range(0, dimensions.height)
+                .forEach(ignored -> newImage.add(Arrays.asList(new IPixel[dimensions.width])));
+        return newImage;
+    }
+
+    private void addDebugGridlines(List<List<IPixel>> image){
+        for (int rowNr = 0; rowNr < image.size(); rowNr += 16){
+            for(int colNr = 0; colNr < image.get(0).size(); colNr ++){
+                if(colNr % 16 == 0){
+                    image.get(rowNr).set(colNr, Pixel2.GREY_PIXEL);
+                } else if(colNr%4==0) {
+                    image.get(rowNr).set(colNr, Pixel2.DARK_GREY_PIXEL);
+                } else {
+                    image.get(rowNr).set(colNr, Pixel2.getDefaultPixel());
+                }
+            }
+        }
+    }
+
+    Point[][] testDecoderBlockMask = {
+            {new Point(0,0), new Point(1,0), new Point(2,0), new Point(3,0)},
+            {new Point(0,1), new Point(1,1), new Point(2,1), new Point(3,1)},
+            {new Point(0,2), new Point(1,2), new Point(2,2), new Point(3,2)},
+            {new Point(0,3), new Point(1,3), new Point(2,3), new Point(3,3)},
+            {new Point(4,0), new Point(5,0), new Point(6,0), new Point(7,0)},
+            {new Point(4,1), new Point(5,1), new Point(6,1), new Point(7,1)},
+            {new Point(4,2), new Point(5,2), new Point(6,2), new Point(7,2)},
+            {new Point(4,3), new Point(5,3), new Point(6,3), new Point(7,3)},
+    };
+    Decoder testDecoderBlock = new Decoder(asBimap(testDecoderBlockMask), new Dimension(128, 64), new Dimension(32, 8));
+
+    Point[][] testDecoderBlockMask2 = {
+            {new Point(0,0), new Point(0,1)},
+            {new Point(1,1), new Point(1,0)},
+            {new Point(2,0), new Point(2,1)},
+            {new Point(3,1), new Point(3,0)},
+            {new Point(4,1), new Point(4,0)},
+            {new Point(5,0), new Point(5,1)},
+            {new Point(6,1), new Point(6,0)},
+            {new Point(7,0), new Point(7,1)},
+    };
+    Decoder testDecoderBlock2 = new Decoder(asBimap(testDecoderBlockMask2), new Dimension(8,8), new Dimension(4,1));
+
+    Point[][] testDecoderBlockMask3 = {
+            {new Point(1,0), new Point(0,1)},
+            {new Point(3,0), new Point(2,1)},
+            {new Point(0,0), new Point(1,1)},
+            {new Point(2,0), new Point(3,1)},
+    };
+    Decoder testDecoderBlock3 = new Decoder(asBimap(testDecoderBlockMask3), new Dimension(8,4), new Dimension(4,1));
+
+    Point[][] testDecoderBlockMask4 = {
+            {new Point(1,0)},
+            {new Point(0,0)},
+            {new Point(2,0)},
+            {new Point(3,0)},
+    };
+    Decoder testDecoderBlock4 = new Decoder(asBimap(testDecoderBlockMask4), new Dimension(1,8), new Dimension(1,2));
+
+
+    Point[][] testDecoderMask = {
+            {new Point(0,2), new Point(0,0), new Point(0,1), new Point(0,3)}
+    };
+    Decoder testDecoder = new Decoder(asBimap(testDecoderMask), new Dimension(4,2),new Dimension(1,1));
+
     private static final BiMap<Point, Point> m1 = HashBiMap.create();
-    Decoder switchLeftBottomRightTop = new Decoder(m1, 2,2);
+    Decoder switchLeftBottomRightTop = new Decoder(m1, new Dimension(2,2),new Dimension(1,1));
     static{
         m1.put(new Point(0,0), new Point(0,0));
         m1.put(new Point(0,1), new Point(1,0));
@@ -83,7 +170,7 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
     }
 
     private static final BiMap<Point, Point> m7 = HashBiMap.create();
-    Decoder switchBlocksLow = new Decoder(m7.inverse(), 16,16);
+    Decoder switchBlocksLow = new Decoder(m7.inverse(), new Dimension(16,16),new Dimension(1,1));
     static {
         m7.put(new Point(0, 0), new Point(0, 0));
         m7.put(new Point(0, 1), new Point(0, 1));
@@ -359,7 +446,7 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
     }
 
     private static final BiMap<Point, Point> m6 = HashBiMap.create();
-    Decoder switchBlocksAll = new Decoder(m6.inverse(), 16,16);
+    Decoder switchBlocksAll = new Decoder(m6.inverse(), new Dimension(16,16),new Dimension(1,1));
     private static BiMap<Point, Point> createMap(){
         BiMap<Point, Point> encodingMap = HashBiMap.create();
 
@@ -639,6 +726,15 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
         m6.put(new Point(15, 15), new Point(15, 15));
     }
 
+    private BiMap<Point, Point> asBimap(Point[][] arrayMap) {
+        BiMap<Point, Point> result = HashBiMap.create();
+        IntStream.range(0, arrayMap.length).forEach(rowNr -> {
+            IntStream.range(0, arrayMap[0].length).forEach(colNr ->
+                    result.put(arrayMap[rowNr][colNr], new Point(rowNr, colNr)));
+        });
+        return result;
+    }
+
     private void generateCode(Point[][] mask, int rowLength, int colLength){
         for(int rowNr = 0; rowNr < rowLength; rowNr++){
             for (int colNr = 0; colNr < colLength; colNr ++){
@@ -665,17 +761,46 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
         return new Point(point.x, 0);
     }
 
-    private Point decode(final Decoder decoder, final Point point){
-        final int rowOffset = point.x % decoder.rows;
-        final int rowBase = point.x - rowOffset;
+    Point decode(final Decoder decoder, final Point point){
+        // offset relative to the full picture
+        final Point outerBlockBase = new Point(point.x - point.x % decoder.outerBlock.height, point.y - point.y % decoder.outerBlock.width);
 
-        final int columnOffset = point.y % decoder.columns;
-        final int columnBase = point.y - columnOffset;
+        // offset relative to outerBlockBase (x and y are counted in innerBlock lengths)
+        final Point innerBlockOffset = new Point((point.x - outerBlockBase.x) / decoder.innerBlock.height, (point.y - outerBlockBase.y) / decoder.innerBlock.width);
 
-        final Point originalOffsets = new Point(rowOffset, columnOffset);
-        final Point decodedOffsets = decoder.map.getOrDefault(originalOffsets, originalOffsets);
+        // point offset relative to InnerBlock
+        final Point pointOffset = new Point(point.x % decoder.innerBlock.height, point.y % decoder.innerBlock.width);
 
-        return new Point(rowBase + decodedOffsets.x, columnBase + decodedOffsets.y);
+        final Point decodedInnerBlockOffset = decoder.map.getOrDefault(innerBlockOffset, innerBlockOffset);
+
+        Point result = new Point(outerBlockBase.x + decoder.innerBlock.height * decodedInnerBlockOffset.x + pointOffset.x, outerBlockBase.y + decoder.innerBlock.width * decodedInnerBlockOffset.y + pointOffset.y);
+        return result;
+    }
+
+    Point decodeVerticalUnrepeating(final Dimension blockDimensions, final List<Point> rowOrder, final Point point){
+        int rowOffset = point.x % rowOrder.size();
+        int baseOffset = point.x % blockDimensions.height;
+        int blockBase = point.x - baseOffset;
+        int compartmentSize = blockDimensions.height / rowOrder.size();
+
+        int decodedRowOffset = rowOrder.indexOf(new Point(rowOffset, 0));
+        int compartmentBase = compartmentSize * decodedRowOffset;
+        int compartmentOffset = baseOffset / rowOrder.size();
+        Point result = new Point(blockBase + compartmentBase + compartmentOffset, point.y);
+        return result;
+    }
+
+    Point decodeHorizontalUnrepeating(final Dimension blockDimensions, final List<Point> columnOrder, final Point point){
+        int columnOffset = point.y % columnOrder.size();
+        int baseOffset = point.y % blockDimensions.width;
+        int blockBase = point.y - baseOffset;
+        int compartmentSize = blockDimensions.width / columnOrder.size();
+
+        int decodedColumnOffset = columnOrder.indexOf(new Point(0, columnOffset));
+        int compartmentBase = compartmentSize * decodedColumnOffset;
+        int compartmentOffset = baseOffset / columnOrder.size();
+        Point result = new Point(point.x, blockBase + compartmentBase + compartmentOffset);
+        return result;
     }
 
 

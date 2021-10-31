@@ -45,7 +45,7 @@ public class ImageEncodingTypeTag extends ImgSubComponent {
     public enum EncodingType {
         NONE("0000", new NoneDecoderStrategy()),
         INTERLACED("0020", new InterleafedDecoderStrategy()),
-        BLOCK_SCRAMBLED("0030", new InterleafedBitwiseDecoderStrategy2()),
+        BLOCK_SCRAMBLED("0030", new InterleafedBitwiseDecoderStrategy()),
         EXPERIMENTAL("XXXXXX", new Interleafed2DecoderStrategy());
 
         final String value;

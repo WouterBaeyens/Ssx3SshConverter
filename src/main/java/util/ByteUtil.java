@@ -130,6 +130,19 @@ public class ByteUtil {
         }
     }
 
+    public static int swapBits(final int input, final int bitIndex1, int bitIndex2, int length){
+        int result = input;
+        for(int offset = 0; offset < length; offset ++) {
+            int bi1 = bitIndex1 + offset;
+            int bi2 = bitIndex2 + offset;
+            if (getBit(result, bi1) != getBit(result, bi2)) {
+                int toggleMask = (1 << bi1) | (1 << bi2);
+                result = result ^ toggleMask;
+            }
+        }
+        return result;
+    }
+
     public static int getBit(final int input, int bitIndex){
         return  getBits(input, bitIndex, bitIndex + 1);
     }
@@ -169,7 +182,7 @@ public class ByteUtil {
 
     public static byte getLeftNibble(final byte _byte){
         byte tmpByte = _byte;
-        return (byte) ((tmpByte &= 0xF0) >>> 4);
+        return (byte) ((tmpByte >>> 4) & 0x0F);
     }
 
     public static byte getRightNibble(final byte _byte){

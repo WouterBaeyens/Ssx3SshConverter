@@ -52,7 +52,7 @@ public class BamImageComponent implements Image {
             this.imageByteBuffer = null;
             imageColorTable = null;
         }
-        if(PRINT_INFO){
+        if(PRINT_INFO && imageHeader != null && getImageType() == ImageTypeTag.ImageType.LOW_RES_4BPP){
             printFormatted();
         }
     }
@@ -92,7 +92,7 @@ public class BamImageComponent implements Image {
             long bufferSize = tmpImageByteBuffer.position() + tmpImageByteBuffer.limit();
             throw new IllegalStateException("Encountered an error reading image data at " + ByteUtil.printLongWithHex(currentPosition) + " (image-data start=" + ByteUtil.printLongWithHex(imageHeader.getImageHeaderEndPosition()) + ", bufferSize=" + ByteUtil.printLongWithHex(bufferSize) +")", e);
         }
-        if(image.size() > 16) {
+        if(image.size() >= 128 && image.get(0).size() >= 128) {
             return imageHeader.getImageDecodingStrategy().decodeImage(image);
 //            return image;
         } else {

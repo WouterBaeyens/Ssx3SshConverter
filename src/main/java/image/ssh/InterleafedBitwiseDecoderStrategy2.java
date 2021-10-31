@@ -54,9 +54,20 @@ public class InterleafedBitwiseDecoderStrategy2 implements SshImageDecoderStrate
 //        if(!rowBit0EqualsRowBit2(imageDimensions, result)){
 //            result = toggleBit(result, 2);
 //        }
-        result = rotateColumnBlockBitsLeft(imageDimensions, result, 3);
+        int nrOfBitsInColumn = Integer.numberOfTrailingZeros(imageDimensions.width);
+        int nrOfBitsInRow = Integer.numberOfTrailingZeros(imageDimensions.width);
+        //result = rotateLeft(result, 3, nrOfBitsInColumn, 2);
 
-        //result = rotateColumnWithOneBitOfRowLeft(imageDimensions, result);
+        //result = rotateColumnBitsLeft(imageDimensions, result, 3);
+
+        // result = rotateRowBitsLeft(imageDimensions, result, 2);
+
+
+
+        //result = rotateLeft(result, 0, nrOfBitsInColumn + 1);
+        result = rotateLeft(result, 0, nrOfBitsInRow -1, 3);
+        result = rotateRowBitsLeft(imageDimensions, result, 2); // rows (all)  01234567 -> 04152637
+        //result = swapBits(result, 0, nrOfBitsInColumn); // swaps 0,1 and 1,0 (in 2 by 2 grid)
         return new Point(result / imageDimensions.width, result % imageDimensions.width);
     }
 
@@ -85,13 +96,19 @@ public class InterleafedBitwiseDecoderStrategy2 implements SshImageDecoderStrate
     /**
      * pixelLocation = 1111 0001 (row=1111, column=0001) -> 1111 0010
      */
-    private int rotateColumnBlockBitsLeft(Dimension imageDimensions, int pixelLocation){
-        return rotateColumnBlockBitsLeft(imageDimensions, pixelLocation, 1);
+    private int rotateColumnBitsLeft(Dimension imageDimensions, int pixelLocation){
+        return rotateColumnBitsLeft(imageDimensions, pixelLocation, 1);
     }
 
-    private int rotateColumnBlockBitsLeft(Dimension imageDimensions, int pixelLocation, int rotationAmount){
+    private int rotateColumnBitsLeft(Dimension imageDimensions, int pixelLocation, int rotationAmount){
         int nrOfBitsInColumn = Integer.numberOfTrailingZeros(imageDimensions.width);
         return rotateLeft(pixelLocation, 0, nrOfBitsInColumn, rotationAmount);
+    }
+
+    private int rotateRowBitsLeft(Dimension imageDimensions, int pixelLocation, int rotationAmount){
+        int nrOfBitsInColumn = Integer.numberOfTrailingZeros(imageDimensions.height);
+        int nrOfBitsInRow = Integer.numberOfTrailingZeros(imageDimensions.width);
+        return rotateLeft(pixelLocation, nrOfBitsInRow, nrOfBitsInRow + nrOfBitsInColumn, rotationAmount);
     }
 
 
