@@ -13,5 +13,5 @@ public class ConverterConfig {
     public static final boolean PRINT_TABLE_INFO = true;
 
     public static final int BLOCK_DIMENSIONS = 32;
-    public static final String PREFIX = "2";
+    public static final String PREFIX = "3";
 }

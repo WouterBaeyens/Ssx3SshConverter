@@ -47,7 +47,7 @@ public class DataFileExtractor {
                 if (!component.containsImage()) {
                     throw new UnsupportedEncodingException("Only image components are currently supported");
                 }
-                if(component.getImageType() == ImageTypeTag.ImageType.LOW_RES_4BPP) {
+                if(component.getImageType() == ImageTypeTag.ImageType.LOW_RES_4BPP && component.getImgHeight() == 64 && component.getImgWidth() == 128) {
                     BmpFileCreator.create(component, specifyDestinationPath(filePath, component.getImageNr(), buffer.position()));
                 }
             }

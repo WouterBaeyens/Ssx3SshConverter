@@ -58,7 +58,7 @@ public class InterleafedBitwiseDecoderStrategy implements SshImageDecoderStrateg
      * 76dcbag	fe32154  //RL1 c5_r5
      * 76dcagf e32154b  //RL1 c0_r3
      */
-    Point decodeLowRezPixelLocation(Point pxlLocation){
+    Point decodeLowRezPixelLocation2(Point pxlLocation){
         Dimension imageDimensions = new Dimension(128, 128);
         final int pixelLocation = pxlLocation.x * imageDimensions.width + pxlLocation.y;
         int result = pixelLocation;
@@ -70,6 +70,31 @@ public class InterleafedBitwiseDecoderStrategy implements SshImageDecoderStrateg
         result = rotateLeft(result, 0, 5, 2); info += " -RL2 c0_c5-> " + asBin(result); // 0,1 -> 0,8
         result = rotateLeft(result, 5, 12, 1); info += " -RL1 c5_6-r5-> " + asBin(result); // 0,1 -> 0,8 // could be anything
         result = rotateLeft(result, 0, 10, 1); info += " -RL1 c5_6-r5-> " + asBin(result); // 0,1 -> 0,8 // could be anything
+
+        LOGGER.info(info);
+        return new Point(result / imageDimensions.width, result % imageDimensions.width);
+    }
+
+    /**
+     * Steps:
+     * gfedcba 7654321 (toggle 3 if b/c is different)
+     * 76edcba gf54321  //r56-c56
+     * 76edcba gf32154  //RL2 c0_c5
+     * 76dcbag	fe32154  //RL1 c5_r5
+     * 76dcagf e32154b  //RL1 c0_r3
+     */
+    Point decodeLowRezPixelLocation(Point pxlLocation){
+        Dimension imageDimensions = new Dimension(128, 128);
+        final int pixelLocation = pxlLocation.x * imageDimensions.width + pxlLocation.y;
+        int result = pixelLocation;
+        String info = asBin(result);
+        if(!bitsEqual(result, 8,9)){
+            result = toggleBit(result, 2); info += " -neq r1,r2 ? ^c5-> " + asBin(result); // 4,0 -> 8,32 (^b2 <<2)
+        }
+        result = swapBits(result, 5, 11,2); info += " -Sw Ro Co 5,6-> " + asBin(result); // 0,32 -> 32,0
+        result = rotateLeft(result, 0, 5, 2); info += " -RL2 c0_c5-> " + asBin(result); // 0,1 -> 0,8
+        result = rotateLeft(result, 5, 11, 1); info += " -RL1 c5_6-r5-> " + asBin(result); // 0,1 -> 0,8 // could be anything
+        result = rotateLeft(result, 0, 9, 1); info += " -RL1 c5_6-r5-> " + asBin(result); // 0,1 -> 0,8 // could be anything
 
         LOGGER.info(info);
         return new Point(result / imageDimensions.width, result % imageDimensions.width);

@@ -92,7 +92,7 @@ public class BamImageComponent implements Image {
             long bufferSize = tmpImageByteBuffer.position() + tmpImageByteBuffer.limit();
             throw new IllegalStateException("Encountered an error reading image data at " + ByteUtil.printLongWithHex(currentPosition) + " (image-data start=" + ByteUtil.printLongWithHex(imageHeader.getImageHeaderEndPosition()) + ", bufferSize=" + ByteUtil.printLongWithHex(bufferSize) +")", e);
         }
-        if(image.size() >= 128 && image.get(0).size() >= 128) {
+        if(image.size() == 64 && image.get(0).size() >= 128) {
             return imageHeader.getImageDecodingStrategy().decodeImage(image);
 //            return image;
         } else {
