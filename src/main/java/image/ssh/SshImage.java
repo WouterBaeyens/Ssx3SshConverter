@@ -150,7 +150,7 @@ public class SshImage implements ImgComponent {
             }
             image.add(imageRow);
         }
-        return decoderStrategy.decodeImage(image);
+        return decoderStrategy.decodeImage(image, null);
     }
 
     public int getImgWidth(){

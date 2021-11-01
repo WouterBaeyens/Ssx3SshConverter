@@ -6,6 +6,7 @@
 package image.ssh;
 
 import com.mycompany.sshtobpmconverter.IPixel;
+import image.ssh2.imageheader.strategies.ByteToPixelStrategy;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * @author Wouter
  */
 public interface SshImageDecoderStrategy {
-    public List<List<IPixel>> decodeImage(List<List<IPixel>> image);
+    public List<List<IPixel>> decodeImage(List<List<IPixel>> image, ByteToPixelStrategy byteToPixelStrategy);
 
     public List<List<IPixel>> encodeImage(List<List<IPixel>> image);
 }

@@ -8,6 +8,7 @@ package image.ssh;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.mycompany.sshtobpmconverter.IPixel;
+import image.ssh2.imageheader.strategies.ByteToPixelStrategy;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import java.util.List;
 public class InterleafedDecoderStrategy implements SshImageDecoderStrategy{
 
     @Override
-    public List<List<IPixel>> decodeImage(List<List<IPixel>> encodedImage) {
+    public List<List<IPixel>> decodeImage(List<List<IPixel>> encodedImage, ByteToPixelStrategy byteToPixelStrategy) {
         List<List<IPixel>> decodedImage = new ArrayList<>();
         int nrOfRows = encodedImage.size();
         int nrOfColumns = encodedImage.get(0).size();

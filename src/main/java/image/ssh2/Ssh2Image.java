@@ -87,7 +87,7 @@ public class Ssh2Image implements Image {
             }
             image.add(imageRow);
         }
-        return ssh2ImageHeader.getImageDecodingStrategy().decodeImage(image);
+        return ssh2ImageHeader.getImageDecodingStrategy().decodeImage(image, getByteToPixelStrategy());
     }
 
     private ByteToPixelStrategy getByteToPixelStrategy(){
