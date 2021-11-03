@@ -23,7 +23,8 @@ public class AttachmentTypeTag extends ImgSubComponent {
 
     public enum AttachmentType {
         METAL_BIN("69"), //
-        IMAGE_NAME("70");
+        IMAGE_NAME("70"),
+        HOT_SPOT("7C"); // only encountered in fe_1.ssh, not much is known about this attachment
 
         final String value;
 

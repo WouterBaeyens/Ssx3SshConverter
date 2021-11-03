@@ -114,7 +114,6 @@ public class Ssh2ColorTableHeader {
         } else {
             calculatedAmount = amountOfEntriesTag.getConvertedValue();
         }
-        System.out.println(amountOfEntries + "->" +calculatedAmount);
         return calculatedAmount * bytesPerEntry;
     }
 

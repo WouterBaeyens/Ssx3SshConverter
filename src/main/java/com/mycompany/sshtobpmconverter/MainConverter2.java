@@ -16,9 +16,9 @@ import static util.FileUtil.findFilesInCurrentDirectory;
 public class MainConverter2 {
 
     public static void main(String[] args) throws IOException {
-        //extractBigFiles();
-        //convertSshFiles();
-        extractDataFiles();
+        extractBigFiles();
+        convertSshFiles();
+        //extractDataFiles();
     }
 
     public static void extractBigFiles() throws IOException {

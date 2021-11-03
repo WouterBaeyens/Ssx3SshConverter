@@ -34,7 +34,7 @@ public class FillerTag extends ImgSubComponent {
      * If the {@link DEFAULT_START_ADDRESS_INCREMENT} is already surpassed, the next desired start address is
      * {@link DEFAULT_START_ADDRESS_INCREMENT} + a multiple of this value.
      */
-    private static final long DEFAULT_START_ADDRESS_INCREMENT = 0x100;
+    private static final long DEFAULT_START_ADDRESS_INCREMENT = 0x080;
 
     private final byte[] prefix;
 
@@ -78,6 +78,10 @@ public class FillerTag extends ImgSubComponent {
 
     private boolean startsWithPrefix() {
         byte[] hexData = getBytes();
+        return startsWithPrefix(hexData, prefix);
+    }
+
+    private static boolean startsWithPrefix(byte[] hexData, byte[] prefix){
         final int minLength = Math.min(prefix.length, hexData.length);
         for (int i = 0; i < minLength; i++) {
             if (hexData[i] != prefix[i]) {
@@ -123,7 +127,7 @@ public class FillerTag extends ImgSubComponent {
             return this;
         }
 
-        public FillerTag read(ByteBuffer buffer){
+        public FillerTag read(final ByteBuffer buffer){
             final Optional<Long> fillerSize = Optional.ofNullable(this.fillerSize);
             final long increment = Optional.ofNullable(this.addressIncrement).orElse(DEFAULT_START_ADDRESS_INCREMENT);
             final Optional<Long> calculatedSize = Optional.ofNullable(desiredStartAddress)
@@ -133,7 +137,17 @@ public class FillerTag extends ImgSubComponent {
             }
 
             final long neededFillerSize = fillerSize.orElseGet(() ->calculatedSize.get());
+            if(!isValid(buffer, (int) neededFillerSize)){
+                LOGGER.error("Skipping buffer as filler prefix does not match expected prefix"); // currently only needed for backs.ssh
+                return new FillerTag(buffer, 0, prefix);
+            }
             return new FillerTag(buffer, neededFillerSize, prefix);
+        }
+
+        private boolean isValid(final ByteBuffer buffer, int fillerSize){
+            byte[] actualPrefix = new byte[Math.min(fillerSize,prefix.length)];
+            buffer.duplicate().get(actualPrefix);
+            return startsWithPrefix(actualPrefix, prefix);
         }
 
         private static long getNeededFillerSize(long currentPosition, final long desiredStartAddress, final long addressIncrement) {

@@ -35,7 +35,7 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
     @Override
     public List<List<IPixel>> decodeImage(List<List<IPixel>> encodedImage, ByteToPixelStrategy byteToPixelStrategy) {
         final Dimension imgDimensions = new Dimension(encodedImage.get(0).size(), encodedImage.size());
-        Point[][] mask = createLowRezWideDecodingMask(imgDimensions);
+        Point[][] mask = createLowRezLowDecodingMask(imgDimensions);
         List<List<IPixel>> decodedImage = decodeImage(encodedImage, mask);
         if(ENABLE_DEBUG_GRID_LINES) addDebugGridlines(decodedImage);
         return decodedImage;
@@ -61,12 +61,25 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
         return maskNew;
     }
 
+    private Point[][] createLowRezLowDecodingMask(final Dimension imgDimension){
+        Point[][] mask = createDefaultmask(imgDimension);
+        var mask2 = manipulateMask(mask, point -> decodeHorizontalUnrepeating(imgDimension, createDefaultColumnList(8), point));
+        var mask3 = manipulateMask(mask2, point -> decodeVerticalUnrepeating(new Dimension(1, 32),createDefaultRowList(4), point));
+        var mask4 = manipulateMask(mask3, point -> decode(decoderLLR1, point));
+        var mask5 = manipulateMask(mask4, point -> decode(decoderLLR2, point));
+        var mask6 = manipulateMask(mask5, point -> decode(decoderLLR3, point));
+        var mask7 = manipulateMask(mask6, point -> decode(decoderLLR4, point));
+        var mask8 = manipulateMask(mask7, point -> decodeVerticalUnrepeating(imgDimension, createDefaultRowList(32), point));
+        var maskNew = manipulateMask(mask8, point -> decode(decoderLLR5, point));
+        return maskNew;
+    }
+
     private Point[][] createLowRezWideDecodingMask(final Dimension imgDimension){
         Point[][] mask = createDefaultmask(imgDimension);
         var mask2 = manipulateMask(mask, point -> decodeVerticalUnrepeating(new Dimension(1,16), List.of(new Point(0, 0), new Point(1, 0)), point));
         var mask3 = manipulateMask(mask2, point -> decodeHorizontalUnrepeating(new Dimension(64,1), List.of(new Point(0,0), new Point(0,1), new Point(0,2), new Point(0,3), new Point(0,4), new Point(0,5), new Point(0,6), new Point(0,7)), point));
         var mask4 = manipulateMask(mask3, point -> decode(interleafVertical8Decoder, point));
-        var mask5 = manipulateMask(mask4, point -> dedoubleMask(imgDimension,point));
+        var mask5 = manipulateMask(mask4, point -> dedoubleMaskHorizontal(imgDimension,point));
 
         var mask6 = manipulateMask(mask5, point -> decode(new Decoder(asBimap(lowRez), new Dimension(8, 2), new Dimension(4,1)), point));
         var mask7 = manipulateMask(mask6, point -> decode(decoderLR1, point));
@@ -117,7 +130,7 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
         return newMask;
     }
 
-    private Point dedoubleMask(Dimension imageDimension, Point point){
+    private Point dedoubleMaskHorizontal(Dimension imageDimension, Point point){
         boolean isUpperHalf = point.x < imageDimension.height / 2;
         if (isUpperHalf){
             int newY = point.y / 2;
@@ -162,6 +175,40 @@ public class Interleafed2DecoderStrategy implements SshImageDecoderStrategy{
             }
         }
     }
+
+    Point[][] maskLLR5 = {
+            {new Point(0,0)},
+            {new Point(2,0)},
+            {new Point(1,0)},
+            {new Point(3,0)},
+    };
+    Decoder decoderLLR5 = new Decoder(asBimap(maskLLR5), new Dimension(1,4), new Dimension(1,1));
+
+
+    Point[][] maskLLR4 = {
+            {new Point(0,0), new Point(1,0)},
+            {new Point(0,1), new Point(1,1)},
+    };
+    Decoder decoderLLR4 = new Decoder(asBimap(maskLLR4), new Dimension(64,64), new Dimension(32,32));
+
+    Point[][] maskLLR3 = {
+            {new Point(0,0),new Point(0,2),new Point(0,4),new Point(0,6), new Point(0,1),new Point(0,3),new Point(0,5),new Point(0,7)},
+    };
+    Decoder decoderLLR3 = new Decoder(asBimap(maskLLR3), new Dimension(64,1), new Dimension(8,1));
+
+
+    Point[][] maskLLR2 = {
+            {new Point(0,0),new Point(0,1),new Point(0,3),new Point(0,2)},
+    };
+    Decoder decoderLLR2 = new Decoder(asBimap(maskLLR2), new Dimension(16,1), new Dimension(4,1));
+
+
+    Point[][] maskLLR1 = {
+            {new Point(0,0),new Point(0,1),new Point(0,3),new Point(0,2)},
+            {new Point(1,1),new Point(1,0),new Point(1,2),new Point(1,3)},
+    };
+    Decoder decoderLLR1 = new Decoder(asBimap(maskLLR1), new Dimension(8,4), new Dimension(4,2));
+
 
     Point[][] maskLR1 = {
             {new Point(0,0)},

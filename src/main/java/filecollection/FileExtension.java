@@ -8,6 +8,7 @@ public enum FileExtension {
 
     BMP_EXTENSION(".bmp", (path, attr) -> path.toString().toLowerCase().endsWith(".bmp")),
     SSH_EXTENSION(".ssh",(path, attr) -> path.toString().toLowerCase().endsWith(".ssh") && !path.toString().toLowerCase().endsWith("_original.ssh")),
+    GSH_EXTENSION(".gsh",(path, attr) -> path.toString().toLowerCase().endsWith(".gsh") && !path.toString().toLowerCase().endsWith("_original.gsh")),
     SSH_BACKUP_EXTENSION("_original.ssh", (path, attr) -> path.toString().toLowerCase().endsWith("_original.ssh")),
     BIG_EXTENSION(".big", (path, attr) -> path.toString().toLowerCase().endsWith(".big")),
     MPF_EXTENSION(".mpf", (path, attr) -> path.toString().toLowerCase().toLowerCase().endsWith(".mpf")),

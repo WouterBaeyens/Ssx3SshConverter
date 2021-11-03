@@ -37,29 +37,31 @@ public class DataFileExtractor {
         }
     }
 
-    private void extractDataFile(final ByteBuffer buffer, final Path filePath) throws IOException {
+    public void extractDataFile(final ByteBuffer buffer, final Path filePath) throws IOException {
         LOGGER.info("-----------------------------------------------------------------------------");
         LOGGER.info("Starting extraction of {}", filePath.toString());
         LOGGER.info("-----------------------------------------------------------------------------");
+        int currentComponentStartPosition = 0;
         try {
             while (buffer.hasRemaining()) {
+                currentComponentStartPosition = buffer.position();
                 BamImageComponent component = new BamImageComponent(buffer);
                 if (!component.containsImage()) {
                     throw new UnsupportedEncodingException("Only image components are currently supported");
                 }
-                //if(component.getImageType() == ImageTypeTag.ImageType.LOW_RES_4BPP && component.getImgHeight() == 64 && component.getImgWidth() == 128) {
-                    BmpFileCreator.create(component, specifyDestinationPath(filePath, component.getImageNr(), buffer.position()));
-                //}
+                    BmpFileCreator.create(component, specifyDestinationPath(filePath, component.getImageNr()));
             }
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("error extracting " + filePath.toString(), e);
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("Further extracting of file {} aborted: Encoding of component at position {} is not supported. Caused by: {}", filePath, ByteUtil.printLongWithHex(buffer.position()), e);
+            ByteBuffer remaining = buffer.duplicate().position(currentComponentStartPosition);
+            FileUtil.writeToFile(remaining, "unparsed.data", filePath);
         }
     }
 
-    private Path specifyDestinationPath(final Path path, int number, int offset) {
-        final String fileName = number + "_" + ConverterConfig.PREFIX + FileExtension.BMP_EXTENSION.value;
-        return path.getParent().resolve(fileName);
+    private Path specifyDestinationPath(final Path path, int number) {
+        final String fileName = number + FileExtension.BMP_EXTENSION.value;
+        return path.resolve(fileName);
     }
 }
