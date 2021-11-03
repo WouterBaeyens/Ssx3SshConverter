@@ -1,6 +1,7 @@
 package image.ssh2.imageheader.strategies;
 
 import com.mycompany.sshtobpmconverter.IPixel;
+import image.ColorTable;
 import image.ssh2.Ssh2ColorTable;
 
 import java.nio.ByteBuffer;
@@ -15,7 +16,7 @@ public interface ByteToPixelStrategy {
      * Note: pixelXPos is needed as a workaround in case of 4-bit colors.
      *       The buffer position is insufficient as it can only jump in increments of 1 byte while the data needed is only 4 bits (or 1/2 bytes) in size.
      */
-    IPixel readNextPixel(final ByteBuffer imageByteBuffer, final Ssh2ColorTable colorTable, final int pixelXPos);
+    IPixel readNextPixel(final ByteBuffer imageByteBuffer, final ColorTable colorTable, final int pixelXPos);
 
     default boolean requiresPalette(){
         return true;

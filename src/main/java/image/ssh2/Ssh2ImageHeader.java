@@ -1,53 +1,52 @@
 package image.ssh2;
 
+import bam.data.image.header.imageheader.BamImageComponentImageHeader;
 import image.ImgSubComponent;
 import image.ssh.SshImageDecoderStrategy;
+import image.ssh2.fileheader.FillerTag;
+import image.ssh2.imageheader.*;
 import image.ssh2.imageheader.strategies.ByteToPixelStrategy;
-import image.ssh2.imageheader.ImageEncodingTypeTag;
-import image.ssh2.imageheader.ImageHeightTag;
-import image.ssh2.imageheader.ImageMaterialTag;
-import image.ssh2.imageheader.ImageSizeTag;
-import image.ssh2.imageheader.ImageTypeTag;
-import image.ssh2.imageheader.ImageWidthTag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.ByteUtil;
 import util.PrintUtil;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Optional;
 
 public class Ssh2ImageHeader {
 
-
-    private final long imageHeaderStartPosition;
+    private static Logger LOGGER = LoggerFactory.getLogger(Ssh2ImageHeader.class);
 
     private final ImageTypeTag imageTypeTag;
-    private final ImageSizeTag imageSizeTag;
+    private final ImageComponentSizeTag imageComponentSizeTag;
     private final ImageWidthTag imageWidthTag;
     private final ImageHeightTag imageHeightTag;
     private final ImageMaterialTag imageMaterialTag;
     private final ImageEncodingTypeTag encodingTypeTag;
+    private final ImageDownScalingTag imageDownScalingTag;
+    private final FillerTag fillerTag;
 
     private final List<ImgSubComponent> componentsOrdered;
 
-    public Ssh2ImageHeader(final ByteBuffer sshFileBuffer) throws IOException {
-        this.imageHeaderStartPosition = sshFileBuffer.position();
-
+    public Ssh2ImageHeader(final ByteBuffer sshFileBuffer) {
         this.imageTypeTag = new ImageTypeTag(sshFileBuffer);
-
-        this.imageSizeTag = new ImageSizeTag(sshFileBuffer);
-
+        this.imageComponentSizeTag = new ImageComponentSizeTag(sshFileBuffer);
         this.imageWidthTag = new ImageWidthTag(sshFileBuffer);
-
         this.imageHeightTag = new ImageHeightTag(sshFileBuffer);
-
         this.imageMaterialTag = new ImageMaterialTag(sshFileBuffer);
-
         this.encodingTypeTag = new ImageEncodingTypeTag(sshFileBuffer);
+        this.imageDownScalingTag = new ImageDownScalingTag(sshFileBuffer);
+        this.fillerTag = new FillerTag.Reader()
+                .withDesiredStartAddress(0x80)
+                .withPrefix(new byte[]{(byte) 0x80})
+                .read(sshFileBuffer);
 
-        // todo check calculated image_with_header_size equals value of sizeTag (or find another meaning)
-
-        componentsOrdered = List.of(imageTypeTag, imageSizeTag, imageWidthTag, imageHeightTag, imageMaterialTag, encodingTypeTag);
+        componentsOrdered = List.of(imageTypeTag, imageComponentSizeTag, imageWidthTag, imageHeightTag, imageMaterialTag, encodingTypeTag, imageDownScalingTag, fillerTag);
+        assertCalculatedImageComponentSizeEqualsImageComponentSizeProperty();
     }
 
     public int getImageHeight() {
@@ -58,34 +57,60 @@ public class Ssh2ImageHeader {
         return imageWidthTag.getConvertedValue();
     }
 
+    public int getImageRowSizeInBytes(){
+        return (int) (getImageWidth() * getBytesPerPixel());
+    }
+
     public int getImageSize(){
         return getImageWidth() * getImageHeight();
     }
 
+    public int getImageComponentSize(){
+        return getImageComponentSizeFromHeaderProperties().orElse(getCalculatedImageComponentSize());
+    }
+
+    private Optional<Integer> getImageComponentSizeFromHeaderProperties(){
+        return Optional.of(imageComponentSizeTag.getConvertedValue())
+                .filter(componentSize -> componentSize != 0);
+    }
+
+    private int getCalculatedImageComponentSize(){
+        return getImageHeaderSize() + getImageMemorySizeIncludingDownscales();
+    }
+
+    /**
+     * Returns the memory-size of the total image data (high + lower rez images)
+     */
     public int getImageMemorySize(){
-        // - If the ssh is of an early version sometimes the properties are not filled (0-filled) and need to be calculated
-        // - If the image is compressed; calculated size will not be accurate (as compression lowers size)
-        if(getImageWithHeaderSize() != 0) {
-            return getImageMemorySizeFromHeaderProperties();
-        } else {
-            return getCalculatedImageMemorySize();
+        return getImageComponentSize() - getImageHeaderSize();
+    }
+
+    private void assertCalculatedImageComponentSizeEqualsImageComponentSizeProperty(){
+        getImageComponentSizeFromHeaderProperties()
+                .filter(definedSize -> definedSize != getCalculatedImageComponentSize())
+                .ifPresent(definedSize -> LOGGER.warn("ImageSize by headerProperties ({}) does not match calculated imageSize({})", definedSize, getCalculatedImageComponentSize()));
+    }
+
+    /**
+     * Calculates image memory size - includes downscaled images if they are present
+     */
+    private int getImageMemorySizeIncludingDownscales(){
+        int numberOfDownscales = imageDownScalingTag.getConvertedValue();
+        int imageSizeAtCurrentScale = getCalculatedHighRezImageMemorySize();
+        int totalImageMemorySize = imageSizeAtCurrentScale;
+        for(int i = 0; i < numberOfDownscales; i++) {
+            imageSizeAtCurrentScale /= 4; // both length and width are halved
+            totalImageMemorySize +=imageSizeAtCurrentScale;
         }
+        return totalImageMemorySize;
     }
 
-    private int getImageMemorySizeFromHeaderProperties(){
-        return (int) (getImageWithHeaderSize() - getImageHeaderSize());
-    }
-
-    private int getCalculatedImageMemorySize(){
+    private int getCalculatedHighRezImageMemorySize(){
         return (int) (getImageSize() * getBytesPerPixel());
     }
 
     public double getBytesPerPixel(){
         return imageTypeTag.getImageType().getBytesPerPixel();
-    }
-
-    public long getImageWithHeaderSize(){
-        return imageSizeTag.getConvertedValue();
     }
 
     public long getImageHeaderStartPosition() {
@@ -96,12 +121,12 @@ public class Ssh2ImageHeader {
         return componentsOrdered.get(componentsOrdered.size() - 1).getEndPos();
     }
 
-    public long getImageHeaderSize() {
-        return getImageHeaderEndPosition() - getImageHeaderStartPosition();
+    private int getImageHeaderSize() {
+        return Math.toIntExact(getImageHeaderEndPosition() - getImageHeaderStartPosition());
     }
 
-    public long getImageEndPosition() {
-        return imageHeaderStartPosition + getImageWithHeaderSize();
+    public long getImageComponentEndPosition() {
+        return getImageHeaderStartPosition() + getImageComponentSize();
     }
 
     public SshImageDecoderStrategy getImageDecodingStrategy() {
@@ -116,17 +141,30 @@ public class Ssh2ImageHeader {
         return getImageType().getByteToPixelStrategy();
     }
 
-    public void printFormatted() {
-        System.out.println("--SSH IMG HEADER--");
+    public boolean requiresPalette(){
+        return imageTypeTag.getImageType().getByteToPixelStrategy().requiresPalette();
+    }
 
-        long endOfImagePixels = getImageHeaderEndPosition() + getImageSize();
-        System.out.println("header_start(" + ByteUtil.printLongWithHex(imageHeaderStartPosition) + ") | header_end/img_pixels_start(" + ByteUtil.printLongWithHex(getImageHeaderEndPosition()) + ") | img_pixels_end(" + ByteUtil.printLongWithHex(endOfImagePixels) + ")");
-        long calculatedImageWithHeaderSize = getImageHeaderEndPosition() - imageHeaderStartPosition + getImageMemorySize();
-        if (calculatedImageWithHeaderSize != getImageWithHeaderSize()) {
-            System.out.println("ERROR: image_size+header_size=" + calculatedImageWithHeaderSize + "; should be " + getImageWithHeaderSize());
-        }
+
+    public void printFormatted() {
+//        System.out.println("--SSH IMG HEADER--");
+
+        System.out.println("header_start(" + ByteUtil.printLongWithHex(getImageHeaderStartPosition()) + ") | header_end/img_pixels_start(" + ByteUtil.printLongWithHex(getImageHeaderEndPosition()) + ") | img_pixels_end(" + ByteUtil.printLongWithHex(getImageComponentEndPosition()) + ")");
         System.out.println(PrintUtil.toRainbow(componentsOrdered.stream().map(ImgSubComponent::getInfo).map(componentInfo -> componentInfo + " | ").toArray(String[]::new)));
         final String[] hexStrings = componentsOrdered.stream().map(ImgSubComponent::getHexData).toArray(String[]::new);
         System.out.println(PrintUtil.insertForColouredString(PrintUtil.toRainbow(hexStrings), "\n", 16 * 3));
+    }
+
+    @Override
+    public String toString() {
+        return "Ssh2ImageHeader{" +
+                "imageTypeTag=" + imageTypeTag +
+                ", imageComponentSizeTag=" + imageComponentSizeTag +
+                ", imageWidthTag=" + imageWidthTag +
+                ", imageHeightTag=" + imageHeightTag +
+                ", imageMaterialTag=" + imageMaterialTag +
+                ", encodingTypeTag=" + encodingTypeTag +
+                ", imageDownScalingTag=" + imageDownScalingTag +
+                '}';
     }
 }

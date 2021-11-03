@@ -3,6 +3,7 @@ package util;
 import filecollection.FileExtension;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 public class FileUtil {
 
     public static Stream<File> findFilesInCurrentDirectory(FileExtension fileExtension) throws IOException {
-        Stream<Path> paths = Files.find(Paths.get("./"), 3, fileExtension.matcher);
+        Stream<Path> paths = Files.find(Paths.get("./"), ConverterConfig.FILE_SEARCH_DEPTH, fileExtension.matcher);
         return paths.filter(Files::isRegularFile).map(Path::toFile);
     }
 
@@ -66,6 +67,20 @@ public class FileUtil {
     public static String getNameWithoutExtension(final String fileName){
         final int indexStartOfExtension = fileName.lastIndexOf(".");
         return indexStartOfExtension > 0 ? fileName.substring(0, indexStartOfExtension) : fileName;
+    }
+
+    public static void writeToFile(final ByteBuffer byteBuffer, final String fileName, final Path destinationFolder) throws IOException {
+        final Path filePath = FileUtil.prepareDirsAndReturnPath(fileName, destinationFolder);
+        FileChannel channel = new FileOutputStream(filePath.toFile()).getChannel();
+        byteBuffer.position(0);
+        channel.write(byteBuffer);
+        channel.close();
+    }
+
+    public static ByteBuffer sliceAndSkip(final ByteBuffer buffer, final int size){
+        ByteBuffer slicedBuffer = slice(buffer, buffer.position(), size);
+        buffer.position(buffer.position() + size);
+        return slicedBuffer;
     }
 
     public static ByteBuffer slice(final ByteBuffer buffer, final int startPosition, final int size){

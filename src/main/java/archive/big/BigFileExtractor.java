@@ -1,10 +1,14 @@
 package archive.big;
 
+import bam.data.image.BamImageComponent;
+import bam.ssb.SsbFile;
+import bam.ssb.SsbFileCreator;
 import com.google.common.io.Files;
 import com.mycompany.sshtobpmconverter.BmpFileCreator;
 import filecollection.FileExtension;
 import image.ssh2.compression.CompressedFile;
 import image.ssh2.fileheader.PlatformTag;
+import render.mpf.MpfFileExtractor;
 import util.FileUtil;
 
 import java.io.File;
@@ -17,6 +21,8 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.EnumSet;
+
+import static util.FileUtil.writeToFile;
 
 public class BigFileExtractor {
 
@@ -46,17 +52,13 @@ public class BigFileExtractor {
             BmpFileCreator.create(decompressedFileBuffer, fileInfo.getName(), destinationFolder);
         } else if(FileExtension.BIG_EXTENSION.getExtension().equals(fileInfo.getExtension())){
             extractBigFile(decompressedFileBuffer, destinationFolder.resolve(fileInfo.getName()));
+        } else if(FileExtension.MPF_EXTENSION.getExtension().equals(fileInfo.getExtension())){
+            writeToFile(new MpfFileExtractor(decompressedFileBuffer).getMergedBuffer(), fileInfo.getFullName(), destinationFolder);
+        } else if(FileExtension.SSB_EXTENSION.getExtension().equals(fileInfo.getExtension())){
+            SsbFileCreator.create(fileBuffer, fileInfo.getName(), destinationFolder);
         } else {
             writeToFile(decompressedFileBuffer, fileInfo.getFullName(), destinationFolder);
         }
-    }
-
-    private void writeToFile(final ByteBuffer byteBuffer, final String fileName, final Path destinationFolder) throws IOException {
-        final Path filePath = FileUtil.prepareDirsAndReturnPath(fileName, destinationFolder);
-        FileChannel channel = new FileOutputStream(filePath.toFile()).getChannel();
-        byteBuffer.position(0);
-        channel.write(byteBuffer);
-        channel.close();
     }
 
     private void assertFileType(File bigFile) {

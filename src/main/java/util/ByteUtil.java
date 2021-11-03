@@ -91,7 +91,7 @@ public class ByteUtil {
      * ex: 17584 -> "17584/0x44b0"
      */
     public static String printLongWithHex(long value) {
-        return value + "/0x" + Long.toHexString(value);
+        return value + "/0x " + Long.toHexString(value);
     }
 
     public static byte[] combineByteArrays(byte[]... byteArrays) {
@@ -119,6 +119,39 @@ public class ByteUtil {
         } else {
             return nr;
         }
+    }
+
+    public static int swapBits(final int input, final int bitIndex1, int bitIndex2){
+        if(getBit(input, bitIndex1) == getBit(input, bitIndex2)){
+            return input;
+        } else {
+            int toggleMask = (1 << bitIndex1) | (1 << bitIndex2);
+            return input ^ toggleMask;
+        }
+    }
+
+    public static int swapBits(final int input, final int bitIndex1, int bitIndex2, int length){
+        int result = input;
+        for(int offset = 0; offset < length; offset ++) {
+            int bi1 = bitIndex1 + offset;
+            int bi2 = bitIndex2 + offset;
+            if (getBit(result, bi1) != getBit(result, bi2)) {
+                int toggleMask = (1 << bi1) | (1 << bi2);
+                result = result ^ toggleMask;
+            }
+        }
+        return result;
+    }
+
+    public static int getBit(final int input, int bitIndex){
+        return  getBits(input, bitIndex, bitIndex + 1);
+    }
+
+    /**
+     * ex: input b00110100, 1, 5 -> ..000 1010 (split like so: 001 1010 00)
+     */
+    public static int getBits(final int input, int bitIndexStart, int bitIndexEnd){
+        return  (input >>> bitIndexStart) & ((1 << (bitIndexEnd - bitIndexStart)) - 1);
     }
 
     /**
@@ -149,7 +182,7 @@ public class ByteUtil {
 
     public static byte getLeftNibble(final byte _byte){
         byte tmpByte = _byte;
-        return (byte) ((tmpByte &= 0xF0) >>> 4);
+        return (byte) ((tmpByte >>> 4) & 0x0F);
     }
 
     public static byte getRightNibble(final byte _byte){

@@ -1,13 +1,16 @@
 package com.mycompany.sshtobpmconverter;
 
 import archive.big.BigFileExtractor;
+import bam.data.image.DataFileExtractor;
 import filecollection.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 
+import static util.FileUtil.createDir;
 import static util.FileUtil.findFilesInCurrentDirectory;
 
 public class MainConverter2 {
@@ -15,6 +18,7 @@ public class MainConverter2 {
     public static void main(String[] args) throws IOException {
         extractBigFiles();
         convertSshFiles();
+        //extractDataFiles();
     }
 
     public static void extractBigFiles() throws IOException {
@@ -32,7 +36,6 @@ public class MainConverter2 {
     }
 
 
-        //todo consider launch4j to create an exec
     /**
      * Collect all ssh and bmp files inside the current directory,
      * group them by image name (eg: group image01.ssh; image01_original.ssh and image01.bmp)
@@ -41,7 +44,6 @@ public class MainConverter2 {
      * 1. if no "_original.ssh" file exists yet, create it by copying the normal ".ssh" file.
      * 2. - [if no ".bmp" file exists yet] create ".bmp" from "_original.ssh"
      * - [if a ".bmp" exists already] create ".ssh" from ".bmp" (note: the existing ".ssh" will be overwritten, but the image from the game is still available as "_original.ssh")
-     *
      */
     public static void convertSshFiles() throws IOException {
         // todo use ByteBuffer for in-between and mappedByteBuffer to combo with RandomAccess
@@ -56,6 +58,20 @@ public class MainConverter2 {
 //            if (imageDataSource.bmpFile != null) {
 //                createSshFile(imageDataSource);
 //            }
+        }
+    }
+
+    public static void extractDataFiles() throws IOException {
+        findFilesInCurrentDirectory(FileExtension.DATA_EXTENSION)
+                .forEach(MainConverter2::extractDataFile);
+    }
+
+    public static void extractDataFile(final File file) throws IllegalStateException {
+        DataFileExtractor extractor = new DataFileExtractor();
+        try {
+            extractor.extractDataFile(file);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
     }
 

@@ -38,7 +38,10 @@ public class Ssh2FileHeader {
 
         final long fillerStart = imageHeaderInfoTags.get(imageHeaderInfoTags.size() - 1).getEndPos();
         final long headerSpaceLeft = getStartOfImageFiles() - fillerStart;
-        this.fillerTag = new FillerTag(sshFileBuffer, fillerStart, headerSpaceLeft);
+        this.fillerTag = new FillerTag.Reader()
+                .withFillerSize(headerSpaceLeft)
+                .withPrefix(FillerTag.BUY_ERTS_AS_BYTE)
+                .read(sshFileBuffer);
         this.componentsOrdered = List.of(
                 Stream.of(List.of(this.platformTag, totalFileSizeTag, numberOfEntriesTag, fileTypeTag), imageHeaderInfoTags, List.of(fillerTag))
                         .flatMap(List::stream)

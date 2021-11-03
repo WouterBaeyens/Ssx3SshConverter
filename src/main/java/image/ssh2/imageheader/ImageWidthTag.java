@@ -14,7 +14,7 @@ public class ImageWidthTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 2;
 
-    public ImageWidthTag(final ByteBuffer sshFileBuffer) throws IOException {
+    public ImageWidthTag(final ByteBuffer sshFileBuffer) {
         super(sshFileBuffer, DEFAULT_SIZE);
     }
 

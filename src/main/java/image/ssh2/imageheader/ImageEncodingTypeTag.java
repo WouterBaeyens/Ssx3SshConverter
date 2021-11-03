@@ -1,9 +1,7 @@
 package image.ssh2.imageheader;
 
 import image.ImgSubComponent;
-import image.ssh.InterleafedDecoderStrategy;
-import image.ssh.NoneDecoderStrategy;
-import image.ssh.SshImageDecoderStrategy;
+import image.ssh.*;
 import util.ByteUtil;
 import util.PrintUtil;
 
@@ -21,7 +19,7 @@ import java.util.Optional;
  */
 public class ImageEncodingTypeTag extends ImgSubComponent {
 
-    private static final long DEFAULT_SIZE = 4;
+    private static final long DEFAULT_SIZE = 2;
 
     public ImageEncodingTypeTag(final ByteBuffer sshFileBuffer) {
         super(sshFileBuffer, DEFAULT_SIZE);
@@ -43,9 +41,12 @@ public class ImageEncodingTypeTag extends ImgSubComponent {
                 .orElse(EncodingType.NONE);
     }
 
+    //Take the closest power of 2 rounded down. divide by 4 for a lower rez
     public enum EncodingType {
-        NONE("00000000", new NoneDecoderStrategy()),
-        INTERLACED("00200000", new InterleafedDecoderStrategy());
+        NONE("0000", new NoneDecoderStrategy()),
+        INTERLACED("0020", new InterleafedDecoderStrategy()),
+        BLOCK_SCRAMBLED("0030", new InterleafedBitwiseDecoderStrategy()),
+        EXPERIMENTAL("XXXXXX", new Interleafed2DecoderStrategy());
 
         final String value;
         private final SshImageDecoderStrategy decoderStrategy;

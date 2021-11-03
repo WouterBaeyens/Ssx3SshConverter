@@ -8,12 +8,14 @@ import image.ssh2.colortableheader.ColorTableHeightTag;
 import image.ssh2.colortableheader.ColorTableLookupType;
 import image.ssh2.colortableheader.ColorTableTypeTag;
 import image.ssh2.colortableheader.lookuptrategies.LookupStrategy;
+import image.ssh2.fileheader.FillerTag;
 import util.ByteUtil;
 import util.PrintUtil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Set;
 
 public class Ssh2ColorTableHeader {
 
@@ -24,18 +26,24 @@ public class Ssh2ColorTableHeader {
     private final ColorTableHeightTag actualTableLocation;
     private final ColorTableEntriesTag amountOfEntriesCopyTag;
     private final ColorTableLookupType colorTableLookupType;
+    private final FillerTag padding;
 
     private final List<ImgSubComponent> componentsOrdered;
 
-    public Ssh2ColorTableHeader(final ByteBuffer sshFileBuffer) throws IOException {
+    public Ssh2ColorTableHeader(final ByteBuffer sshFileBuffer) {
         this.typeTag = new ColorTableTypeTag(sshFileBuffer);
         this.sizeTag = new ColorTableSizeTag(sshFileBuffer);
         this.amountOfEntriesTag = new ColorTableWidthTag(sshFileBuffer);
         this.actualTableLocation = new ColorTableHeightTag(sshFileBuffer);
         this.amountOfEntriesCopyTag = new ColorTableEntriesTag(sshFileBuffer, amountOfEntriesTag.getConvertedValue());
         this.colorTableLookupType = new ColorTableLookupType(sshFileBuffer);
+        if (colorTableLookupType.getLookupType().hasPadding()) {
+            this.padding = new FillerTag.Reader().withPrefix(new byte[]{(byte)0x80}).withDesiredStartAddress(0x080).withAddressIncrement(0x080).read(sshFileBuffer);
+        } else {
+            this.padding = new FillerTag.Reader().withFillerSize(0).read(sshFileBuffer);
+        }
+        this.componentsOrdered = List.of(typeTag, sizeTag, amountOfEntriesTag, actualTableLocation, amountOfEntriesCopyTag, colorTableLookupType, padding);
 
-        this.componentsOrdered = List.of(typeTag, sizeTag, amountOfEntriesTag, actualTableLocation, amountOfEntriesCopyTag, colorTableLookupType);
     }
 
     public void printFormatted() {
@@ -75,11 +83,45 @@ public class Ssh2ColorTableHeader {
         return getStartPosition() + fullColorTableComponentSize;
     }
 
+    public int getTableHeaderSize(){
+        return Math.toIntExact(componentsOrdered.get(componentsOrdered.size() - 1).getEndPos() - componentsOrdered.get(0).getStartPos());
+    }
+
     private long calculateFullTableComponentSize(){
-        final long calculatedHeaderSize = componentsOrdered.get(componentsOrdered.size() - 1).getEndPos() - componentsOrdered.get(0).getStartPos();
-        final long calculatedTableSize = amountOfEntriesTag.getConvertedValue() * 4; // I assume 4 bytes here. the info is probably available somewhere
+        final long calculatedHeaderSize = getTableHeaderSize();
+        final long calculatedTableSize = getCalculatedTableSize();
         final long fullColorTableComponentSize = calculatedHeaderSize + calculatedTableSize;
         final long fullSizeWithBuffer = (long) Math.ceil((double)fullColorTableComponentSize/16) * 16; // lenght increases in groups of 16, 0x00 filled
         return fullSizeWithBuffer;
+    }
+
+    private long getCalculatedTableSize(){
+        final int bytesPerEntry = 4;
+        final boolean switchesIndex = Set.of(ColorTableLookupType.LookupType.DEFAULT_BAM, ColorTableLookupType.LookupType.DEFAULT).contains(colorTableLookupType.getLookupType());
+        int amountOfEntries = amountOfEntriesTag.getConvertedValue();
+        int calculatedAmount;
+        if(switchesIndex){
+            int bit3 = ByteUtil.getBit(amountOfEntries, 3);
+            int bit4 = ByteUtil.getBit(amountOfEntries, 4);
+            if(bit4 == bit3){
+                calculatedAmount = roundUpToNextMultiple(amountOfEntries, 4);
+            } else if(bit4 == 1 && bit3 == 0) {
+                calculatedAmount = roundUpToNextMultiple(amountOfEntries + 1, 8);
+            } else {
+                int amountOfEntriesSwapped = ByteUtil.swapBits(amountOfEntries, 3,4);
+                calculatedAmount = roundUpToNextMultiple(amountOfEntriesSwapped, 4);
+            }
+        } else {
+            calculatedAmount = amountOfEntriesTag.getConvertedValue();
+        }
+        return calculatedAmount * bytesPerEntry;
+    }
+
+    private int roundUpToNextMultiple(int number, int multiple){
+        return (int) Math.ceil((double) number/multiple)*multiple;
+    }
+
+    private int roundDownToPreviousMultiple(int number, int multiple){
+        return (int) Math.floor((double) number/multiple)*multiple;
     }
 }

@@ -5,6 +5,7 @@ import converter.Image;
 import filecollection.FileExtension;
 import filecollection.SourceFileWrapperSsh;
 import image.ssh2.Ssh2File;
+import util.ConverterConfig;
 import util.FileUtil;
 
 import java.io.BufferedOutputStream;
@@ -54,6 +55,13 @@ public class BmpFileCreator {
                     destionationPath = destinationRootFolder.resolve(sshFileNameWithoutExtension + "." + image.getImageName() + FileExtension.BMP_EXTENSION.value);
                 }
                 writeToFile(bmpWrapper, destionationPath);
+        }
+    }
+
+    public static void create(Image image, final Path destionationPath) throws IOException {
+        if(ConverterConfig.WRITE_IMAGES) {
+            BmpImageFileWrapper bmpWrapper = new BmpImageFileWrapper(image);
+            writeToFile(bmpWrapper, destionationPath);
         }
     }
 

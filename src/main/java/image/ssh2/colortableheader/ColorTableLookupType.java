@@ -38,22 +38,38 @@ public class ColorTableLookupType extends ImgSubComponent {
         /**
          * Chooses the color
          */
-        LOW_RES("000000000000", new IndexLookupStrategy()),
+        LOW_RES("000000000000", new IndexLookupStrategy(), false),
+
+        /**
+         * No idea what this is supposed to do
+         */
+        LOW_RES_BAM("000000100000", new IndexLookupStrategy(), true),
+
 
         /**
          */
-        DEFAULT("000000200000", new IndexWithMiddleBitsSwitchedLookupStrategy());
+        DEFAULT("000000200000", new IndexWithMiddleBitsSwitchedLookupStrategy(), false),
+
+        /**
+         */
+        DEFAULT_BAM("000000300000", new IndexWithMiddleBitsSwitchedLookupStrategy(), true);
 
         final String value;
         final LookupStrategy lookupStrategy;
+        final boolean hasPadding;
 
-        LookupType(final String value, final LookupStrategy lookupStrategy) {
+        LookupType(final String value, final LookupStrategy lookupStrategy, final boolean hasPadding) {
             this.value = value;
             this.lookupStrategy = lookupStrategy;
+            this.hasPadding = hasPadding;
         }
 
         public LookupStrategy getLookupStrategy(){
             return lookupStrategy;
+        }
+
+        public boolean hasPadding(){
+            return hasPadding;
         }
 
         public static Optional<LookupType> getLookupType(final byte[] data) {

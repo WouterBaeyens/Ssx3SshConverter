@@ -1,9 +1,6 @@
 package image.ssh2;
 
-import image.ssh2.attachments.Attachment;
-import image.ssh2.attachments.AttachmentTypeTag;
-import image.ssh2.attachments.ImageNameAttachment;
-import image.ssh2.attachments.MetalBinAttachment;
+import image.ssh2.attachments.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -18,6 +15,7 @@ public class Ssh2ImageAttachments {
     private final int startPosition;
     private MetalBinAttachment metalBinAttachment;
     private ImageNameAttachment imageNameAttachment;
+    private HotSpotAttachment hotSpotAttachment;
 
     private List<Attachment> attachments = new ArrayList<>();
 
@@ -66,6 +64,12 @@ public class Ssh2ImageAttachments {
                 this.metalBinAttachment = new MetalBinAttachment(sshFileBuffer);
                 attachments.add(metalBinAttachment);
                 break;
+            case HOT_SPOT:
+                this.hotSpotAttachment = new HotSpotAttachment(sshFileBuffer);
+                attachments.add(hotSpotAttachment);
+                break;
+            default:
+                throw new IllegalStateException("Recognized attachement; but no logic is implemented to read " + attachmentType);
         }
     }
 

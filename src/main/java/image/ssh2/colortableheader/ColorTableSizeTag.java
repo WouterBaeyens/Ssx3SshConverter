@@ -15,7 +15,7 @@ public class ColorTableSizeTag extends ImgSubComponent {
 
     private static final long DEFAULT_SIZE = 3;
 
-    public ColorTableSizeTag(final ByteBuffer buffer) throws IOException {
+    public ColorTableSizeTag(final ByteBuffer buffer) {
         super(buffer, DEFAULT_SIZE);
     }
 
