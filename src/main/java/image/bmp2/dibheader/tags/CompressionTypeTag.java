@@ -1,6 +1,9 @@
 package image.bmp2.dibheader.tags;
 
 import image.ImgSubComponent;
+import image.ssh2.fileheader.ComponentType;
+import image.ssh2.fileheader.TypeComponent;
+import util.ByteUtil;
 import util.PrintUtil;
 
 import javax.xml.bind.DatatypeConverter;
@@ -8,6 +11,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * BI_RGB: The bitmap is in uncompressed red green blue (RGB) format that is not compressed and does not use color masks.
@@ -21,9 +25,14 @@ import java.util.Optional;
  * BI_CMYKRLE4: A CMYK format that uses RLE compression for bitmaps with 4 bits per pixel. The compression uses a 2-byte format consisting of a count byte followed by two word-length color indexes.
  * Note  A bottom-up bitmap can be compressed, but a top-down bitmap cannot.
  */
-public class CompressionTypeTag extends ImgSubComponent {
+public class CompressionTypeTag extends ImgSubComponent implements TypeComponent<CompressionTypeTag.CompressionType> {
 
     private static final long DEFAULT_SIZE = 4;
+
+    @Override
+    public Class<CompressionType> getTypeClass() {
+        return CompressionType.class;
+    }
 
     public CompressionTypeTag(final RandomAccessFile file, final long startPosition) throws IOException {
         super(file, startPosition, DEFAULT_SIZE);
@@ -31,10 +40,10 @@ public class CompressionTypeTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        return "Compression type: " + CompressionType.getInfo(getBytes());
+        return "Compression type: " + getTypeInfo();
     }
 
-    public enum CompressionType {
+    public enum CompressionType implements ComponentType {
         BI_RGB("00000000"),
         BI_RLE8("01000000"),
         BI_RLE4("02000000"),
@@ -51,16 +60,14 @@ public class CompressionTypeTag extends ImgSubComponent {
             this.value = value;
         }
 
-        public static Optional<CompressionType> lookup(byte[] data) {
-            String dataAsHexString = DatatypeConverter.printHexBinary(data);
-            return Arrays.stream(values())
-                    .filter(fileType -> fileType.value.equals(dataAsHexString))
-                    .findAny();
+        @Override
+        public String getReadableValue() {
+            return value;
         }
 
-        public static String getInfo(byte[] data) {
-            return lookup(data).map(Enum::name)
-                    .orElseGet(() -> "Unknown type (" + PrintUtil.toHexString(false, data) + ")");
+        @Override
+        public Function<byte[], String> toReadable() {
+            return ByteUtil::bytesToHex;
         }
     }
 }

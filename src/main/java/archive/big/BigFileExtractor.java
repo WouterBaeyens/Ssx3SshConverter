@@ -69,6 +69,6 @@ public class BigFileExtractor {
 
     private boolean isBigFile(File file) {
         String extension = Files.getFileExtension(file.getPath());
-        return extension.equals(FileExtension.BIG_EXTENSION.getExtension());
+        return extension.equalsIgnoreCase(FileExtension.BIG_EXTENSION.getExtension());
     }
 }

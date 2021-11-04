@@ -2,6 +2,8 @@ package image.ssh2.imageheader;
 
 import image.ImgSubComponent;
 import image.ssh2.colortableheader.ColorTableLookupType;
+import image.ssh2.fileheader.ComponentType;
+import image.ssh2.fileheader.TypeComponent;
 import image.ssh2.imageheader.strategies.ByteToPixelStrategy;
 import image.ssh2.imageheader.strategies._32BitByteToPixelWithoutPaletteStrategy;
 import image.ssh2.imageheader.strategies._4BitByteToPixelStrategy;
@@ -9,13 +11,12 @@ import image.ssh2.imageheader.strategies._8BitByteToPixelStrategy;
 import util.ByteUtil;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * This tag describes the type of image (bits per pixel etc.) that the data contains.
  */
-public class ImageTypeTag extends ImgSubComponent {
+public class ImageTypeTag extends ImgSubComponent implements TypeComponent<ImageTypeTag.ImageType> {
 
     private static final long DEFAULT_SIZE = 1;
 
@@ -24,16 +25,20 @@ public class ImageTypeTag extends ImgSubComponent {
     }
 
     public ImageType getImageType() {
-        return ImageType.getImageType(getBytes())
-                .orElse(ImageType.DEFAULT_8BPP);
+        return getType().orElse(ImageType.DEFAULT_8BPP);
     }
 
     @Override
     public String getInfo() {
-        return "ImageType: " + ImageType.getInfo(getBytes());
+        return "ImageType: " + getTypeInfo();
     }
 
-    public enum ImageType {
+    @Override
+    public Class<ImageType> getTypeClass() {
+        return ImageType.class;
+    }
+
+    public enum ImageType implements ComponentType {
 
         /**
          * Only 16 colours are used, that way each byte contains the info for 2 pixels (each described by 4 bits).
@@ -70,13 +75,6 @@ public class ImageTypeTag extends ImgSubComponent {
             this.bytesPerPixel = bytesPerPixel;
         }
 
-        public static String getInfo(byte[] data) {
-            String dataAsString = ByteUtil.bytesToHex(data);
-
-            return getImageType(data).map(matchingType -> matchingType + "(" + matchingType.value + ")")
-                    .orElseGet(() -> "Unknown type (" + dataAsString + ")");
-        }
-
         public ByteToPixelStrategy getByteToPixelStrategy(){
             return byteToPixelStrategy;
         }
@@ -85,11 +83,14 @@ public class ImageTypeTag extends ImgSubComponent {
             return bytesPerPixel;
         }
 
-        public static Optional<ImageType> getImageType(byte[] data) {
-            String dataAsString = ByteUtil.bytesToHex(data);
-            return Arrays.stream(values())
-                    .filter(fileType -> fileType.value.equals(dataAsString))
-                    .findAny();
+        @Override
+        public String getReadableValue() {
+            return value;
+        }
+
+        @Override
+        public Function<byte[], String> toReadable() {
+            return ByteUtil::bytesToHex;
         }
     }
 }

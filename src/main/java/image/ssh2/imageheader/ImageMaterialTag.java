@@ -1,6 +1,8 @@
 package image.ssh2.imageheader;
 
 import image.ImgSubComponent;
+import image.ssh2.fileheader.ComponentType;
+import image.ssh2.fileheader.TypeComponent;
 import util.ByteUtil;
 import util.PrintUtil;
 
@@ -8,6 +10,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.function.Function;
 
 /**
  * The purpose and info within this tag is completely unknown.
@@ -15,9 +18,14 @@ import java.util.Arrays;
  * <p>
  * Note: even the name ImageMaterialTag is just a wild guess
  **/
-public class ImageMaterialTag extends ImgSubComponent {
+public class ImageMaterialTag extends ImgSubComponent implements TypeComponent<ImageMaterialTag.MaterialType> {
 
     private static final long DEFAULT_SIZE = 4;
+
+    @Override
+    public Class<MaterialType> getTypeClass() {
+        return MaterialType.class;
+    }
 
     public ImageMaterialTag(final ByteBuffer sshFileBuffer) {
         super(sshFileBuffer, DEFAULT_SIZE);
@@ -25,10 +33,11 @@ public class ImageMaterialTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        return "?Material?: " + MaterialType.getInfo(getBytes());
+        return "?Material?: " + getTypeInfo();
     }
 
-    public enum MaterialType {
+
+    public enum MaterialType implements ComponentType {
         DEFAULT("00000000");
 
         final String value;
@@ -37,14 +46,14 @@ public class ImageMaterialTag extends ImgSubComponent {
             this.value = value;
         }
 
-        public static String getInfo(byte[] data) {
-            //todo check if Hex.encodeHexString(data); is sufficient
-            String dataAsString = ByteUtil.bytesToHex(data);
+        @Override
+        public String getReadableValue() {
+            return value;
+        }
 
-            return Arrays.stream(values())
-                    .filter(fileType -> fileType.value.equals(dataAsString))
-                    .findAny().map(matchingType -> matchingType + "(" + matchingType.value + ")")
-                    .orElseGet(() -> "Unknown Material (" + dataAsString + ")");
+        @Override
+        public Function<byte[], String> toReadable() {
+            return ByteUtil::bytesToHex;
         }
     }
 }
