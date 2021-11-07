@@ -19,6 +19,6 @@ public class BigSubFileNameTag extends ImgSubComponent {
     }
 
     public String getConvertedValue() {
-        return new String(Arrays.copyOf(getBytes(), getBytes().length - 1));
+        return new String(Arrays.copyOf(getRawBytes(), getRawBytes().length - 1));
     }
 }

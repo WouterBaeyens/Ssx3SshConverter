@@ -2,6 +2,7 @@ package image.ssh2;
 
 import com.mycompany.sshtobpmconverter.IPixel;
 import converter.Image;
+import image.ssh2.fileheader.FileTypeTag;
 import image.ssh2.imageheader.strategies.ByteToPixelStrategy;
 import image.ssh2.compression.CompressedFile;
 import image.ssh2.fileheader.FillerTag;
@@ -19,6 +20,11 @@ import java.util.Optional;
 
 public class Ssh2Image implements Image {
 
+    // Default settings for reading fillerTag
+    private final FillerTag.Reader fillerTagReader = new FillerTag.Reader()
+            .withPrefix(FillerTag.BUY_ERTS_AS_BYTE)
+            .withDesiredStartAddress(FillerTag.DESIRED_IMG_HEADER_START_ADDRESS);
+
     private final ImageHeaderInfoTag imageInfo;
 
     private final Ssh2ImageHeader ssh2ImageHeader;
@@ -27,7 +33,7 @@ public class Ssh2Image implements Image {
     private final Ssh2ImageAttachments ssh2ImageAttachments;
     private final FillerTag fillerTag;
 
-    public Ssh2Image(final ByteBuffer sshFileBuffer, final ImageHeaderInfoTag imageInfo) throws IOException {
+    public Ssh2Image(final ByteBuffer sshFileBuffer, final ImageHeaderInfoTag imageInfo, FileTypeTag.VersionType versionType) throws IOException {
         this.imageInfo = imageInfo;
         assertBufferAtStartOfImage(sshFileBuffer, imageInfo);
         this.ssh2ImageHeader = new Ssh2ImageHeader(sshFileBuffer);
@@ -36,7 +42,17 @@ public class Ssh2Image implements Image {
         final boolean needsTable = ssh2ImageHeader.requiresPalette();
         this.ssh2ColorTable = needsTable ? new Ssh2ColorTable(sshFileBuffer) : null;
         this.ssh2ImageAttachments = new Ssh2ImageAttachments(sshFileBuffer);
-        fillerTag = (sshFileBuffer.hasRemaining() && getImageType() != ImageTypeTag.ImageType.HIGH_REZ) ? new FillerTag.Reader().withDesiredStartAddress(FillerTag.DESIRED_IMG_HEADER_START_ADDRESS).withPrefix(FillerTag.BUY_ERTS_AS_BYTE).read(sshFileBuffer) : null;
+        configureFillerTagReader(sshFileBuffer, getImageType(), versionType);
+        fillerTag = fillerTagReader.read(sshFileBuffer);
+    }
+
+    private void configureFillerTagReader(ByteBuffer sshFileBuffer, ImageTypeTag.ImageType imageType, FileTypeTag.VersionType versionType){
+        if(!sshFileBuffer.hasRemaining() || getImageType() == ImageTypeTag.ImageType.HIGH_REZ){
+            fillerTagReader.withFillerSize(0); // there is no filler
+        }
+        if(versionType == FileTypeTag.VersionType.TRICKY_PRE_ALPHA){
+            fillerTagReader.withPrefix(FillerTag.EA_SPORTS_AS_BYTE);
+        }
     }
 
 
@@ -128,7 +144,7 @@ public class Ssh2Image implements Image {
 
     @Override
     public String getImageName() {
-        return ssh2ImageAttachments.getFullName()
+        return ssh2ImageAttachments.getFullName().filter(name -> !name.isBlank())
                 .orElse(imageInfo.getName());
     }
 

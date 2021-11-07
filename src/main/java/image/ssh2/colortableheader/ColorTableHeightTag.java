@@ -2,12 +2,8 @@ package image.ssh2.colortableheader;
 
 import image.ImgSubComponent;
 import util.ByteUtil;
-import util.PrintUtil;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 /**
  * This number refers to the height of the table. It seems the height is always 1.
@@ -26,6 +22,6 @@ public class ColorTableHeightTag extends ImgSubComponent {
     }
 
     public int getConvertedValue() {
-        return (int) ByteUtil.convertToLongLE(getBytes());
+        return (int) ByteUtil.convertToLongLE(getRawBytes());
     }
 }

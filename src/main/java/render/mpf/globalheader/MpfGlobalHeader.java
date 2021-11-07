@@ -5,7 +5,6 @@ import image.UnknownComponent;
 import util.ByteUtil;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MpfGlobalHeader {
@@ -37,6 +36,6 @@ public class MpfGlobalHeader {
     }
 
     public byte[] getBytes(){
-        return ByteUtil.combineByteArrays(components.stream().map(ImgSubComponent::getBytes).toArray(byte[][]::new));
+        return ByteUtil.combineByteArrays(components.stream().map(ImgSubComponent::getRawBytes).toArray(byte[][]::new));
     }
 }

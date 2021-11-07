@@ -3,10 +3,7 @@ package image.ssh2.fileheader;
 import image.ImgSubComponent;
 import util.ByteUtil;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -29,10 +26,10 @@ public class ImageHeaderInfoTag extends ImgSubComponent {
     }
 
     public String getName() {
-        return new String(Arrays.copyOf(getBytes(), NAME_SIZE));
+        return new String(Arrays.copyOf(getRawBytes(), NAME_SIZE));
     }
 
     public long getHeaderLocation() {
-        return ByteUtil.convertToLongLE(Arrays.copyOfRange(getBytes(), 4, 8));
+        return ByteUtil.convertToLongLE(Arrays.copyOfRange(getRawBytes(), 4, 8));
     }
 }

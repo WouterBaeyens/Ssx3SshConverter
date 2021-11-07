@@ -3,10 +3,7 @@ package image.ssh2.fileheader;
 import image.ImgSubComponent;
 import util.ByteUtil;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 
 /**
  * This tag describes the size of the full ssh file.
@@ -33,7 +30,7 @@ public class TotalFileSizeTag extends ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongLE(getBytes());
+        return ByteUtil.convertToLongLE(getRawBytes());
     }
 
     public boolean isCompressed() {

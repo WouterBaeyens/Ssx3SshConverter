@@ -8,7 +8,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 /**
- * This tag describes the size of the full ssh file in bytes.
+ * This tag describes the size of the full big file in bytes.
  */
 public class FileSizeTag extends ImgSubComponent {
 
@@ -37,7 +37,7 @@ public class FileSizeTag extends ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongLE(getBytes());
+        return ByteUtil.convertToLongLE(getRawBytes());
     }
 
     public boolean isCompressed() {

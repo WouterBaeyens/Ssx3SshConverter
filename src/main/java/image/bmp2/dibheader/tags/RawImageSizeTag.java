@@ -25,7 +25,7 @@ public class RawImageSizeTag extends ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongLE(getBytes());
+        return ByteUtil.convertToLongLE(getRawBytes());
     }
 
 }

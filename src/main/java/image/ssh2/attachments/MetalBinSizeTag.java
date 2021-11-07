@@ -3,7 +3,6 @@ package image.ssh2.attachments;
 import image.ImgSubComponent;
 import util.ByteUtil;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -23,7 +22,7 @@ public class MetalBinSizeTag extends ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongLE(getBytes());
+        return ByteUtil.convertToLongLE(getRawBytes());
     }
 
 }

@@ -3,8 +3,6 @@ package image.ssh2.compression;
 import image.ImgSubComponent;
 import util.ByteUtil;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 public class DecompressedFileSizeTag extends ImgSubComponent {
@@ -21,7 +19,7 @@ public class DecompressedFileSizeTag extends ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongBE(getBytes());
+        return ByteUtil.convertToLongBE(getRawBytes());
     }
 
 }

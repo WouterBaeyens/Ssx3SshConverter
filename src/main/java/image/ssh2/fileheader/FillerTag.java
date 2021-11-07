@@ -29,6 +29,7 @@ public class FillerTag extends ImgSubComponent {
     public static final long DESIRED_IMG_HEADER_START_ADDRESS = 112;
 
     public static final byte[] BUY_ERTS_AS_BYTE = {0x42, 0x75, 0x79, 0x20, 0x45, 0x52, 0x54, 0x53};
+    public static final byte[] EA_SPORTS_AS_BYTE = {0x45, 0x41, 0x53, 0x70, 0x6F, 0x72, 0x74, 0x73};
 
     /**
      * If the {@link DEFAULT_START_ADDRESS_INCREMENT} is already surpassed, the next desired start address is
@@ -48,7 +49,7 @@ public class FillerTag extends ImgSubComponent {
     @Override
     public String getHexData() {
         if (!startsWithPrefix() || hasNonZeroBytesAfterPrefix() || getSize() < 16) {
-            return PrintUtil.toHexString(false, getBytes());
+            return PrintUtil.toHexString(false, getRawBytes());
         } else {
             return "\"Buy ERTS\"  00 00 00 ........ 00";
         }
@@ -77,7 +78,7 @@ public class FillerTag extends ImgSubComponent {
     }
 
     private boolean startsWithPrefix() {
-        byte[] hexData = getBytes();
+        byte[] hexData = getRawBytes();
         return startsWithPrefix(hexData, prefix);
     }
 
@@ -92,7 +93,7 @@ public class FillerTag extends ImgSubComponent {
     }
 
     private boolean hasNonZeroBytesAfterPrefix() {
-        return IntStream.range(prefix.length, getBytes().length).map(length -> getBytes()[length])
+        return IntStream.range(prefix.length, getRawBytes().length).map(length -> getRawBytes()[length])
                 .anyMatch(value -> value != 0);
     }
 

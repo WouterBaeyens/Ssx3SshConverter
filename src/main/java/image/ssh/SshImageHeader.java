@@ -6,6 +6,7 @@
 package image.ssh;
 
 import image.ImgComponent;
+import image.ssh2.fileheader.ComponentType;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import util.ByteUtil;
@@ -16,6 +17,7 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  *

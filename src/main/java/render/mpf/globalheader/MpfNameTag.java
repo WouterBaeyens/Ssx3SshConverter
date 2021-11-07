@@ -18,7 +18,7 @@ public class MpfNameTag extends ImgSubComponent {
     }
 
     public String getConvertedValue() {
-        return new String(Arrays.copyOf(getBytes(), getSize())).replaceAll("\u0000", "");
+        return new String(Arrays.copyOf(getRawBytes(), getSize())).replaceAll("\u0000", "");
     }
 
 }

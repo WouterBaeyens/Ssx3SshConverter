@@ -37,7 +37,7 @@ public class BigFileSizeTag extends ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongLE(getBytes());
+        return ByteUtil.convertToLongLE(getRawBytes());
     }
 
     public boolean isCompressed() {

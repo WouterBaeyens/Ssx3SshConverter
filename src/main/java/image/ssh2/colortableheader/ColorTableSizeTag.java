@@ -3,8 +3,6 @@ package image.ssh2.colortableheader;
 import image.ImgSubComponent;
 import util.ByteUtil;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 /**
@@ -25,7 +23,7 @@ public class ColorTableSizeTag extends ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongLE(getBytes());
+        return ByteUtil.convertToLongLE(getRawBytes());
     }
 
 }

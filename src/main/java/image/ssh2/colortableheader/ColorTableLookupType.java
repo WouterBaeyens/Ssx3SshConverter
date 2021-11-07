@@ -4,11 +4,14 @@ import image.ImgSubComponent;
 import image.ssh2.colortableheader.lookuptrategies.IndexLookupStrategy;
 import image.ssh2.colortableheader.lookuptrategies.IndexWithMiddleBitsSwitchedLookupStrategy;
 import image.ssh2.colortableheader.lookuptrategies.LookupStrategy;
+import image.ssh2.fileheader.ComponentType;
+import image.ssh2.fileheader.TypeComponent;
 import util.ByteUtil;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * The purpose and info within this tag are completely unknown.
@@ -16,9 +19,14 @@ import java.util.Optional;
  * <p>
  * Note: even the name TableType2Tag is just a wild guess
  */
-public class ColorTableLookupType extends ImgSubComponent {
+public class ColorTableLookupType extends ImgSubComponent implements TypeComponent<ColorTableLookupType.LookupType> {
 
     private static final long DEFAULT_SIZE = 6;
+
+    @Override
+    public Class<LookupType> getTypeClass() {
+        return LookupType.class;
+    }
 
     public ColorTableLookupType(final ByteBuffer buffer) {
         super(buffer, DEFAULT_SIZE);
@@ -26,15 +34,14 @@ public class ColorTableLookupType extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        return "?TableType2?: " + LookupType.getInfo(getBytes());
+        return "?TableType2?: " + getTypeInfo();
     }
 
     public LookupType getLookupType(){
-        return LookupType.getLookupType(getBytes())
-                .orElse(LookupType.DEFAULT);
+        return getType().orElse(LookupType.DEFAULT);
     }
 
-    public enum LookupType {
+    public enum LookupType implements ComponentType {
         /**
          * Chooses the color
          */
@@ -72,17 +79,14 @@ public class ColorTableLookupType extends ImgSubComponent {
             return hasPadding;
         }
 
-        public static Optional<LookupType> getLookupType(final byte[] data) {
-            String dataAsString = ByteUtil.bytesToHex(data);
-            return Arrays.stream(values())
-                    .filter(fileType -> fileType.value.equals(dataAsString))
-                    .findAny();
+        @Override
+        public String getReadableValue() {
+            return value;
         }
 
-        public static String getInfo(final byte[] data) {
-            String dataAsString = ByteUtil.bytesToHex(data);
-            return getLookupType(data).map(matchingType -> matchingType + "(" + matchingType.value + ")")
-                    .orElseGet(() -> "Unknown type (" + dataAsString + ")");
+        @Override
+        public Function<byte[], String> toReadable() {
+            return ByteUtil::bytesToHex;
         }
     }
 }

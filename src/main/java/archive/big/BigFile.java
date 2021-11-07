@@ -1,5 +1,9 @@
 package archive.big;
 
+import archive.big.header.BigFileHeader;
+import archive.big.header.BigFileHeaderFactory;
+import archive.big.header.BigFileTypeTag;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +17,12 @@ public class BigFile {
     final List<BigSubFileInfo> strangeFileInfoList = new ArrayList<>();
 
     public BigFile(final ByteBuffer byteBuffer){
-        this.bigFileHeader = new BigFileHeader(byteBuffer);
+        this.bigFileHeader = BigFileHeaderFactory.readBigFileHeader(byteBuffer);
 
         final int numberOfEntries = bigFileHeader.getNumberOfEntries();
+        BigFileTypeTag.BigArchiveType archiveType = bigFileHeader.getArchiveType();
         for(int entryNr = 0; entryNr < numberOfEntries; entryNr++){
-            BigSubFileInfo fileInfo = new BigSubFileInfo(byteBuffer);
+            BigSubFileInfo fileInfo = new BigSubFileInfo(byteBuffer, archiveType);
             if(fileInfo.getSize() == 0){
                 strangeFileInfoList.add(fileInfo);
             } else {

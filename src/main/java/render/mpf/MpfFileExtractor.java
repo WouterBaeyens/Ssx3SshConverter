@@ -2,7 +2,6 @@ package render.mpf;
 
 import image.UnknownComponent;
 import image.ssh2.compression.CompressedFile;
-import render.mpf.globalheader.MpfFileLocationTag;
 import render.mpf.globalheader.MpfGlobalHeader;
 import util.FileUtil;
 
@@ -93,7 +92,7 @@ public class MpfFileExtractor {
         int totalSize = getCompressedMeshLocation() + decompressedMesh.remaining();
         return ByteBuffer.allocate(totalSize)
                 .put(mpfGlobalHeader.getBytes())
-                .put(after.getBytes())
+                .put(after.getRawBytes())
                 .put(decompressedMesh);
     }
 

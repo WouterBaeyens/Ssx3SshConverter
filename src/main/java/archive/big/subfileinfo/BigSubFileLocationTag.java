@@ -19,7 +19,7 @@ public class BigSubFileLocationTag extends ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongBE(getBytes());
+        return ByteUtil.convertToLongBE(getRawBytes());
     }
 
 }

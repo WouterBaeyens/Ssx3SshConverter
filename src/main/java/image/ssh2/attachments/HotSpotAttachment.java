@@ -1,5 +1,7 @@
 package image.ssh2.attachments;
 
+import image.AmountTag;
+import image.ByteOrder;
 import image.ImgSubComponent;
 import image.UnknownComponent;
 import util.PrintUtil;
@@ -10,13 +12,19 @@ import java.util.List;
 public class HotSpotAttachment implements Attachment{
 
     private final AttachmentTypeTag attachmentTypeTag;
-    private final UnknownComponent u01_u30;
+    private final AmountTag attachmentSize;
+    private final UnknownComponent remaining;
     private final List<ImgSubComponent> componentsOrdered;
 
     public HotSpotAttachment(final ByteBuffer sshFileBuffer){
         this.attachmentTypeTag = new AttachmentTypeTag(sshFileBuffer);
-        this.u01_u30 = new UnknownComponent(sshFileBuffer, 48 - 1);
-        componentsOrdered = List.of(attachmentTypeTag, u01_u30);
+        this.attachmentSize = new AmountTag.Reader()
+                .withSize(3)
+                .withByteOrder(ByteOrder.LITTLE_ENDIAN)
+                .read(sshFileBuffer);
+        int remainingSize = (int) (attachmentSize.getConvertedValue() - (attachmentTypeTag.getSize() + attachmentSize.getSize()));
+        this.remaining = new UnknownComponent(sshFileBuffer, remainingSize);
+        componentsOrdered = List.of(attachmentTypeTag, remaining);
     }
 
     @Override
@@ -28,6 +36,6 @@ public class HotSpotAttachment implements Attachment{
 
     @Override
     public long getEndPosition() {
-        return u01_u30.getEndPos();
+        return remaining.getEndPos();
     }
 }

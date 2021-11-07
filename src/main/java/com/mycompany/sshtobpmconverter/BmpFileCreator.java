@@ -49,10 +49,11 @@ public class BmpFileCreator {
                 bmpWrapper.printFormatted();
                 final Path destionationPath;
                 if(ssh2File.getImages().size() > 1){
-                    destionationPath = FileUtil.createDir(destinationRootFolder.resolve(sshFileNameWithoutExtension))
-                            .resolve(sshFileNameWithoutExtension + "." + image.getImageName() + FileExtension.BMP_EXTENSION.value);
+                    Path createdPath = FileUtil.prepareDirsAndReturnPath(sshFileNameWithoutExtension, destinationRootFolder);
+                    FileUtil.createDir(createdPath);
+                    destionationPath = createdPath.resolve(createdPath.toFile().getName() + "." + image.getImageName() + FileExtension.BMP_EXTENSION.value);
                 } else {
-                    destionationPath = destinationRootFolder.resolve(sshFileNameWithoutExtension + "." + image.getImageName() + FileExtension.BMP_EXTENSION.value);
+                    destionationPath = FileUtil.prepareDirsAndReturnPath(sshFileNameWithoutExtension + "." + image.getImageName() + FileExtension.BMP_EXTENSION.value, destinationRootFolder);
                 }
                 writeToFile(bmpWrapper, destionationPath);
         }

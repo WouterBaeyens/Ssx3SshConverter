@@ -33,7 +33,7 @@ public class Ssh2ImageHeader {
     private final List<ImgSubComponent> componentsOrdered;
 
     public Ssh2ImageHeader(final ByteBuffer sshFileBuffer) {
-        this.imageTypeTag = new ImageTypeTag(sshFileBuffer);
+            this.imageTypeTag = new ImageTypeTag(sshFileBuffer);
         this.imageComponentSizeTag = new ImageComponentSizeTag(sshFileBuffer);
         this.imageWidthTag = new ImageWidthTag(sshFileBuffer);
         this.imageHeightTag = new ImageHeightTag(sshFileBuffer);

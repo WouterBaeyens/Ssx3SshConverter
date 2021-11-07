@@ -1,32 +1,37 @@
 package bam.ssb;
 
 import image.ImgSubComponent;
-import util.ByteUtil;
+import image.ssh2.fileheader.ComponentType;
+import image.ssh2.fileheader.TypeComponent;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.function.Function;
 
-public class SsbComponentTypeTag extends ImgSubComponent {
+public class SsbComponentTypeTag extends ImgSubComponent implements TypeComponent<SsbComponentTypeTag.SsbComponentType> {
 
     private static final long DEFAULT_SIZE = 4;
+
+    @Override
+    public Class<SsbComponentType> getTypeClass() {
+        return SsbComponentType.class;
+    }
 
     public SsbComponentTypeTag(final ByteBuffer buffer) {
         super(buffer, DEFAULT_SIZE);
     }
 
     public SsbComponentType getComponentType(){
-        return SsbComponentType.getSsbComponentType(getBytes())
+        return getType()
                 .orElseThrow(() -> new NoSuchElementException(getInfo()));
     }
 
     @Override
     public String getInfo() {
-        return "ssb component type: " + SsbComponentType.getInfo(getBytes());
+        return "ssb component type: " + getTypeInfo();
     }
 
-    public enum SsbComponentType {
+    public enum SsbComponentType implements ComponentType {
         /**
          * Component of collection file
          */
@@ -43,18 +48,14 @@ public class SsbComponentTypeTag extends ImgSubComponent {
             this.value = value;
         }
 
-        public static String getInfo(byte[] data) {
-            String dataAsString = new String(data);
-            return getSsbComponentType(data)
-                    .map(matchingType -> matchingType + "(" + matchingType.value + ")")
-                    .orElseGet(() -> "Unknown (" + dataAsString + ")");
+        @Override
+        public String getReadableValue() {
+            return value;
         }
 
-        public static Optional<SsbComponentType> getSsbComponentType(byte[] data) {
-            String dataAsString = new String(data);
-            return Arrays.stream(values())
-                    .filter(fileType -> fileType.value.equals(dataAsString))
-                    .findAny();
+        @Override
+        public Function<byte[], String> toReadable() {
+            return String::new;
         }
     }
 

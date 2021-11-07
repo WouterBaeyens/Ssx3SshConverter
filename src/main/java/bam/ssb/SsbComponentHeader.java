@@ -30,7 +30,7 @@ public class SsbComponentHeader {
     }
 
     public byte[] getBytes(){
-        return ByteUtil.combineByteArrays(ssbComponentTypeTag.getBytes(), fileSizeTag.getBytes());
+        return ByteUtil.combineByteArrays(ssbComponentTypeTag.getRawBytes(), fileSizeTag.getRawBytes());
     }
 
     @Override

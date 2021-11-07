@@ -1,10 +1,13 @@
 package image.bmp2.bmpheader;
 
 import image.ImgSubComponent;
+import image.ssh2.fileheader.ComponentType;
+import image.ssh2.fileheader.TypeComponent;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
+import java.util.function.Function;
 
 /**
  * This tag describes the file type (similar to how the extension .bmp also describes the file type).
@@ -21,9 +24,14 @@ import java.util.Arrays;
  * PT
  * OS/2 pointer
  */
-public class FileTypeTag extends ImgSubComponent {
+public class FileTypeTag extends ImgSubComponent implements TypeComponent<FileTypeTag.FileType> {
 
     private static final long DEFAULT_SIZE = 2;
+
+    @Override
+    public Class<FileType> getTypeClass() {
+        return FileType.class;
+    }
 
     public FileTypeTag(final RandomAccessFile file, final long startPosition) throws IOException {
         super(file, startPosition, DEFAULT_SIZE);
@@ -31,10 +39,10 @@ public class FileTypeTag extends ImgSubComponent {
 
     @Override
     public String getInfo() {
-        return "FileType: " + FileType.getInfo(getBytes());
+        return "FileType: " + getTypeInfo();
     }
 
-    public enum FileType {
+    public enum FileType implements ComponentType {
         BM("BM");
 
         final String value;
@@ -43,12 +51,14 @@ public class FileTypeTag extends ImgSubComponent {
             this.value = value;
         }
 
-        public static String getInfo(byte[] data) {
-            String dataAsString = new String(data);
-            return Arrays.stream(values())
-                    .filter(fileType -> fileType.value.equals(dataAsString))
-                    .findAny().map(matchingType -> matchingType.value)
-                    .orElseGet(() -> "Unknown type (" + dataAsString + ")");
+        @Override
+        public String getReadableValue() {
+            return value;
+        }
+
+        @Override
+        public Function<byte[], String> toReadable() {
+            return String::new;
         }
     }
 }
