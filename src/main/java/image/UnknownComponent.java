@@ -1,6 +1,5 @@
 package image;
 
-import bam.data.image.DataFileExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.ByteUtil;
@@ -23,8 +22,8 @@ public class UnknownComponent extends ImgSubComponent{
     }
 
     private void assertExpectedValue(final String expectedValueAsHex){
-        if(!expectedValueAsHex.equalsIgnoreCase(PrintUtil.toHexString(getBytes()).trim())) {
-            LOGGER.error("Expected content \"{}\", but was \"{}\" at component with pos: {}", expectedValueAsHex, PrintUtil.toHexString(getBytes()), ByteUtil.printLongWithHex(getStartPos()));
+        if(!expectedValueAsHex.equalsIgnoreCase(PrintUtil.toHexString(getRawBytes()).trim())) {
+            LOGGER.error("Expected content \"{}\", but was \"{}\" at component with pos: {}", expectedValueAsHex, PrintUtil.toHexString(getRawBytes()), ByteUtil.printLongWithHex(getStartPos()));
         }
     }
 

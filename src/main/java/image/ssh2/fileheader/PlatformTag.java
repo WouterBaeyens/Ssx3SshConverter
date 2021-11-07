@@ -31,6 +31,7 @@ public class PlatformTag extends ImgSubComponent implements TypeComponent<Platfo
         PC_FILE("SHPI"),
         PS1_FILE("SHPP"),
         PS2_FILE("SHPS"),
+        TRICKY_PS2_FILE("ShpS"),
         XBOX_FILE("SHPX"),
         Xbox_FILE("ShpX"),
         PSP_FILE("SHPM");

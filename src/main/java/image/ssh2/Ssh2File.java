@@ -1,5 +1,6 @@
 package image.ssh2;
 
+import image.bmp2.bmpheader.FileTypeTag;
 import image.ssh2.compression.CompressedFile;
 import image.ssh2.fileheader.ImageHeaderInfoTag;
 import util.ByteUtil;
@@ -30,7 +31,7 @@ public class Ssh2File {
         this.sshFileBuffer = decompressFile(sshFileBuffer);
         // todo - consider static read methods instead to improve readability
         this.ssh2FileHeader = deserializeFileHeader(0);
-        this.images = deserializeImages(ssh2FileHeader.getImageInfoList());
+        this.images = deserializeImages(ssh2FileHeader.getImageInfoList(), ssh2FileHeader.getFileType());
         printFormatted();
         assertFileFullyConsumed(sshFileBuffer);
     }
@@ -46,11 +47,11 @@ public class Ssh2File {
         return new Ssh2FileHeader(sshFileBuffer);
     }
 
-    private List<Ssh2Image> deserializeImages(List<ImageHeaderInfoTag> imageInfoList) throws IOException {
+    private List<Ssh2Image> deserializeImages(List<ImageHeaderInfoTag> imageInfoList, image.ssh2.fileheader.FileTypeTag.VersionType versionType) throws IOException {
         List<Ssh2Image> images = new ArrayList<>();
         Ssh2Image previousImage = null;
         for (ImageHeaderInfoTag imageInfo : imageInfoList) {
-            final Ssh2Image currentImage = deserializeImage(imageInfo);
+            final Ssh2Image currentImage = deserializeImage(imageInfo, versionType);
             images.add(currentImage);
             if (previousImage != null) {
                 System.out.println("From " + ByteUtil.printLongWithHex(previousImage.getEndPosition()) + "\tto " + ByteUtil.printLongWithHex(imageInfo.getHeaderLocation()));
@@ -62,8 +63,8 @@ public class Ssh2File {
         return images;
     }
 
-    private Ssh2Image deserializeImage(final ImageHeaderInfoTag imageInfo) throws IOException {
-        return new Ssh2Image(sshFileBuffer, imageInfo);
+    private Ssh2Image deserializeImage(final ImageHeaderInfoTag imageInfo, image.ssh2.fileheader.FileTypeTag.VersionType versionType) throws IOException {
+        return new Ssh2Image(sshFileBuffer, imageInfo, versionType);
     }
 
     public void printFormatted() {

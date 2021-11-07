@@ -32,7 +32,7 @@ public class BamPadding {
         }
 
         public int getConvertedValue(){
-            return Math.toIntExact(ByteUtil.convertToLongLE(getBytes()));
+            return Math.toIntExact(ByteUtil.convertToLongLE(getRawBytes()));
         }
     }
 }

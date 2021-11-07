@@ -33,6 +33,7 @@ public class FileTypeTag extends ImgSubComponent implements TypeComponent<FileTy
     }
 
     public enum VersionType implements ComponentType{
+        TRICKY_PRE_ALPHA("G247"), // attachments. see specmap.ssh
         SSX3_PRE_ALPHA1("G264"), // table size is not defined in header, no attachments
         SSX3_PRE_ALPHA2("G268"), // table size is not defined in header, no attachments
         SSX_TRICKY("G278"), // SSX_TRICKY, no attachments

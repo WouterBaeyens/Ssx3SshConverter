@@ -3,8 +3,6 @@ package image.ssh2.imageheader;
 import image.ImgSubComponent;
 import util.ByteUtil;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 /**
@@ -24,7 +22,7 @@ public class ImageHeightTag extends ImgSubComponent {
     }
 
     public int getConvertedValue() {
-        return (int) ByteUtil.convertToLongLE(getBytes());
+        return (int) ByteUtil.convertToLongLE(getRawBytes());
     }
 
 }

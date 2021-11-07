@@ -1,6 +1,9 @@
 package image.ssh2;
 
 import image.ssh2.attachments.*;
+import image.ssh2.fileheader.FillerTag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -10,6 +13,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class Ssh2ImageAttachments {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(FillerTag.class);
 
     // all these attachments are optional
     private final int startPosition;
@@ -24,8 +29,8 @@ public class Ssh2ImageAttachments {
         readAttachments(sshFileBuffer);
     }
 
-    public long getEndPosition(){
-        if(attachments.isEmpty()){
+    public long getEndPosition() {
+        if (attachments.isEmpty()) {
             return startPosition;
         } else {
             return attachments.get(attachments.size() - 1).getEndPosition();
@@ -34,23 +39,24 @@ public class Ssh2ImageAttachments {
 
     private void readAttachments(final ByteBuffer sshFileBuffer) {
         while (sshFileBuffer.hasRemaining()) {
-            try {
-                AttachmentTypeTag.AttachmentType attachmentType = peekNextAttachmentType(sshFileBuffer);
-                readAttachment(sshFileBuffer, attachmentType);
-            } catch (NoSuchElementException e) {
-                // todo - find decent logic when to stop instead of catching and breaking.
-                //          Possible solutions:
-                //           - Calculate the end-position
-                //           - Use the start position of the next image header
-                //           - Use the content size tag of the attachments somehow
-                //           - If tag 70 is always present and always the last one, this can be used
-                System.out.println("ERROR at " + sshFileBuffer.position() + ": " + e.getMessage());
+            AttachmentTypeTag attachmentTypeTag = new AttachmentTypeTag(sshFileBuffer.duplicate());
+            Optional<AttachmentTypeTag.AttachmentType> attachmentType = attachmentTypeTag.getType();
+
+            if (attachmentType.isEmpty()) {
+                LOGGER.warn("Unknown componentTag at " + sshFileBuffer.position() + ": " + attachmentTypeTag.getInfo());
                 break;
             }
+            readAttachment(sshFileBuffer, attachmentType.get());
+            // todo - find decent logic when to stop instead of catching and breaking.
+            //          Possible solutions:
+            //           - Calculate the end-position
+            //           - Use the start position of the next image header
+            //           - Use the content size tag of the attachments somehow
+            //           - If tag 70 is always present and always the last one, this can be used
         }
     }
 
-    public Optional<String> getFullName(){
+    public Optional<String> getFullName() {
         return Optional.ofNullable(imageNameAttachment).map(ImageNameAttachment::getFullName);
     }
 
@@ -73,9 +79,8 @@ public class Ssh2ImageAttachments {
         }
     }
 
-    private AttachmentTypeTag.AttachmentType peekNextAttachmentType(final ByteBuffer sshFileBuffer) {
-        final byte attachmentTypeTag = sshFileBuffer.get(sshFileBuffer.position());
-        return AttachmentTypeTag.AttachmentType.getAttachmentType(attachmentTypeTag);
+    private Optional<AttachmentTypeTag.AttachmentType> peekNextAttachmentType(final ByteBuffer sshFileBuffer) {
+        return new AttachmentTypeTag(sshFileBuffer.duplicate()).getType();
     }
 
     public void printFormatted() {

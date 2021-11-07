@@ -50,10 +50,11 @@ public class BigFileExtractor {
         final ByteBuffer decompressedFileBuffer = new CompressedFile(fileBuffer).decompress();
         if(FileExtension.SSH_EXTENSION.getExtension().equals(fileInfo.getExtension())) {
             BmpFileCreator.create(decompressedFileBuffer, fileInfo.getName(), destinationFolder);
-        } else if(FileExtension.BIG_EXTENSION.getExtension().equals(fileInfo.getExtension())){
+        } else
+         if(FileExtension.BIG_EXTENSION.getExtension().equals(fileInfo.getExtension())){
             extractBigFile(decompressedFileBuffer, destinationFolder.resolve(fileInfo.getName()));
-        } else if(FileExtension.MPF_EXTENSION.getExtension().equals(fileInfo.getExtension())){
-            writeToFile(new MpfFileExtractor(decompressedFileBuffer).getMergedBuffer(), fileInfo.getFullName(), destinationFolder);
+//        } else if(FileExtension.MPF_EXTENSION.getExtension().equals(fileInfo.getExtension())){
+//            writeToFile(new MpfFileExtractor(decompressedFileBuffer).getMergedBuffer(), fileInfo.getFullName(), destinationFolder);
         } else if(FileExtension.SSB_EXTENSION.getExtension().equals(fileInfo.getExtension())){
             SsbFileCreator.create(fileBuffer, fileInfo.getName(), destinationFolder);
         } else {

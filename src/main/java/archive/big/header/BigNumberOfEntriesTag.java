@@ -34,7 +34,7 @@ public class BigNumberOfEntriesTag extends ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongBE(getBytes());
+        return ByteUtil.convertToLongBE(getRawBytes());
     }
 
 }

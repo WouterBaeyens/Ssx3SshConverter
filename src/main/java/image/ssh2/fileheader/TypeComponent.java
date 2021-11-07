@@ -11,10 +11,10 @@ public interface TypeComponent<T extends Enum<T> & ComponentType> {
      * Obviously the return value will be T.class
      */
     Class<T> getTypeClass();
-    byte[] getBytes();
+    byte[] getBytesBE();
 
     default Optional<T> getType(){
-        String readableData = getTypeClass().getEnumConstants()[0].toReadable().apply(getBytes());
+        String readableData = getTypeClass().getEnumConstants()[0].toReadable().apply(getBytesBE());
         Optional<T> matchingType = Arrays.stream(getTypeClass().getEnumConstants())
                 .filter(fileType -> fileType.getReadableValue().equals(readableData))
                 .findAny();
@@ -25,7 +25,7 @@ public interface TypeComponent<T extends Enum<T> & ComponentType> {
     }
 
     default String getTypeInfo() {
-        String readableData = getTypeClass().getEnumConstants()[0].toReadable().apply(getBytes());
+        String readableData = getTypeClass().getEnumConstants()[0].toReadable().apply(getBytesBE());
         return getType()
                 .map(fileType -> fileType + "(" + fileType.getReadableValue() + ")")
                 .orElseGet(() -> "Unknown type (" + readableData + ")");

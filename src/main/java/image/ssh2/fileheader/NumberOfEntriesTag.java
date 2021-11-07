@@ -1,27 +1,24 @@
 package image.ssh2.fileheader;
 
-import image.ImgSubComponent;
-import util.ByteUtil;
+import image.AbstractAmountTag;
+import image.ByteOrder;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 
 /**
  * This tag describes the number of images contained within the ssh file
  */
-public class NumberOfEntriesTag extends ImgSubComponent {
+public class NumberOfEntriesTag extends AbstractAmountTag {
 
-    private static final long DEFAULT_SIZE = 4;
+    private static final int DEFAULT_SIZE = 4;
 
     /**
      * If this number is exceeded, I assume something went wrong.
      */
     private static final int REASONABLE_MAX_NUMBER_OF_IMAGES_IN_FILE = 1000;
 
-    public NumberOfEntriesTag(final ByteBuffer buffer) {
-        super(buffer, DEFAULT_SIZE);
+    public NumberOfEntriesTag(final ByteBuffer buffer, final ByteOrder byteOrder) {
+        super(buffer, DEFAULT_SIZE, "#images", byteOrder);
         checkAssertions();
     }
 
@@ -31,13 +28,10 @@ public class NumberOfEntriesTag extends ImgSubComponent {
         }
     }
 
-    @Override
-    public String getInfo() {
-        return "#images: " + getConvertedValue();
-    }
+    public static class Reader extends AbstractAmountTag.Reader<Reader> {
 
-    public long getConvertedValue() {
-        return ByteUtil.convertToLongLE(getBytes());
+        public NumberOfEntriesTag read(ByteBuffer buffer){
+            return new NumberOfEntriesTag(buffer, getOrder());
+        }
     }
-
 }

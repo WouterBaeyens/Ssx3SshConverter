@@ -2,7 +2,6 @@ package bam.ssb;
 
 import image.ImgSubComponent;
 import util.ByteUtil;
-import util.PrintUtil;
 
 import java.nio.ByteBuffer;
 
@@ -20,6 +19,6 @@ public class SsbComponentSizeTag extends ImgSubComponent {
     }
 
     public int getConvertedValue(){
-        return Math.toIntExact(ByteUtil.convertToLongBE(getBytes()));
+        return Math.toIntExact(ByteUtil.convertToLongBE(getRawBytes()));
     }
 }

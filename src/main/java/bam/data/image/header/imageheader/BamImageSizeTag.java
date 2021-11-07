@@ -23,7 +23,7 @@ public class BamImageSizeTag extends ImgSubComponent {
     }
 
     public int getConvertedValue(){
-        return Math.toIntExact(ByteUtil.convertToLongLE(getBytes()) * IMAGE_SIZE_MULTIPLE);
+        return Math.toIntExact(ByteUtil.convertToLongLE(getRawBytes()) * IMAGE_SIZE_MULTIPLE);
     }
 
 }

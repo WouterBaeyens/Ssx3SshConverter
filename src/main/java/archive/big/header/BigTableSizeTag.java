@@ -8,7 +8,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 /**
- * This tag describes the size of the full ssh file in bytes.
+ * This tag describes end address of the subFileInfo data.
  */
 public class BigTableSizeTag extends ImgSubComponent {
 
@@ -17,6 +17,11 @@ public class BigTableSizeTag extends ImgSubComponent {
 
     public BigTableSizeTag(final ByteBuffer byteBuffer) {
         super(byteBuffer, DEFAULT_SIZE);
+        actualFileSize = byteBuffer.limit();
+    }
+
+    public BigTableSizeTag(final ByteBuffer byteBuffer, int size) {
+        super(byteBuffer, size);
         actualFileSize = byteBuffer.limit();
     }
 
@@ -31,7 +36,7 @@ public class BigTableSizeTag extends ImgSubComponent {
     }
 
     public long getConvertedValue() {
-        return ByteUtil.convertToLongBE(getBytes());
+        return ByteUtil.convertToLongBE(getRawBytes());
     }
 
     public boolean isCompressed() {

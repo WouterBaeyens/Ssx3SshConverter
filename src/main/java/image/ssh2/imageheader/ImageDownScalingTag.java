@@ -25,7 +25,7 @@ public class ImageDownScalingTag extends ImgSubComponent {
 
     public void assertRightNibbleEmpty(){
         if(getRawValue() % 0x01000 != 0 || getConvertedValue() > 3){
-            throw new IllegalStateException("Expected downscaling value [0-3], but was " + ByteUtil.bytesToHex(getBytes()));
+            throw new IllegalStateException("Expected downscaling value [0-3], but was " + ByteUtil.bytesToHex(getRawBytes()));
         }
     }
 
@@ -35,10 +35,10 @@ public class ImageDownScalingTag extends ImgSubComponent {
     }
 
     public int getConvertedValue(){
-        return Math.toIntExact(ByteUtil.convertToLongLE(getBytes()) / 0x01000);
+        return Math.toIntExact(ByteUtil.convertToLongLE(getRawBytes()) / 0x01000);
     }
 
     private int getRawValue(){
-        return Math.toIntExact(ByteUtil.convertToLongLE(getBytes()));
+        return Math.toIntExact(ByteUtil.convertToLongLE(getRawBytes()));
     };
 }

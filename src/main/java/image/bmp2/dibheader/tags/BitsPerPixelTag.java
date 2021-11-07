@@ -23,7 +23,7 @@ public class BitsPerPixelTag extends ImgSubComponent {
     }
 
     public int getConvertedValue() {
-        return (int) ByteUtil.convertToLongLE(getBytes());
+        return (int) ByteUtil.convertToLongLE(getRawBytes());
     }
 
 }

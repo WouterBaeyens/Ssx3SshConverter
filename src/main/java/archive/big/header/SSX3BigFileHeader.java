@@ -1,20 +1,17 @@
-package archive.big;
+package archive.big.header;
 
-import archive.big.header.BigFileTypeTag;
-import archive.big.header.BigNumberOfEntriesTag;
-import archive.big.header.BigTableSizeTag;
 import image.bmp2.bmpheader.FileSizeTag;
 
 import java.nio.ByteBuffer;
 
-public class BigFileHeader {
+public class SSX3BigFileHeader implements BigFileHeader{
 
     private final BigFileTypeTag bigFileTypeTag;
     private final FileSizeTag fileSizeTag;
     private final BigNumberOfEntriesTag bigNumberOfEntriesTag;
     private final BigTableSizeTag bigTableSizeTag;
 
-    public BigFileHeader(ByteBuffer buffer){
+    public SSX3BigFileHeader(final ByteBuffer buffer) {
         this.bigFileTypeTag = new BigFileTypeTag(buffer);
         this.fileSizeTag = new FileSizeTag(buffer);
         this.bigNumberOfEntriesTag = new BigNumberOfEntriesTag(buffer);
@@ -23,5 +20,9 @@ public class BigFileHeader {
 
     public int getNumberOfEntries(){
         return Math.toIntExact(bigNumberOfEntriesTag.getConvertedValue());
+    }
+
+    public BigFileTypeTag.BigArchiveType getArchiveType(){
+        return bigFileTypeTag.getType().orElse(BigFileTypeTag.BigArchiveType.SSX3_BIG);
     }
 }

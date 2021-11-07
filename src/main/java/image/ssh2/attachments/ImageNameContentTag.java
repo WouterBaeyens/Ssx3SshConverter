@@ -3,7 +3,6 @@ package image.ssh2.attachments;
 import image.ImgSubComponent;
 import util.FileUtil;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -39,7 +38,7 @@ public class ImageNameContentTag extends ImgSubComponent {
     }
 
     public String getConvertedValue() {
-        return new String(Arrays.copyOf(getBytes(), getSize())).replaceAll("\u0000", "");
+        return new String(Arrays.copyOf(getRawBytes(), getSize())).replaceAll("\u0000", "");
     }
 
 }
